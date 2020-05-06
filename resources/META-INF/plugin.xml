@@ -1,0 +1,63 @@
+<idea-plugin url="https://github.com/lensvol/intellij-blackconnect">
+  <id>me.lensvol.blackconnect</id>
+  <name>BlackConnect</name>
+  <version>0.1.0</version>
+  <vendor email="lensvol@gmail.com" url="https://github.com/lensvol/">Kirill Borisov</vendor>
+
+  <description>
+    <![CDATA[
+    <p>Connect to blackd and format your Python code without creating a new black process!</p>
+    <p />
+    <p>This plugin allows you to avoid overhard of starting a new <b>black</b> process on each
+    file save by utilizing <a href="https://black.readthedocs.io/en/stable/blackd.html">blackd</a>.</p>
+    <p />
+    <p><b>Steps to use:</b></p>
+    <ol>
+      <li><b>pip install black[d]</b></li>
+      <li>Start <b>blackd</b> daemon.</li>
+      <li>Set the hostname and port in IDE settings if they differ from default.</li>
+      <li>Use <i>"Format Using blackd"</i> from under <i>Tools</i> menu.</li>
+    </ol>
+
+    <p><b>Features supported:</b></p>
+    <ul>
+      <li>Automatic Python type stub (.pyi) detection.</li>
+    </ul>
+    ]]>
+  </description>
+
+  <change-notes>
+    <![CDATA[
+      <p>0.1.0:</p>
+      <ul>
+        <li>Initial release. Basic functionality implemented.</li>
+      </ul>
+    ]]>
+  </change-notes>
+
+  <idea-version since-build="193.3793.14" />
+
+  <depends>com.intellij.modules.platform</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <projectConfigurable groupId="tools"
+                         id="me.lensvol.blackconnect.settings"
+                         provider="me.lensvol.blackconnect.BlackConnectConfigurableProvider"/>
+    <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectSettingsConfiguration"/>
+  </extensions>
+
+  <depends>com.intellij.modules.lang</depends>
+
+  <actions>
+    <action id="me.lensvol.blackconnect.FormatUsingBlackdAction"
+            class="me.lensvol.blackconnect.FormatUsingBlackdAction"
+            text="Format Code Using Blackd"
+            description="Send a request to blackd."
+            icon="/icons/blackconnect.svg">
+      <keyboard-shortcut first-keystroke="alt shift b" keymap="$default" />
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+      <override-text place="MainMenu" text="Format Using blackd"/>
+    </action>
+  </actions>
+
+</idea-plugin>
