@@ -12,7 +12,7 @@ class BlackConnectConfigurable(project: Project) : Configurable {
     private val configuration: BlackConnectSettingsConfiguration = BlackConnectSettingsConfiguration.getInstance(project)
 
     override fun isModified(): Boolean {
-        return true
+        return panel.isModified(configuration)
     }
 
     override fun getDisplayName(): String {
@@ -21,6 +21,10 @@ class BlackConnectConfigurable(project: Project) : Configurable {
 
     override fun apply() {
         panel.apply(configuration)
+    }
+
+    override fun reset() {
+        panel.load(configuration)
     }
 
     override fun createComponent(): JComponent? {

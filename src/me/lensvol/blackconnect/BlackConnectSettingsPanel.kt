@@ -29,12 +29,16 @@ class BlackConnectSettingsPanel : JPanel() {
     }
 
     fun apply(configuration: BlackConnectSettingsConfiguration) {
-        configuration.hostname = hostnameText.text
+        configuration.hostname = hostnameText.text.ifBlank { "localhost" }
         configuration.port = portSpinner.value as Int
     }
 
     fun load(configuration: BlackConnectSettingsConfiguration) {
         hostnameText.text = configuration.hostname
         portSpinner.value = configuration.port
+    }
+
+    fun isModified(configuration: BlackConnectSettingsConfiguration): Boolean {
+        return hostnameText.text != configuration.hostname || portSpinner.value != configuration.port
     }
 }
