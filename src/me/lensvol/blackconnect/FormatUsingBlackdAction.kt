@@ -1,6 +1,5 @@
 package me.lensvol.blackconnect
 
-import com.intellij.notification.Notification
 import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationType
@@ -52,9 +51,13 @@ class FormatUsingBlackdAction : AnAction() {
         }
     }
 
-    override fun actionPerformed(event: AnActionEvent) {
-        val notificationGroup = NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, true)
+    private fun showError(project: Project, text: String) {
+        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, true)
+                .createNotification(text, NotificationType.ERROR)
+                .notify(project)
+    }
 
+    override fun actionPerformed(event: AnActionEvent) {
         event.project?.let { project ->
             FileEditorManagerEx.getInstance(project).selectedTextEditor?.let { editor ->
                 val configuration = BlackConnectSettingsConfiguration.getInstance(project)
@@ -62,57 +65,38 @@ class FormatUsingBlackdAction : AnAction() {
                 val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
                 val fileName = vFile?.name ?: "unknown"
 
-                val result = callBlackd(
+                val (responseCode, responseText) = callBlackd(
                         "http://" + configuration.hostname + ":" + configuration.port + "/",
                         editor.document.text,
                         pyi = fileName.endsWith(".pyi")
                 )
-                val notification: Notification
 
-                when (result.first) {
+                when (responseCode) {
                     200 -> {
                         ApplicationManager.getApplication().runWriteAction(Computable {
                             CommandProcessor.getInstance().executeCommand(
                                     project,
-                                    { editor.document.setText(result.second) },
+                                    { editor.document.setText(responseText) },
                                     "Reformat code using blackd",
                                     null,
                                     UndoConfirmationPolicy.DEFAULT,
                                     editor.document
                             )
                         })
-                        notification = notificationGroup.createNotification(
-                                "Code was re-formatted.",
-                                NotificationType.INFORMATION
-                        )
                     }
                     204 -> {
-                        notification = notificationGroup.createNotification(
-                                "No changes were needed.",
-                                NotificationType.INFORMATION
-                        )
+                        // Nothing was modified, nothing to do here, move along.
                     }
                     400 -> {
-                        notification = notificationGroup.createNotification(
-                                "Source code contained syntax errors.",
-                                NotificationType.ERROR
-                        )
+                        showError(project,"Source code contained syntax errors.")
                     }
                     500 -> {
-                        notification = notificationGroup.createNotification(
-                                "Internal error, please see blackd output.",
-                                NotificationType.ERROR
-                        )
+                        showError(project,"Internal error, please see blackd output.")
                     }
                     else -> {
-                        notification = notificationGroup.createNotification(
-                                "Something unexpected happened:\n" + result.second,
-                                NotificationType.ERROR
-                        )
+                        showError(project,"Something unexpected happened:\n$responseText")
                     }
                 }
-
-                notification.notify(project)
             }
         }
     }
