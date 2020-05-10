@@ -12,6 +12,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 * Configurable options:
     * Hostname and port
     * Preferred line length (default: 88)
+    * Skipping sanity checks ("fast mode")
 
 ## Installation
 

@@ -22,6 +22,9 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var lineLength: Int = 80
 
+    @Attribute
+    var fastMode: Boolean = false
+
     override fun getState() = this
 
     override fun loadState(state: BlackConnectSettingsConfiguration) {

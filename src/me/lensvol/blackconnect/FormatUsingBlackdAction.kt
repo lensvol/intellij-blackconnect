@@ -21,7 +21,7 @@ import java.net.URL
 
 class FormatUsingBlackdAction : AnAction() {
 
-    private fun callBlackd(path: String, sourceCode: String, pyi: Boolean = false, lineLength: Int = 88): Pair<Int, String> {
+    private fun callBlackd(path: String, sourceCode: String, pyi: Boolean = false, lineLength: Int = 88, fastMode: Boolean = false): Pair<Int, String> {
         val url = URL(path)
 
         try {
@@ -30,7 +30,7 @@ class FormatUsingBlackdAction : AnAction() {
                 doOutput = true
 
                 setRequestProperty("X-Protocol-Version", "1")
-                setRequestProperty("X-Fast-Or-Safe", "safe")
+                setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe" )
                 setRequestProperty("X-Line-Length", lineLength.toString())
 
                 if (pyi) {
@@ -71,7 +71,8 @@ class FormatUsingBlackdAction : AnAction() {
                         "http://" + configuration.hostname + ":" + configuration.port + "/",
                         editor.document.text,
                         pyi = fileName.endsWith(".pyi"),
-                        lineLength = configuration.lineLength
+                        lineLength = configuration.lineLength,
+                        fastMode = configuration.fastMode
                 )
 
                 when (responseCode) {

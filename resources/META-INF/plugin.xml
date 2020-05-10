@@ -22,7 +22,7 @@
     <p><b>Features supported:</b></p>
     <ul>
       <li>Automatic Python type stub (.pyi) detection.</li>
-      <li>Configurable options: hostname, port, line length.
+      <li>Configurable options: hostname, port, line length, fast or safe mode.
     </ul>
     ]]>
   </description>
