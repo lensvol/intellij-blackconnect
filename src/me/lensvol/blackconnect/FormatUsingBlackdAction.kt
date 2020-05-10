@@ -21,7 +21,14 @@ import java.net.URL
 
 class FormatUsingBlackdAction : AnAction() {
 
-    private fun callBlackd(path: String, sourceCode: String, pyi: Boolean = false, lineLength: Int = 88, fastMode: Boolean = false): Pair<Int, String> {
+    private fun callBlackd(
+            path: String,
+            sourceCode: String,
+            pyi: Boolean = false,
+            lineLength: Int = 88,
+            fastMode: Boolean = false,
+            skipStringNormalization: Boolean = false
+    ): Pair<Int, String> {
         val url = URL(path)
 
         try {
@@ -30,11 +37,15 @@ class FormatUsingBlackdAction : AnAction() {
                 doOutput = true
 
                 setRequestProperty("X-Protocol-Version", "1")
-                setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe" )
+                setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe")
                 setRequestProperty("X-Line-Length", lineLength.toString())
 
                 if (pyi) {
                     setRequestProperty("X-Python-Variant", "pyi")
+                }
+
+                if (skipStringNormalization) {
+                    setRequestProperty("X-Skip-String-Normalization", "yes")
                 }
 
                 try {
@@ -72,7 +83,8 @@ class FormatUsingBlackdAction : AnAction() {
                         editor.document.text,
                         pyi = fileName.endsWith(".pyi"),
                         lineLength = configuration.lineLength,
-                        fastMode = configuration.fastMode
+                        fastMode = configuration.fastMode,
+                        skipStringNormalization = configuration.skipStringNormalization
                 )
 
                 when (responseCode) {
@@ -92,13 +104,13 @@ class FormatUsingBlackdAction : AnAction() {
                         // Nothing was modified, nothing to do here, move along.
                     }
                     400 -> {
-                        showError(project,"Source code contained syntax errors.")
+                        showError(project, "Source code contained syntax errors.")
                     }
                     500 -> {
-                        showError(project,"Internal error, please see blackd output.")
+                        showError(project, "Internal error, please see blackd output.")
                     }
                     else -> {
-                        showError(project,"Something unexpected happened:\n$responseText")
+                        showError(project, "Something unexpected happened:\n$responseText")
                     }
                 }
             }

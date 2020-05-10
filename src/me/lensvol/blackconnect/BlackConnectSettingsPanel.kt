@@ -10,12 +10,15 @@ import javax.swing.*
 
 class BlackConnectSettingsPanel : JPanel() {
     private val hostnameText = JTextField("127.0.0.1")
+
     private val portSpinnerModel = SpinnerNumberModel(45484, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
-    private val fastModeCheckbox = JCheckBox()
 
     private val lineLengthModel = SpinnerNumberModel(88, 45, 255, 1)
     private val lineLengthSpinner = JSpinner(lineLengthModel)
+
+    private val fastModeCheckbox = JCheckBox()
+    private val skipStringNormalCheckbox = JCheckBox()
 
     init {
         portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
@@ -27,6 +30,7 @@ class BlackConnectSettingsPanel : JPanel() {
                 .addLabeledComponent("Port:", portSpinner)
                 .addLabeledComponent("Line length:", lineLengthSpinner)
                 .addLabeledComponent("Skip sanity checks:", fastModeCheckbox)
+                .addLabeledComponent("Skip string normalization:", skipStringNormalCheckbox)
                 .panel
 
         add(contentPanel, BorderLayout.NORTH)
@@ -37,6 +41,7 @@ class BlackConnectSettingsPanel : JPanel() {
         configuration.port = portSpinner.value as Int
         configuration.lineLength = lineLengthSpinner.value as Int
         configuration.fastMode = fastModeCheckbox.isSelected
+        configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
     }
 
     fun load(configuration: BlackConnectSettingsConfiguration) {
@@ -44,12 +49,14 @@ class BlackConnectSettingsPanel : JPanel() {
         portSpinner.value = configuration.port
         lineLengthSpinner.value = configuration.lineLength
         fastModeCheckbox.isSelected = configuration.fastMode
+        skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
     }
 
     fun isModified(configuration: BlackConnectSettingsConfiguration): Boolean {
         return hostnameText.text != configuration.hostname ||
                 portSpinner.value != configuration.port ||
                 lineLengthSpinner.value != configuration.lineLength ||
-                fastModeCheckbox.isSelected != configuration.fastMode
+                fastModeCheckbox.isSelected != configuration.fastMode ||
+                skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization
     }
 }
