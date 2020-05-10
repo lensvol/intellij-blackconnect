@@ -8,8 +8,10 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 
 ## Features
 
-* Configurable hostname and port
 * Automatic handling of Python type stubs (`.pyi`)
+* Configurable options:
+    * Hostname and port
+    * Preferred line length (default: 88)
 
 ## Installation
 

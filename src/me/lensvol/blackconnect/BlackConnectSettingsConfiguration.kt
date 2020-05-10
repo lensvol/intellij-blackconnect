@@ -19,6 +19,9 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var port: Int = 45484
 
+    @Attribute
+    var lineLength: Int = 80
+
     override fun getState() = this
 
     override fun loadState(state: BlackConnectSettingsConfiguration) {
