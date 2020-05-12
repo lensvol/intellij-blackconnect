@@ -9,10 +9,17 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
+import com.intellij.openapi.progress.EmptyProgressIndicator
+import com.intellij.openapi.progress.ProgressIndicator
+import com.intellij.openapi.progress.ProgressManager
+import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 import java.io.IOException
 import java.net.ConnectException
 import java.net.HttpURLConnection
@@ -78,41 +85,57 @@ class FormatUsingBlackdAction : AnAction() {
                 val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
                 val fileName = vFile?.name ?: "unknown"
 
-                val (responseCode, responseText) = callBlackd(
-                        "http://" + configuration.hostname + ":" + configuration.port + "/",
-                        editor.document.text,
-                        pyi = fileName.endsWith(".pyi"),
-                        lineLength = configuration.lineLength,
-                        fastMode = configuration.fastMode,
-                        skipStringNormalization = configuration.skipStringNormalization
-                )
+                val progressIndicator = EmptyProgressIndicator()
+                progressIndicator.isIndeterminate = true
 
-                when (responseCode) {
-                    200 -> {
-                        ApplicationManager.getApplication().runWriteAction(Computable {
-                            CommandProcessor.getInstance().executeCommand(
-                                    project,
-                                    { editor.document.setText(responseText) },
-                                    "Reformat code using blackd",
-                                    null,
-                                    UndoConfirmationPolicy.DEFAULT,
-                                    editor.document
-                            )
-                        })
-                    }
-                    204 -> {
-                        // Nothing was modified, nothing to do here, move along.
-                    }
-                    400 -> {
-                        showError(project, "Source code contained syntax errors.")
-                    }
-                    500 -> {
-                        showError(project, "Internal error, please see blackd output.")
-                    }
-                    else -> {
-                        showError(project, "Something unexpected happened:\n$responseText")
-                    }
+                ProgressManager.getInstance().runProcessWithProgressAsynchronously(
+                        object : Task.Backgroundable(project, "Calling blackd") {
+                            override fun run(indicator: ProgressIndicator) {
+                                reformatCodeInCurrentTab(configuration, editor, fileName, project)
+                            }
+                        },
+                        progressIndicator
+                )
+            }
+        }
+    }
+
+    private fun reformatCodeInCurrentTab(configuration: BlackConnectSettingsConfiguration, editor: @Nullable Editor, fileName: @NotNull String, project: @Nullable Project) {
+        val (responseCode, responseText) = callBlackd(
+                "http://" + configuration.hostname + ":" + configuration.port + "/",
+                editor.document.text,
+                pyi = fileName.endsWith(".pyi"),
+                lineLength = configuration.lineLength,
+                fastMode = configuration.fastMode,
+                skipStringNormalization = configuration.skipStringNormalization
+        )
+
+        when (responseCode) {
+            200 -> {
+                ApplicationManager.getApplication().invokeLater {
+                    ApplicationManager.getApplication().runWriteAction(Computable {
+                        CommandProcessor.getInstance().executeCommand(
+                                project,
+                                { editor.document.setText(responseText) },
+                                "Reformat code using blackd",
+                                null,
+                                UndoConfirmationPolicy.DEFAULT,
+                                editor.document
+                        )
+                    })
                 }
+            }
+            204 -> {
+                // Nothing was modified, nothing to do here, move along.
+            }
+            400 -> {
+                showError(project, "Source code contained syntax errors.")
+            }
+            500 -> {
+                showError(project, "Internal error, please see blackd output.")
+            }
+            else -> {
+                showError(project, "Something unexpected happened:\n$responseText")
             }
         }
     }
