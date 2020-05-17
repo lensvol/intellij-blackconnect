@@ -9,6 +9,7 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.progress.EmptyProgressIndicator
@@ -27,7 +28,6 @@ import java.net.URL
 
 
 class FormatUsingBlackdAction : AnAction() {
-
     private fun callBlackd(
             path: String,
             sourceCode: String,
@@ -88,6 +88,9 @@ class FormatUsingBlackdAction : AnAction() {
                 val progressIndicator = EmptyProgressIndicator()
                 progressIndicator.isIndeterminate = true
 
+                val projectService = project.service<BlackConnectProgressTracker>()
+                projectService.registerOperationOnPath(vFile!!.path, progressIndicator)
+
                 ProgressManager.getInstance().runProcessWithProgressAsynchronously(
                         object : Task.Backgroundable(project, "Calling blackd") {
                             override fun run(indicator: ProgressIndicator) {
@@ -101,6 +104,10 @@ class FormatUsingBlackdAction : AnAction() {
     }
 
     private fun reformatCodeInCurrentTab(configuration: BlackConnectSettingsConfiguration, editor: @Nullable Editor, fileName: @NotNull String, project: @Nullable Project) {
+        val progressIndicator = ProgressManager.getGlobalProgressIndicator()
+        if(progressIndicator?.isCanceled == true)
+            return
+
         val (responseCode, responseText) = callBlackd(
                 "http://" + configuration.hostname + ":" + configuration.port + "/",
                 editor.document.text,
@@ -110,18 +117,25 @@ class FormatUsingBlackdAction : AnAction() {
                 skipStringNormalization = configuration.skipStringNormalization
         )
 
+        if(progressIndicator?.isCanceled == true)
+            return
+
         when (responseCode) {
             200 -> {
                 ApplicationManager.getApplication().invokeLater {
                     ApplicationManager.getApplication().runWriteAction(Computable {
-                        CommandProcessor.getInstance().executeCommand(
-                                project,
-                                { editor.document.setText(responseText) },
-                                "Reformat code using blackd",
-                                null,
-                                UndoConfirmationPolicy.DEFAULT,
-                                editor.document
-                        )
+                        if(progressIndicator?.isCanceled == false) {
+                            CommandProcessor.getInstance().executeCommand(
+                                    project,
+                                    {
+                                        editor.document.setText(responseText)
+                                    },
+                                    "Reformat code using blackd",
+                                    null,
+                                    UndoConfirmationPolicy.DEFAULT,
+                                    editor.document
+                            )
+                        }
                     })
                 }
             }
