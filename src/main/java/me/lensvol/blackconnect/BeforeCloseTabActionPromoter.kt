@@ -1,6 +1,5 @@
 package me.lensvol.blackconnect
 
-import com.intellij.ide.actions.CloseAction
 import com.intellij.openapi.actionSystem.ActionPromoter
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.DataContext
