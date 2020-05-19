@@ -13,23 +13,27 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
     * Hostname and port
     * Preferred line length (default: 88)
     * Skipping sanity checks ("fast mode")
+    * Skipping string normalization
 
 ## Installation
 
+Install it from [JetBrains Plugins Repository](https://plugins.jetbrains.com/plugin/14321-blackconnect) or build from the source code:
+
 1. Open this project in IDEA.
-2. Choose `Prepare Plugin Module 'intellij-blackconnect' for Deployment` in the **Build** menu.
-3.  In **Preferences** window, choose *Plugins* pane and click on the gear icon.
-4. Choose `Install Plugin from Disk` and point it to *intellij-blackconnect.jar* in the root directory.
-5. Enjoy!
+2. Open _Gradle_ side tab and run `buildPlugin` task.
+3. After project is built, open PyCharm.
+4. In **Preferences** window, choose *Plugins* pane and click on the gear icon.
+5. Choose `Install Plugin from Disk` and point it to *intellij-blackconnect.jar* in the `build/libs` directory.
+6. Enjoy!
 
 ## TODOs
 
-* Publish it in the [JetBrains Plugin Repository](https://plugins.jetbrains.com/)
-* Use Gradle instead of Pludin DevKit.
-* Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
-* More configuration options.
+* ~~Publish it in the [JetBrains Plugin Repository](https://plugins.jetbrains.com/)~~
+* ~~Use Gradle instead of Pludin DevKit.~~
+* ~~More configuration options.~~
+* ~~Use background thread instead of UI thread for HTTP call.~~
 * Hook into file saving logic.
-* Use background thread instead of UI thread for HTTP call.
+* Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
 * Automatic detection of applicable Python frameworks.
 * Spawn **blackd** process if not started already.
 
