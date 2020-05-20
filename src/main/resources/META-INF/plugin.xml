@@ -1,7 +1,7 @@
 <idea-plugin url="https://github.com/lensvol/intellij-blackconnect">
     <id>me.lensvol.blackconnect</id>
     <name>BlackConnect</name>
-    <version>0.1.0</version>
+    <version>0.0.0</version>
     <vendor email="lensvol@gmail.com" url="https://github.com/lensvol/">Kirill Borisov</vendor>
 
     <description>

@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.1.0'
+version '0.2.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -29,7 +29,13 @@ compileTestKotlin {
 }
 
 patchPluginXml {
+    version project.version
     changeNotes """
+      <p>0.2.0</p>
+      <ul>
+        <li>Nothing yet.</li>
+      </ul>
+
       <p>0.1.0:</p>
       <ul>
         <li>Initial release. Basic functionality implemented.</li>
