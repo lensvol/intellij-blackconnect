@@ -10,7 +10,8 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.service
-import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
@@ -71,10 +72,10 @@ class FormatUsingBlackdAction : AnAction() {
         }
     }
 
-    private fun showError(project: Project, text: String) {
+    private fun showError(text: String) {
         NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, true)
                 .createNotification(text, NotificationType.ERROR)
-                .notify(project)
+                .notify(null)
     }
 
     override fun actionPerformed(event: AnActionEvent) {
@@ -82,7 +83,7 @@ class FormatUsingBlackdAction : AnAction() {
             FileEditorManagerEx.getInstance(project).selectedTextEditor?.let { editor ->
                 val configuration = BlackConnectSettingsConfiguration.getInstance(project)
 
-                val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
+                val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
                 val fileName = vFile?.name ?: "unknown"
 
                 val progressIndicator = EmptyProgressIndicator()
@@ -94,7 +95,7 @@ class FormatUsingBlackdAction : AnAction() {
                 ProgressManager.getInstance().runProcessWithProgressAsynchronously(
                         object : Task.Backgroundable(project, "Calling blackd") {
                             override fun run(indicator: ProgressIndicator) {
-                                reformatCodeInCurrentTab(configuration, editor, fileName, project)
+                                reformatCodeInCurrentTab(configuration, editor.document, fileName, project)
                             }
                         },
                         progressIndicator
@@ -103,14 +104,14 @@ class FormatUsingBlackdAction : AnAction() {
         }
     }
 
-    private fun reformatCodeInCurrentTab(configuration: BlackConnectSettingsConfiguration, editor: @Nullable Editor, fileName: @NotNull String, project: @Nullable Project) {
+    private fun reformatCodeInCurrentTab(configuration: BlackConnectSettingsConfiguration, document: @Nullable Document, fileName: @NotNull String, project: @Nullable Project) {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
         if(progressIndicator?.isCanceled == true)
             return
 
         val (responseCode, responseText) = callBlackd(
                 "http://" + configuration.hostname + ":" + configuration.port + "/",
-                editor.document.text,
+                document.text,
                 pyi = fileName.endsWith(".pyi"),
                 lineLength = configuration.lineLength,
                 fastMode = configuration.fastMode,
@@ -128,12 +129,12 @@ class FormatUsingBlackdAction : AnAction() {
                             CommandProcessor.getInstance().executeCommand(
                                     project,
                                     {
-                                        editor.document.setText(responseText)
+                                        document.setText(responseText)
                                     },
                                     "Reformat code using blackd",
                                     null,
                                     UndoConfirmationPolicy.DEFAULT,
-                                    editor.document
+                                    document
                             )
                         }
                     })
@@ -143,13 +144,13 @@ class FormatUsingBlackdAction : AnAction() {
                 // Nothing was modified, nothing to do here, move along.
             }
             400 -> {
-                showError(project, "Source code contained syntax errors.")
+                showError("Source code contained syntax errors.")
             }
             500 -> {
-                showError(project, "Internal error, please see blackd output.")
+                showError("Internal error, please see blackd output.")
             }
             else -> {
-                showError(project, "Something unexpected happened:\n$responseText")
+                showError("Something unexpected happened:\n$responseText")
             }
         }
     }
