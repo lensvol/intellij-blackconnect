@@ -33,7 +33,7 @@ patchPluginXml {
     changeNotes """
       <p>0.2.0</p>
       <ul>
-        <li>Nothing yet.</li>
+        <li>Option to trigger on each file save.</li>
       </ul>
 
       <p>0.1.0:</p>
