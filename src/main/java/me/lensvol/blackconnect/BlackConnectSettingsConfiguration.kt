@@ -28,6 +28,9 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var skipStringNormalization: Boolean = false
 
+    @Attribute
+    var triggerOnEachSave: Boolean = false
+
     override fun getState() = this
 
     override fun loadState(state: BlackConnectSettingsConfiguration) {

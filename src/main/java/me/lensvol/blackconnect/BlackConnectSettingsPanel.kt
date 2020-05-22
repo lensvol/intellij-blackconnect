@@ -20,6 +20,8 @@ class BlackConnectSettingsPanel : JPanel() {
     private val fastModeCheckbox = JCheckBox()
     private val skipStringNormalCheckbox = JCheckBox()
 
+    private val triggerOnEachSave = JCheckBox()
+
     init {
         portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
 
@@ -31,6 +33,7 @@ class BlackConnectSettingsPanel : JPanel() {
                 .addLabeledComponent("Line length:", lineLengthSpinner)
                 .addLabeledComponent("Skip sanity checks:", fastModeCheckbox)
                 .addLabeledComponent("Skip string normalization:", skipStringNormalCheckbox)
+                .addLabeledComponent("Trigger on each file save:", triggerOnEachSave)
                 .panel
 
         add(contentPanel, BorderLayout.NORTH)
@@ -42,6 +45,7 @@ class BlackConnectSettingsPanel : JPanel() {
         configuration.lineLength = lineLengthSpinner.value as Int
         configuration.fastMode = fastModeCheckbox.isSelected
         configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
+        configuration.triggerOnEachSave = triggerOnEachSave.isSelected
     }
 
     fun load(configuration: BlackConnectSettingsConfiguration) {
@@ -50,6 +54,7 @@ class BlackConnectSettingsPanel : JPanel() {
         lineLengthSpinner.value = configuration.lineLength
         fastModeCheckbox.isSelected = configuration.fastMode
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
+        triggerOnEachSave.isSelected = configuration.triggerOnEachSave
     }
 
     fun isModified(configuration: BlackConnectSettingsConfiguration): Boolean {
@@ -57,6 +62,7 @@ class BlackConnectSettingsPanel : JPanel() {
                 portSpinner.value != configuration.port ||
                 lineLengthSpinner.value != configuration.lineLength ||
                 fastModeCheckbox.isSelected != configuration.fastMode ||
-                skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization
+                skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
+                triggerOnEachSave.isSelected != configuration.triggerOnEachSave
     }
 }
