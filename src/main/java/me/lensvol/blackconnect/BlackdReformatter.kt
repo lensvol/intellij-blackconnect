@@ -27,7 +27,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
     private val currentProject: Project = project
     private val currentConfig: BlackConnectSettingsConfiguration = configuration
 
-    public fun process(document: Document) {
+    fun process(document: Document) {
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(document)
         val fileName = vFile?.name ?: "unknown"
 
@@ -91,14 +91,14 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
     }
 
     private fun showError(text: String) {
-        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, true)
-                .createNotification(text, NotificationType.ERROR)
-                .notify(currentProject)
+        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON)
+            .createNotification("BlackConnect", text, NotificationType.ERROR)
+            .notify(currentProject)
     }
 
     private fun reformatCodeInDocument(configuration: BlackConnectSettingsConfiguration, document: @Nullable Document, fileName: @NotNull String, project: @Nullable Project) {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
-        if(progressIndicator?.isCanceled == true)
+        if (progressIndicator?.isCanceled == true)
             return
 
         val (responseCode, responseText) = callBlackd(
@@ -110,14 +110,14 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
                 skipStringNormalization = configuration.skipStringNormalization
         )
 
-        if(progressIndicator?.isCanceled == true)
+        if (progressIndicator?.isCanceled == true)
             return
 
         when (responseCode) {
             200 -> {
                 ApplicationManager.getApplication().invokeLater {
                     ApplicationManager.getApplication().runWriteAction(Computable {
-                        if(progressIndicator?.isCanceled == false) {
+                        if (progressIndicator?.isCanceled == false) {
                             CommandProcessor.getInstance().executeCommand(
                                     project,
                                     {
@@ -136,7 +136,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
                 // Nothing was modified, nothing to do here, move along.
             }
             400 -> {
-                showError("Source code contained syntax errors!")
+                showError("Source code contained syntax errors.")
             }
             500 -> {
                 showError("Internal error, please see blackd output.")
