@@ -29,131 +29,16 @@ import java.net.URL
 
 
 class FormatUsingBlackdAction : AnAction() {
-    private fun callBlackd(
-            path: String,
-            sourceCode: String,
-            pyi: Boolean = false,
-            lineLength: Int = 88,
-            fastMode: Boolean = false,
-            skipStringNormalization: Boolean = false
-    ): Pair<Int, String> {
-        val url = URL(path)
-
-        try {
-            with(url.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-                doOutput = true
-
-                setRequestProperty("X-Protocol-Version", "1")
-                setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe")
-                setRequestProperty("X-Line-Length", lineLength.toString())
-
-                if (pyi) {
-                    setRequestProperty("X-Python-Variant", "pyi")
-                }
-
-                if (skipStringNormalization) {
-                    setRequestProperty("X-Skip-String-Normalization", "yes")
-                }
-
-                try {
-                    outputStream.use { os ->
-                        val input: ByteArray = sourceCode.toByteArray()
-                        os.write(input, 0, input.size)
-                    }
-
-                    inputStream.bufferedReader().use { return Pair(responseCode, it.readText()) }
-                } catch (e: IOException) {
-                    return Pair(responseCode, errorStream.readBytes().toString())
-                }
-            }
-        } catch (e: ConnectException) {
-            return Pair(-1, e.message ?: "Connection failed.")
-        }
-    }
-
-    private fun showError(text: String) {
-        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, true)
-                .createNotification(text, NotificationType.ERROR)
-                .notify(null)
-    }
 
     override fun actionPerformed(event: AnActionEvent) {
         event.project?.let { project ->
             FileEditorManagerEx.getInstance(project).selectedTextEditor?.let { editor ->
                 val configuration = BlackConnectSettingsConfiguration.getInstance(project)
-
-                val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
-                val fileName = vFile?.name ?: "unknown"
-
-                val progressIndicator = EmptyProgressIndicator()
-                progressIndicator.isIndeterminate = true
-
-                val projectService = project.service<BlackConnectProgressTracker>()
-                projectService.registerOperationOnPath(vFile!!.path, progressIndicator)
-
-                ProgressManager.getInstance().runProcessWithProgressAsynchronously(
-                        object : Task.Backgroundable(project, "Calling blackd") {
-                            override fun run(indicator: ProgressIndicator) {
-                                reformatCodeInCurrentTab(configuration, editor.document, fileName, project)
-                            }
-                        },
-                        progressIndicator
-                )
+                BlackdReformatter(project, configuration).process(editor.document)
             }
         }
     }
 
-    private fun reformatCodeInCurrentTab(configuration: BlackConnectSettingsConfiguration, document: @Nullable Document, fileName: @NotNull String, project: @Nullable Project) {
-        val progressIndicator = ProgressManager.getGlobalProgressIndicator()
-        if(progressIndicator?.isCanceled == true)
-            return
-
-        val (responseCode, responseText) = callBlackd(
-                "http://" + configuration.hostname + ":" + configuration.port + "/",
-                document.text,
-                pyi = fileName.endsWith(".pyi"),
-                lineLength = configuration.lineLength,
-                fastMode = configuration.fastMode,
-                skipStringNormalization = configuration.skipStringNormalization
-        )
-
-        if(progressIndicator?.isCanceled == true)
-            return
-
-        when (responseCode) {
-            200 -> {
-                ApplicationManager.getApplication().invokeLater {
-                    ApplicationManager.getApplication().runWriteAction(Computable {
-                        if(progressIndicator?.isCanceled == false) {
-                            CommandProcessor.getInstance().executeCommand(
-                                    project,
-                                    {
-                                        document.setText(responseText)
-                                    },
-                                    "Reformat code using blackd",
-                                    null,
-                                    UndoConfirmationPolicy.DEFAULT,
-                                    document
-                            )
-                        }
-                    })
-                }
-            }
-            204 -> {
-                // Nothing was modified, nothing to do here, move along.
-            }
-            400 -> {
-                showError("Source code contained syntax errors.")
-            }
-            500 -> {
-                showError("Internal error, please see blackd output.")
-            }
-            else -> {
-                showError("Something unexpected happened:\n$responseText")
-            }
-        }
-    }
 
     override fun update(event: AnActionEvent) {
         val project: Project? = event.project
