@@ -1,6 +1,6 @@
 # intellij-blackconnect
 
-![GitHub](https://img.shields.io/github/license/lensvol/intellij-blackconnect)
+![GitHub](https://img.shields.io/github/license/lensvol/intellij-blackconnect) ![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/14321-blackconnect)![JetBrains IntelliJ plugins] (https://img.shields.io/jetbrains/plugin/d/14321-blackconnect))
 
 Simple plugin for IDEA intended to help you to avoid overhead from starting [black](https://github.com/psf/black) process each time you save a Python file.
 
@@ -8,12 +8,13 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 
 ## Features
 
-* Automatic handling of Python type stubs (`.pyi`)
+* Automatic handling of Python type stubs (`.pyi`).
+* Ability to trigger on each file save.
 * Configurable options:
-    * Hostname and port
-    * Preferred line length (default: 88)
-    * Skipping sanity checks ("fast mode")
-    * Skipping string normalization
+    * Hostname and port.
+    * Preferred line length (default: 88).
+    * Skipping sanity checks ("fast mode").
+    * Skipping string normalization.
 
 ## Installation
 
@@ -32,7 +33,7 @@ Install it from [JetBrains Plugins Repository](https://plugins.jetbrains.com/plu
 * ~~Use Gradle instead of Pludin DevKit.~~
 * ~~More configuration options.~~
 * ~~Use background thread instead of UI thread for HTTP call.~~
-* Hook into file saving logic.
+* ~~Hook into file saving logic~~.
 * Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
 * Automatic detection of applicable Python frameworks.
 * Spawn **blackd** process if not started already.
