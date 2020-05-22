@@ -61,4 +61,8 @@
                 use-shortcut-of="CloseContent"/>
     </actions>
 
+    <projectListeners>
+        <listener class="me.lensvol.blackconnect.FileSaveListener" topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener" />
+    </projectListeners>
+
 </idea-plugin>
