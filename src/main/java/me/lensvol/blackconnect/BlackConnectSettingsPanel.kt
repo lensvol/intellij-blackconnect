@@ -3,9 +3,7 @@ package me.lensvol.blackconnect
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.UIUtil
-import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.Dimension
+import java.awt.*
 import javax.swing.*
 
 
@@ -24,11 +22,16 @@ class BlackConnectSettingsPanel : JPanel() {
     private val triggerOnEachSave = JCheckBox("Trigger on each file save")
 
     init {
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
-
+        layout = GridBagLayout()
         border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
 
-        val formattingPanel = HorizontalFillPanel().apply {
+        val constraints = GridBagConstraints()
+        constraints.anchor = GridBagConstraints.NORTHWEST
+        constraints.weightx = 1.0
+        constraints.fill = GridBagConstraints.HORIZONTAL
+        constraints.gridwidth = GridBagConstraints.REMAINDER
+
+        val formattingPanel = JPanel().apply {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Formatting options")
 
@@ -44,7 +47,7 @@ class BlackConnectSettingsPanel : JPanel() {
 
         portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
 
-        val connectionSettingPanel = HorizontalFillPanel().apply {
+        val connectionSettingPanel = JPanel().apply {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Connection settings")
 
@@ -62,9 +65,17 @@ class BlackConnectSettingsPanel : JPanel() {
         connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
         formattingPanel.alignmentX = Component.LEFT_ALIGNMENT
 
-        add(triggerOnEachSave)
-        add(connectionSettingPanel)
-        add(formattingPanel)
+        add(triggerOnEachSave, constraints)
+        add(connectionSettingPanel, constraints)
+        add(formattingPanel, constraints)
+
+        // Add empty filler to push our other panels to the top
+        constraints.fill = GridBagConstraints.VERTICAL
+        constraints.gridheight = GridBagConstraints.REMAINDER
+        constraints.weighty = 2.0
+        constraints.gridx = 0
+        constraints.anchor = GridBagConstraints.NORTH
+        add(JPanel(), constraints)
     }
 
     fun apply(configuration: BlackConnectSettingsConfiguration) {
@@ -92,11 +103,5 @@ class BlackConnectSettingsPanel : JPanel() {
                 fastModeCheckbox.isSelected != configuration.fastMode ||
                 skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
                 triggerOnEachSave.isSelected != configuration.triggerOnEachSave
-    }
-}
-
-class HorizontalFillPanel : JPanel() {
-    override fun getMaximumSize(): Dimension {
-        return Dimension(super.getMaximumSize().width, super.getPreferredSize().height)
     }
 }
