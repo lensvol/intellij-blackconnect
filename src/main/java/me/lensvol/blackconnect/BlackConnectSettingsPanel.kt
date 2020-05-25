@@ -1,10 +1,11 @@
 package me.lensvol.blackconnect
 
 import com.intellij.ui.IdeBorderFactory
-import com.intellij.ui.layout.selected
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.UIUtil
 import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Dimension
 import javax.swing.*
 
 
@@ -17,26 +18,53 @@ class BlackConnectSettingsPanel : JPanel() {
     private val lineLengthModel = SpinnerNumberModel(88, 45, 255, 1)
     private val lineLengthSpinner = JSpinner(lineLengthModel)
 
-    private val fastModeCheckbox = JCheckBox()
-    private val skipStringNormalCheckbox = JCheckBox()
+    private val fastModeCheckbox = JCheckBox("Skip sanity checks")
+    private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
 
-    private val triggerOnEachSave = JCheckBox()
+    private val triggerOnEachSave = JCheckBox("Trigger on each file save")
 
     init {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+
+        border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
+
+        val formattingPanel = HorizontalFillPanel().apply {
+            layout = BorderLayout()
+            border = IdeBorderFactory.createTitledBorder("Formatting options")
+
+            add(
+                FormBuilder.createFormBuilder()
+                    .addComponent(fastModeCheckbox)
+                    .addComponent(skipStringNormalCheckbox)
+                    .addLabeledComponent("Line length:", lineLengthSpinner)
+                    .panel,
+                BorderLayout.NORTH
+            )
+        }
+
         portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
 
-        layout = BorderLayout()
-        border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
-        val contentPanel = FormBuilder.createFormBuilder()
-                .addLabeledComponent("Hostname:", hostnameText)
-                .addLabeledComponent("Port:", portSpinner)
-                .addLabeledComponent("Line length:", lineLengthSpinner)
-                .addLabeledComponent("Skip sanity checks:", fastModeCheckbox)
-                .addLabeledComponent("Skip string normalization:", skipStringNormalCheckbox)
-                .addLabeledComponent("Trigger on each file save:", triggerOnEachSave)
-                .panel
+        val connectionSettingPanel = HorizontalFillPanel().apply {
+            layout = BorderLayout()
+            border = IdeBorderFactory.createTitledBorder("Connection settings")
 
-        add(contentPanel, BorderLayout.NORTH)
+            add(
+                FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Hostname:", hostnameText)
+                    .addLabeledComponent("Port:", portSpinner)
+                    .addComponent(formattingPanel)
+                    .panel,
+                BorderLayout.NORTH
+            )
+        }
+
+        triggerOnEachSave.alignmentX = Component.LEFT_ALIGNMENT
+        connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
+        formattingPanel.alignmentX = Component.LEFT_ALIGNMENT
+
+        add(triggerOnEachSave)
+        add(connectionSettingPanel)
+        add(formattingPanel)
     }
 
     fun apply(configuration: BlackConnectSettingsConfiguration) {
@@ -64,5 +92,11 @@ class BlackConnectSettingsPanel : JPanel() {
                 fastModeCheckbox.isSelected != configuration.fastMode ||
                 skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
                 triggerOnEachSave.isSelected != configuration.triggerOnEachSave
+    }
+}
+
+class HorizontalFillPanel : JPanel() {
+    override fun getMaximumSize(): Dimension {
+        return Dimension(super.getMaximumSize().width, super.getPreferredSize().height)
     }
 }
