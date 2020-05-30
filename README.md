@@ -29,14 +29,12 @@ Install it from [JetBrains Plugins Repository](https://plugins.jetbrains.com/plu
 
 ## TODOs
 
-* ~~Publish it in the [JetBrains Plugin Repository](https://plugins.jetbrains.com/)~~
-* ~~Use Gradle instead of Pludin DevKit.~~
-* ~~More configuration options.~~
-* ~~Use background thread instead of UI thread for HTTP call.~~
-* ~~Hook into file saving logic~~.
-* Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
-* Automatic detection of applicable Python frameworks.
 * Spawn **blackd** process if not started already.
+* Load applicable **black** settings from `pyproject.toml`
+* Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
+* Support Jupyter Notebooks.
+* "Live reformatting".
+* Automatic detection of applicable Python frameworks.
 
 ## Special thanks
 
