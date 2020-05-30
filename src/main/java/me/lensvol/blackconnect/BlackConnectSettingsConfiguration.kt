@@ -31,6 +31,12 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var triggerOnEachSave: Boolean = false
 
+    @Attribute
+    var targetSpecificVersions: Boolean = false
+
+    @Attribute
+    var pythonTargets: String = ""
+
     override fun getState() = this
 
     override fun loadState(state: BlackConnectSettingsConfiguration) {

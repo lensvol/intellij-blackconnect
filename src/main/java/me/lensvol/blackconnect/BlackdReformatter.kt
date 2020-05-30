@@ -53,7 +53,8 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
             pyi: Boolean = false,
             lineLength: Int = 88,
             fastMode: Boolean = false,
-            skipStringNormalization: Boolean = false
+            skipStringNormalization: Boolean = false,
+            targetPythonVersions: String = ""
     ): Pair<Int, String> {
         val url = URL(path)
 
@@ -68,6 +69,10 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
 
                 if (pyi) {
                     setRequestProperty("X-Python-Variant", "pyi")
+                } else {
+                    if (!targetPythonVersions.isEmpty()) {
+                        setRequestProperty("X-Python-Variant", targetPythonVersions)
+                    }
                 }
 
                 if (skipStringNormalization) {
@@ -92,8 +97,8 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
 
     private fun showError(text: String) {
         NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON)
-            .createNotification("BlackConnect", text, NotificationType.ERROR)
-            .notify(currentProject)
+                .createNotification("BlackConnect", text, NotificationType.ERROR)
+                .notify(currentProject)
     }
 
     private fun reformatCodeInDocument(configuration: BlackConnectSettingsConfiguration, document: @Nullable Document, fileName: @NotNull String, project: @Nullable Project) {
@@ -107,7 +112,8 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
                 pyi = fileName.endsWith(".pyi"),
                 lineLength = configuration.lineLength,
                 fastMode = configuration.fastMode,
-                skipStringNormalization = configuration.skipStringNormalization
+                skipStringNormalization = configuration.skipStringNormalization,
+                targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else ""
         )
 
         if (progressIndicator?.isCanceled == true)

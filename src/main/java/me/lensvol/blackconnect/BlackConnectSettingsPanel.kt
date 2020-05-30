@@ -2,6 +2,7 @@ package me.lensvol.blackconnect
 
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
+import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import java.awt.*
 import javax.swing.*
@@ -18,8 +19,17 @@ class BlackConnectSettingsPanel : JPanel() {
 
     private val fastModeCheckbox = JCheckBox("Skip sanity checks")
     private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
+    private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
 
     private val triggerOnEachSave = JCheckBox("Trigger on each file save")
+
+    private val targetVersions = listOf("2.7", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8")
+
+    private val versionCheckboxes = sortedMapOf<String, JCheckBox>().apply {
+        targetVersions.map { version ->
+            this.put("py$version", JCheckBox(version))
+        }
+    }
 
     init {
         layout = GridBagLayout()
@@ -31,17 +41,38 @@ class BlackConnectSettingsPanel : JPanel() {
         constraints.fill = GridBagConstraints.HORIZONTAL
         constraints.gridwidth = GridBagConstraints.REMAINDER
 
+        val targetVersionsPanel = JPanel().apply {
+            layout = FlowLayout(FlowLayout.LEFT)
+            border = IdeBorderFactory.createEmptyBorder(JBUI.insetsLeft(16))
+
+            versionCheckboxes.values.forEach { checkbox ->
+                this.add(checkbox)
+            }
+        }
+
+        targetVersionsPanel.components.map { checkbox ->
+            checkbox.isEnabled = false
+        }
+
+        targetSpecificVersionsCheckbox.addItemListener {
+            targetVersionsPanel.components.map { checkbox ->
+                checkbox.isEnabled = targetSpecificVersionsCheckbox.isSelected
+            }
+        }
+
         val formattingPanel = JPanel().apply {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Formatting options")
 
             add(
-                FormBuilder.createFormBuilder()
-                    .addComponent(fastModeCheckbox)
-                    .addComponent(skipStringNormalCheckbox)
-                    .addLabeledComponent("Line length:", lineLengthSpinner)
-                    .panel,
-                BorderLayout.NORTH
+                    FormBuilder.createFormBuilder()
+                            .addLabeledComponent("Line length:", lineLengthSpinner)
+                            .addComponent(fastModeCheckbox)
+                            .addComponent(skipStringNormalCheckbox)
+                            .addComponent(targetSpecificVersionsCheckbox)
+                            .addComponent(targetVersionsPanel)
+                            .panel,
+                    BorderLayout.NORTH
             )
         }
 
@@ -52,12 +83,12 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Connection settings")
 
             add(
-                FormBuilder.createFormBuilder()
-                    .addLabeledComponent("Hostname:", hostnameText)
-                    .addLabeledComponent("Port:", portSpinner)
-                    .addComponent(formattingPanel)
-                    .panel,
-                BorderLayout.NORTH
+                    FormBuilder.createFormBuilder()
+                            .addLabeledComponent("Hostname:", hostnameText)
+                            .addLabeledComponent("Port:", portSpinner)
+                            .addComponent(formattingPanel)
+                            .panel,
+                    BorderLayout.NORTH
             )
         }
 
@@ -85,6 +116,8 @@ class BlackConnectSettingsPanel : JPanel() {
         configuration.fastMode = fastModeCheckbox.isSelected
         configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
         configuration.triggerOnEachSave = triggerOnEachSave.isSelected
+        configuration.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
+        configuration.pythonTargets = generateVersionSpec()
     }
 
     fun load(configuration: BlackConnectSettingsConfiguration) {
@@ -94,6 +127,22 @@ class BlackConnectSettingsPanel : JPanel() {
         fastModeCheckbox.isSelected = configuration.fastMode
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
         triggerOnEachSave.isSelected = configuration.triggerOnEachSave
+
+        configuration.pythonTargets.split(",").forEach { version ->
+            versionCheckboxes[version]?.isSelected = true
+        }
+
+        if (configuration.targetSpecificVersions) {
+            targetSpecificVersionsCheckbox.doClick()
+            targetSpecificVersionsCheckbox.isSelected = true
+        }
+    }
+
+    fun generateVersionSpec(): String {
+        return versionCheckboxes
+                .filter { it.value.isSelected }
+                .map { it.key }
+                .joinToString(",")
     }
 
     fun isModified(configuration: BlackConnectSettingsConfiguration): Boolean {
@@ -102,6 +151,8 @@ class BlackConnectSettingsPanel : JPanel() {
                 lineLengthSpinner.value != configuration.lineLength ||
                 fastModeCheckbox.isSelected != configuration.fastMode ||
                 skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
-                triggerOnEachSave.isSelected != configuration.triggerOnEachSave
+                triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
+                targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
+                generateVersionSpec() != configuration.pythonTargets
     }
 }
