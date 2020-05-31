@@ -153,7 +153,9 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
                 // Nothing was modified, nothing to do here, move along.
             }
             400 -> {
-                showError("Source code contained syntax errors.")
+                if (configuration.showSyntaxErrorMsgs) {
+                    showError("Source code contained syntax errors.")
+                }
             }
             500 -> {
                 showError("Internal error, please see blackd output.")

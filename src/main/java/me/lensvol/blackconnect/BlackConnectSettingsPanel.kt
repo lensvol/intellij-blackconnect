@@ -32,6 +32,7 @@ class BlackConnectSettingsPanel : JPanel() {
     }
 
     private val jupyterSupportCheckbox = JCheckBox("Enable Jupyter Notebook support (whole file only)")
+    private val showSyntaxErrorMsgsCheckbox = JCheckBox("Show notifications about syntax errors")
 
     init {
         layout = GridBagLayout()
@@ -88,7 +89,6 @@ class BlackConnectSettingsPanel : JPanel() {
                     FormBuilder.createFormBuilder()
                             .addLabeledComponent("Hostname:", hostnameText)
                             .addLabeledComponent("Port:", portSpinner)
-                            .addComponent(formattingPanel)
                             .panel,
                     BorderLayout.NORTH
             )
@@ -98,7 +98,13 @@ class BlackConnectSettingsPanel : JPanel() {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
 
-            add(jupyterSupportCheckbox)
+            add(
+                    FormBuilder.createFormBuilder()
+                            .addComponent(jupyterSupportCheckbox)
+                            .addComponent(showSyntaxErrorMsgsCheckbox)
+                            .panel,
+                    BorderLayout.NORTH
+            )
         }
 
         triggerOnEachSave.alignmentX = Component.LEFT_ALIGNMENT
@@ -130,6 +136,7 @@ class BlackConnectSettingsPanel : JPanel() {
         configuration.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
         configuration.pythonTargets = generateVersionSpec()
         configuration.enableJupyterSupport = jupyterSupportCheckbox.isSelected
+        configuration.showSyntaxErrorMsgs = showSyntaxErrorMsgsCheckbox.isSelected
     }
 
     fun load(configuration: BlackConnectSettingsConfiguration) {
@@ -140,6 +147,7 @@ class BlackConnectSettingsPanel : JPanel() {
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
         triggerOnEachSave.isSelected = configuration.triggerOnEachSave
         jupyterSupportCheckbox.isSelected = configuration.enableJupyterSupport
+        showSyntaxErrorMsgsCheckbox.isSelected = configuration.showSyntaxErrorMsgs
 
         configuration.pythonTargets.split(",").forEach { version ->
             versionCheckboxes[version]?.isSelected = true
@@ -169,6 +177,7 @@ class BlackConnectSettingsPanel : JPanel() {
                 triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
                 targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
                 generateVersionSpec() != configuration.pythonTargets ||
-                jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport
+                jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
+                showSyntaxErrorMsgsCheckbox.isSelected != configuration.showSyntaxErrorMsgs
     }
 }
