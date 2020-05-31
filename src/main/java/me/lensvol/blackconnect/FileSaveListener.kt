@@ -15,9 +15,10 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
         }
 
         val vFile = FileDocumentManager.getInstance().getFile(document)
-        vFile?.name?.let {filename ->
-            if (filename.endsWith(".py") || filename.endsWith(".pyi")) {
-                BlackdReformatter(currentProject, configuration).process(document)
+        vFile?.let {file ->
+            val reformatter = BlackdReformatter(currentProject, configuration)
+            if (reformatter.isFileSupported(file)) {
+                reformatter.process(document)
             }
         }
     }

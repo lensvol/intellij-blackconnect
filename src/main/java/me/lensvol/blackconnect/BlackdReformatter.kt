@@ -9,6 +9,7 @@ import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
+import com.intellij.openapi.fileTypes.LanguageFileType
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -27,6 +28,11 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
     private val currentProject: Project = project
     private val currentConfig: BlackConnectSettingsConfiguration = configuration
 
+    fun isFileSupported(file: VirtualFile): Boolean {
+        return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
+                (currentConfig.enableJupyterSupport && (file.fileType as LanguageFileType).language.id == "Jupyter")
+    }
+
     fun process(document: Document) {
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(document)
         val fileName = vFile?.name ?: "unknown"
@@ -38,23 +44,23 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
         projectService.registerOperationOnPath(vFile!!.path, progressIndicator)
 
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(
-                object : Task.Backgroundable(currentProject, "Calling blackd") {
-                    override fun run(indicator: ProgressIndicator) {
-                        reformatCodeInDocument(currentConfig, document, fileName, project)
-                    }
-                },
-                progressIndicator
+            object : Task.Backgroundable(currentProject, "Calling blackd") {
+                override fun run(indicator: ProgressIndicator) {
+                    reformatCodeInDocument(currentConfig, document, fileName, project)
+                }
+            },
+            progressIndicator
         )
     }
 
     private fun callBlackd(
-            path: String,
-            sourceCode: String,
-            pyi: Boolean = false,
-            lineLength: Int = 88,
-            fastMode: Boolean = false,
-            skipStringNormalization: Boolean = false,
-            targetPythonVersions: String = ""
+        path: String,
+        sourceCode: String,
+        pyi: Boolean = false,
+        lineLength: Int = 88,
+        fastMode: Boolean = false,
+        skipStringNormalization: Boolean = false,
+        targetPythonVersions: String = ""
     ): Pair<Int, String> {
         val url = URL(path)
 
@@ -97,23 +103,28 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
 
     private fun showError(text: String) {
         NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON)
-                .createNotification("BlackConnect", text, NotificationType.ERROR)
-                .notify(currentProject)
+            .createNotification("BlackConnect", text, NotificationType.ERROR)
+            .notify(currentProject)
     }
 
-    private fun reformatCodeInDocument(configuration: BlackConnectSettingsConfiguration, document: @Nullable Document, fileName: @NotNull String, project: @Nullable Project) {
+    private fun reformatCodeInDocument(
+        configuration: BlackConnectSettingsConfiguration,
+        document: @Nullable Document,
+        fileName: @NotNull String,
+        project: @Nullable Project
+    ) {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
         if (progressIndicator?.isCanceled == true)
             return
 
         val (responseCode, responseText) = callBlackd(
-                "http://" + configuration.hostname + ":" + configuration.port + "/",
-                document.text,
-                pyi = fileName.endsWith(".pyi"),
-                lineLength = configuration.lineLength,
-                fastMode = configuration.fastMode,
-                skipStringNormalization = configuration.skipStringNormalization,
-                targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else ""
+            "http://" + configuration.hostname + ":" + configuration.port,
+            document.text,
+            pyi = fileName.endsWith(".pyi"),
+            lineLength = configuration.lineLength,
+            fastMode = configuration.fastMode,
+            skipStringNormalization = configuration.skipStringNormalization,
+            targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else ""
         )
 
         if (progressIndicator?.isCanceled == true)
@@ -125,14 +136,14 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
                     ApplicationManager.getApplication().runWriteAction(Computable {
                         if (progressIndicator?.isCanceled == false) {
                             CommandProcessor.getInstance().executeCommand(
-                                    project,
-                                    {
-                                        document.setText(responseText)
-                                    },
-                                    "Reformat code using blackd",
-                                    null,
-                                    UndoConfirmationPolicy.DEFAULT,
-                                    document
+                                project,
+                                {
+                                    document.setText(responseText)
+                                },
+                                "Reformat code using blackd",
+                                null,
+                                UndoConfirmationPolicy.DEFAULT,
+                                document
                             )
                         }
                     })

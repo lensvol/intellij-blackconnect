@@ -22,13 +22,15 @@ class FormatUsingBlackdAction : AnAction() {
 
     override fun update(event: AnActionEvent) {
         val project: Project? = event.project
-        if (project == null) {
-            event.presentation.isEnabled = false
-        } else {
-            val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
-            vFile?.name?.let { filename ->
-                event.presentation.isEnabled = filename.endsWith(".py") || filename.endsWith(".pyi")
-            }
+        event.presentation.isEnabled = false
+
+        if (project == null)
+            return
+
+        val configuration = BlackConnectSettingsConfiguration.getInstance(project)
+        val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
+        vFile?.let {
+            event.presentation.isEnabled = BlackdReformatter(project, configuration).isFileSupported(vFile)
         }
     }
 }

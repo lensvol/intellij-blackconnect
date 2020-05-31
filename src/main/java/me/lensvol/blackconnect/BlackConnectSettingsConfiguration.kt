@@ -37,6 +37,9 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var pythonTargets: String = ""
 
+    @Attribute
+    var enableJupyterSupport: Boolean = false
+
     override fun getState() = this
 
     override fun loadState(state: BlackConnectSettingsConfiguration) {

@@ -31,6 +31,8 @@ class BlackConnectSettingsPanel : JPanel() {
         }
     }
 
+    private val jupyterSupportCheckbox = JCheckBox("Enable Jupyter Notebook support (whole file only)")
+
     init {
         layout = GridBagLayout()
         border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
@@ -92,13 +94,22 @@ class BlackConnectSettingsPanel : JPanel() {
             )
         }
 
+        val miscSettingsPanel = JPanel().apply {
+            layout = BorderLayout()
+            border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
+
+            add(jupyterSupportCheckbox)
+        }
+
         triggerOnEachSave.alignmentX = Component.LEFT_ALIGNMENT
         connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
         formattingPanel.alignmentX = Component.LEFT_ALIGNMENT
+        miscSettingsPanel.alignmentX = Component.LEFT_ALIGNMENT
 
         add(triggerOnEachSave, constraints)
         add(connectionSettingPanel, constraints)
         add(formattingPanel, constraints)
+        add(miscSettingsPanel, constraints)
 
         // Add empty filler to push our other panels to the top
         constraints.fill = GridBagConstraints.VERTICAL
@@ -118,6 +129,7 @@ class BlackConnectSettingsPanel : JPanel() {
         configuration.triggerOnEachSave = triggerOnEachSave.isSelected
         configuration.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
         configuration.pythonTargets = generateVersionSpec()
+        configuration.enableJupyterSupport = jupyterSupportCheckbox.isSelected
     }
 
     fun load(configuration: BlackConnectSettingsConfiguration) {
@@ -127,18 +139,21 @@ class BlackConnectSettingsPanel : JPanel() {
         fastModeCheckbox.isSelected = configuration.fastMode
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
         triggerOnEachSave.isSelected = configuration.triggerOnEachSave
+        jupyterSupportCheckbox.isSelected = configuration.enableJupyterSupport
 
         configuration.pythonTargets.split(",").forEach { version ->
             versionCheckboxes[version]?.isSelected = true
         }
 
         if (configuration.targetSpecificVersions) {
+            // This is done to trigger dependent item change logic
+            // and enable version checkboxes
             targetSpecificVersionsCheckbox.doClick()
             targetSpecificVersionsCheckbox.isSelected = true
         }
     }
 
-    fun generateVersionSpec(): String {
+    private fun generateVersionSpec(): String {
         return versionCheckboxes
                 .filter { it.value.isSelected }
                 .map { it.key }
@@ -153,6 +168,7 @@ class BlackConnectSettingsPanel : JPanel() {
                 skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
                 triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
                 targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
-                generateVersionSpec() != configuration.pythonTargets
+                generateVersionSpec() != configuration.pythonTargets ||
+                jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport
     }
 }
