@@ -10,11 +10,13 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 
 * Automatic handling of Python type stubs (`.pyi`).
 * Ability to trigger on each file save.
+* Rough support for Jupyter Notebook files.
 * Configurable options:
     * Hostname and port.
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
+    * Target specific Python versions. 
 
 ## Installation
 
@@ -32,7 +34,6 @@ Install it from [JetBrains Plugins Repository](https://plugins.jetbrains.com/plu
 * Spawn **blackd** process if not started already.
 * Load applicable **black** settings from `pyproject.toml`
 * Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
-* Support Jupyter Notebooks.
 * "Live reformatting".
 * Automatic detection of applicable Python frameworks.
 
