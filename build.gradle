@@ -35,6 +35,10 @@ patchPluginXml {
       <p>0.2.0</p>
       <ul>
         <li>Option to trigger on each file save.</li>
+        <li>Target syntax of specific Python versions.</li>
+        <li>Initial support for "Jupyter" file type.</li>
+        <li>Option to hide notifications about syntax errors.</li>
+        <li>Fixed compatibility with IDEA 2019.3.5</li>
       </ul>
 
       <p>0.1.0:</p>
