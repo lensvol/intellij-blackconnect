@@ -102,8 +102,9 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
     }
 
     private fun showError(text: String) {
-        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON)
-            .createNotification("BlackConnect", text, NotificationType.ERROR)
+        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
+            .createNotification(text, NotificationType.ERROR)
+            .setTitle("BlackConnect")
             .notify(currentProject)
     }
 

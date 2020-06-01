@@ -17,6 +17,7 @@ dependencies {
 
 intellij {
     version ideaVersion
+    updateSinceUntilBuild false
     pluginName 'intellij-blackconnect'
 }
 

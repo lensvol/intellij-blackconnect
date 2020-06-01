@@ -51,18 +51,23 @@
         <action id="me.lensvol.blackconnect.FormatUsingBlackdAction"
                 class="me.lensvol.blackconnect.FormatUsingBlackdAction"
                 text="Format Code Using Blackd"
-                description="Send a request to blackd."
+                description="Try to reformat code in current tab."
                 icon="/icons/blackconnect.svg">
             <keyboard-shortcut first-keystroke="alt shift b" keymap="$default"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-            <override-text place="MainMenu" text="Format Using blackd"/>
         </action>
         <action id="me.lensvol.blackconnect.BeforeTabClosedAction" class="me.lensvol.blackconnect.BeforeTabClosedAction"
                 use-shortcut-of="CloseContent"/>
     </actions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <postStartupActivity
+                implementation="me.lensvol.blackconnect.PluginStartupActivity"/>
+    </extensions>
+
     <projectListeners>
-        <listener class="me.lensvol.blackconnect.FileSaveListener" topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener" />
+        <listener class="me.lensvol.blackconnect.FileSaveListener"
+                  topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"/>
     </projectListeners>
 
 </idea-plugin>
