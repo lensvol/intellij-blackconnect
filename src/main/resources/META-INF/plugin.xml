@@ -22,7 +22,9 @@
     <p><b>Features supported:</b></p>
     <ul>
       <li>Automatic Python type stub (.pyi) detection.</li>
-      <li>Configurable options: hostname, port, preferred line length, etc.
+      <li>Configurable options: hostname, port, preferred line length, etc.</li>
+      <li>Trigger automatically when saving changed files.</li>
+      <li>Rough support for "Jupyter" file type.</li>
     </ul>
     ]]>
     </description>

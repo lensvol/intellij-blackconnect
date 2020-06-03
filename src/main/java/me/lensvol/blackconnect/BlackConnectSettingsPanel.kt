@@ -21,7 +21,7 @@ class BlackConnectSettingsPanel : JPanel() {
     private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
     private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
 
-    private val triggerOnEachSave = JCheckBox("Trigger on each file save")
+    private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
 
     private val targetVersions = listOf("2.7", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8")
 

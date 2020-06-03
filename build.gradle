@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.2.0-SNAPSHOT'
+version '0.2.0-EAP-2006011937'
 
 repositories {
     mavenCentral()
@@ -34,7 +34,7 @@ patchPluginXml {
     changeNotes """
       <p>0.2.0</p>
       <ul>
-        <li>Option to trigger on each file save.</li>
+        <li>Option to trigger when saving changed files.</li>
         <li>Target syntax of specific Python versions.</li>
         <li>Initial support for "Jupyter" file type.</li>
         <li>Option to hide notifications about syntax errors.</li>
