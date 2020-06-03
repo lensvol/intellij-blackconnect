@@ -43,6 +43,9 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var showSyntaxErrorMsgs: Boolean = true
 
+    @Attribute
+    var showSaveTriggerOptIn: Boolean = true
+
     override fun getState() = this
 
     override fun loadState(state: BlackConnectSettingsConfiguration) {
