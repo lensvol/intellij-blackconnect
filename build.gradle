@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.2.0-EAP-2006011937'
+version '0.2.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
