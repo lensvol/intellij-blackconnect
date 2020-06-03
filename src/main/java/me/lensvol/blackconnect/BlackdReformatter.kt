@@ -27,10 +27,13 @@ import java.net.URL
 class BlackdReformatter(project: Project, configuration: BlackConnectSettingsConfiguration) {
     private val currentProject: Project = project
     private val currentConfig: BlackConnectSettingsConfiguration = configuration
+    private val notificationGroup: NotificationGroup =
+        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
 
     fun isFileSupported(file: VirtualFile): Boolean {
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
-                (currentConfig.enableJupyterSupport && (file.fileType as LanguageFileType).language.id == "Jupyter")
+                (currentConfig.enableJupyterSupport &&
+                        (file.fileType as LanguageFileType).language.id == "Jupyter")
     }
 
     fun process(document: Document) {
@@ -102,7 +105,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
     }
 
     private fun showError(text: String) {
-        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
+        notificationGroup
             .createNotification(text, NotificationType.ERROR)
             .setTitle("BlackConnect")
             .notify(currentProject)
