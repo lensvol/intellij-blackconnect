@@ -6,26 +6,28 @@
 
     <description>
         <![CDATA[
-    <p>Connect to blackd and format your Python code without creating a new black process!</p>
+    <p>Connect to blackd and format your Python code without creating a new <b>black</b> process!</p>
     <p />
-    <p>This plugin allows you to avoid overhard of starting a new <b>black</b> process on each
-    file save by utilizing <a href="https://black.readthedocs.io/en/stable/blackd.html">blackd</a>.</p>
+    <p>This plugin allows you to avoid overhead of starting a new <b>black</b> process on each
+    file save by utilizing <b><a href="https://black.readthedocs.io/en/stable/blackd.html">blackd</a></b>.</p>
     <p />
-    <p><b>Steps to use:</b></p>
+
+    <p>Features supported:</p>
+    <p />
+    <p>
+      –&nbsp;Automatic Python type stub (.pyi) detection.<br>
+      –&nbsp;Configurable options: hostname, port, preferred line length, etc.<br>
+      –&nbsp;Trigger automatically when saving changed files.<br>
+      –&nbsp;Rough support for "Jupyter" file type.<br>
+    </p>
+    <p />
+    <p>Steps to use:</p>
     <ol>
       <li><b>pip install black[d]</b></li>
       <li>Start <b>blackd</b> daemon.</li>
-      <li>Set the hostname and port in IDE settings if they differ from default.</li>
-      <li>Use <i>"Format Using blackd"</i> from under <i>Tools</i> menu.</li>
+      <li>Press "Alt + Shift + B" to reformat your code...<br>...or enable "on file save" option.</li>
+      <li>Enjoy!</li>
     </ol>
-
-    <p><b>Features supported:</b></p>
-    <ul>
-      <li>Automatic Python type stub (.pyi) detection.</li>
-      <li>Configurable options: hostname, port, preferred line length, etc.</li>
-      <li>Trigger automatically when saving changed files.</li>
-      <li>Rough support for "Jupyter" file type.</li>
-    </ul>
     ]]>
     </description>
 

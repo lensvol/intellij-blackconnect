@@ -40,10 +40,5 @@ patchPluginXml {
         <li>Option to hide notifications about syntax errors.</li>
         <li>Fixed compatibility with IDEA 2019.3.5</li>
       </ul>
-
-      <p>0.1.0:</p>
-      <ul>
-        <li>Initial release. Basic functionality implemented.</li>
-      </ul>
       """
 }
