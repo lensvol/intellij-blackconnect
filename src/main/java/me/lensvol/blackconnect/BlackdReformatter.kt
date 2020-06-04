@@ -24,9 +24,9 @@ import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 
-class BlackdReformatter(project: Project, configuration: BlackConnectSettingsConfiguration) {
+class BlackdReformatter(project: Project, configuration: BlackConnectProjectSettings) {
     private val currentProject: Project = project
-    private val currentConfig: BlackConnectSettingsConfiguration = configuration
+    private val currentConfig: BlackConnectProjectSettings = configuration
     private val notificationGroup: NotificationGroup =
         NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
 
@@ -112,7 +112,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectSettingsCon
     }
 
     private fun reformatCodeInDocument(
-        configuration: BlackConnectSettingsConfiguration,
+        configuration: BlackConnectProjectSettings,
         document: @Nullable Document,
         fileName: @NotNull String,
         project: @Nullable Project

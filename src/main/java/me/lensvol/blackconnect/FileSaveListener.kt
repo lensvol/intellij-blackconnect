@@ -9,7 +9,7 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
     private val currentProject: Project = project
 
     override fun beforeDocumentSaving(document: Document) {
-        val configuration = BlackConnectSettingsConfiguration.getInstance(currentProject)
+        val configuration = BlackConnectProjectSettings.getInstance(currentProject)
         if (!configuration.triggerOnEachSave) {
             return
         }

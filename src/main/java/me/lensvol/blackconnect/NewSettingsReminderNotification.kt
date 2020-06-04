@@ -18,7 +18,7 @@ You can enable/disable them individually in the project settings.
 class NewSettingsReminderNotification(
         notificationGroup: NotificationGroup,
         project: Project,
-        configuration: BlackConnectSettingsConfiguration) : Notification(
+        configuration: BlackConnectGlobalSettings) : Notification(
             notificationGroup.displayId,
             "BlackConnect",
             REMINDER_TEXT,

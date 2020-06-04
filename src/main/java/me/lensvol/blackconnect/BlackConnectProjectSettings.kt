@@ -6,11 +6,11 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Attribute
 
 @State(name = "BlackConnectSettings", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
-class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectSettingsConfiguration> {
+class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProjectSettings> {
 
     companion object {
-        fun getInstance(project: Project): BlackConnectSettingsConfiguration =
-                ServiceManager.getService(project, BlackConnectSettingsConfiguration::class.java)
+        fun getInstance(project: Project): BlackConnectProjectSettings =
+                ServiceManager.getService(project, BlackConnectProjectSettings::class.java)
     }
 
     @Attribute
@@ -43,12 +43,9 @@ class BlackConnectSettingsConfiguration : PersistentStateComponent<BlackConnectS
     @Attribute
     var showSyntaxErrorMsgs: Boolean = true
 
-    @Attribute
-    var showSaveTriggerOptIn: Boolean = true
-
     override fun getState() = this
 
-    override fun loadState(state: BlackConnectSettingsConfiguration) {
+    override fun loadState(state: BlackConnectProjectSettings) {
         XmlSerializerUtil.copyBean(state, this)
     }
 }

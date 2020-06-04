@@ -13,7 +13,7 @@ class FormatUsingBlackdAction : AnAction() {
     override fun actionPerformed(event: AnActionEvent) {
         event.project?.let { project ->
             FileEditorManagerEx.getInstance(project).selectedTextEditor?.let { editor ->
-                val configuration = BlackConnectSettingsConfiguration.getInstance(project)
+                val configuration = BlackConnectProjectSettings.getInstance(project)
                 BlackdReformatter(project, configuration).process(editor.document)
             }
         }
@@ -27,7 +27,7 @@ class FormatUsingBlackdAction : AnAction() {
         if (project == null)
             return
 
-        val configuration = BlackConnectSettingsConfiguration.getInstance(project)
+        val configuration = BlackConnectProjectSettings.getInstance(project)
         val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
         vFile?.let {
             event.presentation.isEnabled = BlackdReformatter(project, configuration).isFileSupported(vFile)

@@ -11,7 +11,6 @@ import com.intellij.openapi.startup.StartupActivity
 class PluginStartupActivity : StartupActivity, DumbAware {
     override fun runActivity(project: Project) {
         val applicationInfo = ApplicationInfo.getInstance()
-        val configuration = BlackConnectSettingsConfiguration.getInstance(project)
 
         // FIXME: For some reason, project listeners declared in plugin.xml
         // are not being registered, so we do it manually.
@@ -20,11 +19,11 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         }
 
         val notificationGroup = NotificationGroup("BlackConnect", NotificationDisplayType.STICKY_BALLOON, false)
-
-        if (configuration.showSaveTriggerOptIn) {
+        val appLevelConfiguration = BlackConnectGlobalSettings.getInstance()
+        if (appLevelConfiguration.showSaveTriggerOptIn) {
             val optInNotification = NewSettingsReminderNotification(
                     notificationGroup,
-                    project, configuration
+                    project, appLevelConfiguration
             )
             optInNotification.notify(project)
         }

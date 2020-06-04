@@ -9,7 +9,7 @@ class BlackConnectConfigurable(project: Project) : Configurable {
         BlackConnectSettingsPanel()
     }
 
-    private val configuration: BlackConnectSettingsConfiguration = BlackConnectSettingsConfiguration.getInstance(project)
+    private val configuration: BlackConnectProjectSettings = BlackConnectProjectSettings.getInstance(project)
 
     override fun isModified(): Boolean {
         return panel.isModified(configuration)

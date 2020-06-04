@@ -126,7 +126,7 @@ class BlackConnectSettingsPanel : JPanel() {
         add(JPanel(), constraints)
     }
 
-    fun apply(configuration: BlackConnectSettingsConfiguration) {
+    fun apply(configuration: BlackConnectProjectSettings) {
         configuration.hostname = hostnameText.text.ifBlank { "localhost" }
         configuration.port = portSpinner.value as Int
         configuration.lineLength = lineLengthSpinner.value as Int
@@ -139,7 +139,7 @@ class BlackConnectSettingsPanel : JPanel() {
         configuration.showSyntaxErrorMsgs = showSyntaxErrorMsgsCheckbox.isSelected
     }
 
-    fun load(configuration: BlackConnectSettingsConfiguration) {
+    fun load(configuration: BlackConnectProjectSettings) {
         hostnameText.text = configuration.hostname
         portSpinner.value = configuration.port
         lineLengthSpinner.value = configuration.lineLength
@@ -168,7 +168,7 @@ class BlackConnectSettingsPanel : JPanel() {
                 .joinToString(",")
     }
 
-    fun isModified(configuration: BlackConnectSettingsConfiguration): Boolean {
+    fun isModified(configuration: BlackConnectProjectSettings): Boolean {
         return hostnameText.text != configuration.hostname ||
                 portSpinner.value != configuration.port ||
                 lineLengthSpinner.value != configuration.lineLength ||

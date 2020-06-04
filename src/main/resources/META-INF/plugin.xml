@@ -44,7 +44,8 @@
         <projectConfigurable groupId="tools"
                              id="me.lensvol.blackconnect.settings"
                              provider="me.lensvol.blackconnect.BlackConnectConfigurableProvider"/>
-        <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectSettingsConfiguration"/>
+        <applicationService serviceImplementation="me.lensvol.blackconnect.BlackConnectGlobalSettings"/>
+        <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProjectSettings"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProgressTracker"/>
         <actionPromoter implementation="me.lensvol.blackconnect.BeforeCloseTabActionPromoter"/>
     </extensions>
