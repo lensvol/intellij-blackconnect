@@ -21,7 +21,6 @@ class PluginStartupActivity : StartupActivity, DumbAware {
 
         val notificationGroup = NotificationGroup("BlackConnect", NotificationDisplayType.STICKY_BALLOON, false)
 
-
         if (configuration.showSaveTriggerOptIn) {
             val optInNotification = NewSettingsReminderNotification(
                     notificationGroup,

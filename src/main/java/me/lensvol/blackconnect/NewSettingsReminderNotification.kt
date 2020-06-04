@@ -12,7 +12,7 @@ const val REMINDER_TEXT = """We've added several new features for your convenien
 –&nbsp;Jupyter Notebook support.<br>
 –&nbsp;Option to hide "syntax error" balloons.<br>
 <br>
-You can enable/disable them individually in settings.
+You can enable/disable them individually in the project settings.
 """
 
 class NewSettingsReminderNotification(
