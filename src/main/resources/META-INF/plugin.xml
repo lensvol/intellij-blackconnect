@@ -6,22 +6,24 @@
 
     <description>
         <![CDATA[
-    <p>Connect to blackd and format your Python code without creating a new <b>black</b> process!</p>
-    <p />
-    <p>This plugin allows you to avoid overhead of starting a new <b>black</b> process on each
-    file save by utilizing <b><a href="https://black.readthedocs.io/en/stable/blackd.html">blackd</a></b>.</p>
-    <p />
+    <p>Connect to <b><a href="https://black.readthedocs.io/en/stable/blackd.html">blackd</a></b> and format your Python
+    code without creating a new <b>black</b> process!</p>
+    <br>
+    <p>Avoid overhead of starting a new <b>black</b> process on each file save by making a quick
+    HTTP call to <b>blackd</b> instead.</p>
+    <br>
 
-    <p>Features supported:</p>
-    <p />
+    <p><b>Features supported:</b></p>
+    <br>
     <p>
       –&nbsp;Automatic Python type stub (.pyi) detection.<br>
       –&nbsp;Configurable options: hostname, port, preferred line length, etc.<br>
       –&nbsp;Trigger automatically when saving changed files.<br>
       –&nbsp;Rough support for "Jupyter" file type.<br>
     </p>
-    <p />
-    <p>Steps to use:</p>
+    <br>
+
+    <p><b>Steps to use:</b></p>
     <ol>
       <li><b>pip install black[d]</b></li>
       <li>Start <b>blackd</b> daemon.</li>
