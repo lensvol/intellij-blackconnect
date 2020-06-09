@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - 'build.gradle'
+      - 'gradle.properties'
+      - 'src/**'
 jobs:
   gradle:
     strategy:
