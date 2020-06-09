@@ -1,6 +1,6 @@
 # intellij-blackconnect
 
-![GitHub](https://img.shields.io/github/license/lensvol/intellij-blackconnect) ![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/14321-blackconnect) ![JetBrains IntelliJ plugins](https://img.shields.io/jetbrains/plugin/d/14321-blackconnect) 
+![GitHub](https://img.shields.io/github/license/lensvol/intellij-blackconnect) ![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/14321-blackconnect) ![JetBrains IntelliJ plugins](https://img.shields.io/jetbrains/plugin/d/14321-blackconnect) ![build](https://github.com/lensvol/intellij-blackconnect/workflows/build/badge.svg) 
 
 Simple plugin for IDEA intended to help you to avoid overhead from starting [black](https://github.com/psf/black) process each time you save a Python file.
 
