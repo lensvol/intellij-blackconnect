@@ -1,4 +1,4 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -7,7 +7,8 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-
+import me.lensvol.blackconnect.BlackdReformatter
+import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 class FormatUsingBlackdAction : AnAction(), DumbAware {
 
@@ -31,7 +32,10 @@ class FormatUsingBlackdAction : AnAction(), DumbAware {
         val configuration = BlackConnectProjectSettings.getInstance(project)
         val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
         vFile?.let {
-            event.presentation.isEnabled = BlackdReformatter(project, configuration).isFileSupported(vFile)
+            event.presentation.isEnabled = BlackdReformatter(
+                project,
+                configuration
+            ).isFileSupported(vFile)
         }
     }
 }

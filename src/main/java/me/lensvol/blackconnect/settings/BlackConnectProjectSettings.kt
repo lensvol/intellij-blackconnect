@@ -1,4 +1,4 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.settings
 
 import com.intellij.openapi.components.*
 import com.intellij.openapi.project.Project

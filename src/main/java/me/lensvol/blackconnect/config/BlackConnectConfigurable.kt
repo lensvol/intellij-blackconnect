@@ -1,7 +1,8 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.config
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import javax.swing.JComponent
 
 class BlackConnectConfigurable(project: Project) : Configurable {
@@ -9,7 +10,8 @@ class BlackConnectConfigurable(project: Project) : Configurable {
         BlackConnectSettingsPanel()
     }
 
-    private val configuration: BlackConnectProjectSettings = BlackConnectProjectSettings.getInstance(project)
+    private val configuration: BlackConnectProjectSettings =
+        BlackConnectProjectSettings.getInstance(project)
 
     override fun isModified(): Boolean {
         return panel.isModified(configuration)

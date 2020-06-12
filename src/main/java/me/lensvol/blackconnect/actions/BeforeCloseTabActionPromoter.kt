@@ -1,4 +1,4 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.actions
 
 import com.intellij.openapi.actionSystem.ActionPromoter
 import com.intellij.openapi.actionSystem.AnAction

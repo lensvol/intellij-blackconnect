@@ -45,25 +45,25 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="tools"
                              id="me.lensvol.blackconnect.settings"
-                             provider="me.lensvol.blackconnect.BlackConnectConfigurableProvider"/>
-        <applicationService serviceImplementation="me.lensvol.blackconnect.BlackConnectGlobalSettings"/>
-        <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProjectSettings"/>
+                             provider="me.lensvol.blackconnect.config.BlackConnectConfigurableProvider"/>
+        <applicationService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectGlobalSettings"/>
+        <projectService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectProjectSettings"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProgressTracker"/>
-        <actionPromoter implementation="me.lensvol.blackconnect.BeforeCloseTabActionPromoter"/>
+        <actionPromoter implementation="me.lensvol.blackconnect.actions.BeforeCloseTabActionPromoter"/>
     </extensions>
 
     <depends>com.intellij.modules.lang</depends>
 
     <actions>
-        <action id="me.lensvol.blackconnect.FormatUsingBlackdAction"
-                class="me.lensvol.blackconnect.FormatUsingBlackdAction"
+        <action id="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
+                class="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
                 text="Format Code Using Blackd"
                 description="Try to reformat code in current tab."
                 icon="/icons/blackconnect.svg">
             <keyboard-shortcut first-keystroke="alt shift b" keymap="$default"/>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </action>
-        <action id="me.lensvol.blackconnect.BeforeTabClosedAction" class="me.lensvol.blackconnect.BeforeTabClosedAction"
+        <action id="me.lensvol.blackconnect.actions.BeforeTabClosedAction" class="me.lensvol.blackconnect.actions.BeforeTabClosedAction"
                 use-shortcut-of="CloseContent"/>
     </actions>
 

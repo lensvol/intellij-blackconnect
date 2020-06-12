@@ -7,6 +7,8 @@ import com.intellij.openapi.application.ApplicationInfo
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
+import me.lensvol.blackconnect.ui.NewSettingsReminderNotification
 
 class PluginStartupActivity : StartupActivity, DumbAware {
     override fun runActivity(project: Project) {
@@ -22,8 +24,8 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         val appLevelConfiguration = BlackConnectGlobalSettings.getInstance()
         if (appLevelConfiguration.showSaveTriggerOptIn) {
             val optInNotification = NewSettingsReminderNotification(
-                    notificationGroup,
-                    project, appLevelConfiguration
+                notificationGroup,
+                project, appLevelConfiguration
             )
             optInNotification.notify(project)
         }

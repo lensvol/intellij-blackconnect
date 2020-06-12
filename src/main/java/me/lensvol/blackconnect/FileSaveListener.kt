@@ -4,6 +4,7 @@ import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.project.Project
+import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 class FileSaveListener(project: Project) : FileDocumentManagerListener {
     private val currentProject: Project = project

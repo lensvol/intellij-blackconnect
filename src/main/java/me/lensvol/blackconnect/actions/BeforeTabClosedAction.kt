@@ -1,4 +1,4 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.actions
 
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.actionSystem.ex.ActionUtil
@@ -6,6 +6,7 @@ import com.intellij.openapi.components.service
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.vfs.VirtualFile
+import me.lensvol.blackconnect.BlackConnectProgressTracker
 
 class BeforeTabClosedAction : AnAction(), DumbAware {
 

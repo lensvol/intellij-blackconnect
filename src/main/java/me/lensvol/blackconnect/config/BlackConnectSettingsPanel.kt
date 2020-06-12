@@ -1,9 +1,10 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.config
 
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
+import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.*
 import javax.swing.*
 

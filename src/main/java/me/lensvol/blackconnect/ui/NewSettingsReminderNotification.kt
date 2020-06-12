@@ -1,10 +1,12 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.ui
 
 import com.intellij.notification.*
 import com.intellij.notification.impl.NotificationFullContent
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.IconLoader
+import me.lensvol.blackconnect.config.BlackConnectConfigurable
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 
 const val REMINDER_TEXT = """We've added several new features for your convenience:<br><br>
 –&nbsp;Reformat on file save.<br>
@@ -18,10 +20,11 @@ You can enable/disable them individually in the project settings.
 class NewSettingsReminderNotification(
         notificationGroup: NotificationGroup,
         project: Project,
-        configuration: BlackConnectGlobalSettings) : Notification(
+        configuration: BlackConnectGlobalSettings
+) : Notification(
             notificationGroup.displayId,
             "BlackConnect",
-            REMINDER_TEXT,
+    REMINDER_TEXT,
             NotificationType.INFORMATION,
             NotificationListener.URL_OPENING_LISTENER
 ), NotificationFullContent {
@@ -30,7 +33,9 @@ class NewSettingsReminderNotification(
 
         addAction(NotificationAction.createSimpleExpiring("Show settings") {
             configuration.showSaveTriggerOptIn = false
-            ShowSettingsUtil.getInstance().editConfigurable(project, BlackConnectConfigurable(project))
+            ShowSettingsUtil.getInstance().editConfigurable(project,
+                BlackConnectConfigurable(project)
+            )
         })
         addAction(NotificationAction.createSimpleExpiring("Not now") {})
         addAction(NotificationAction.createSimpleExpiring("Do not display again") {
