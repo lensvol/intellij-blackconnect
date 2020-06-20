@@ -32,6 +32,11 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
+      <p>0.3.0</p>
+      <ul>
+        <li>Nothing yet.</li>
+      </ul>
+
       <p>0.2.1</p>
       <ul>
         <li>Fix menu option being disabled during re-indexing.</li>
