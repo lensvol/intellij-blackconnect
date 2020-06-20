@@ -43,3 +43,11 @@ patchPluginXml {
       </ul>
       """
 }
+
+processResources {
+    def properties = ['version': project.version]
+    inputs.properties(properties)
+    filesMatching('version.properties') {
+        expand(properties)
+    }
+}
