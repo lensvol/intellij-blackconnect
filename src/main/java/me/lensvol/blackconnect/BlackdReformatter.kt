@@ -7,6 +7,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.CommandProcessor
 import com.intellij.openapi.command.UndoConfirmationPolicy
 import com.intellij.openapi.components.service
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileTypes.LanguageFileType
@@ -31,6 +32,8 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
     private val notificationGroup: NotificationGroup =
         NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
 
+    private val logger = Logger.getInstance(PluginStartupActivity::class.java.name)
+
     fun isFileSupported(file: VirtualFile): Boolean {
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
                 (currentConfig.enableJupyterSupport &&
@@ -50,6 +53,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(
             object : Task.Backgroundable(currentProject, "Calling blackd") {
                 override fun run(indicator: ProgressIndicator) {
+                    logger.debug("Reformatting code in '$fileName'")
                     reformatCodeInDocument(currentConfig, document, fileName, project)
                 }
             },
@@ -119,6 +123,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
         project: @Nullable Project
     ) {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
+        logger.debug("Reformatting cancelled before we could begin")
         if (progressIndicator?.isCanceled == true)
             return
 
@@ -132,17 +137,20 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
             targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else ""
         )
 
+        logger.debug("Reformatting cancelled after call to blackd")
         if (progressIndicator?.isCanceled == true)
             return
 
         when (responseCode) {
             200 -> {
+                logger.debug("200 OK: Code should be reformatted")
                 ApplicationManager.getApplication().invokeLater {
                     ApplicationManager.getApplication().runWriteAction(Computable {
                         if (progressIndicator?.isCanceled == false) {
                             CommandProcessor.getInstance().executeCommand(
                                 project,
                                 {
+                                    logger.debug("Code is going to be updated in $document")
                                     document.setText(responseText)
                                 },
                                 "Reformat code using blackd",
@@ -150,22 +158,28 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
                                 UndoConfirmationPolicy.DEFAULT,
                                 document
                             )
+                        } else {
+                            logger.debug("Reformatting cancelled before updating the document")
                         }
                     })
                 }
             }
             204 -> {
+                logger.debug("No changes to formatting, move along.")
                 // Nothing was modified, nothing to do here, move along.
             }
             400 -> {
+                logger.debug("400 Bad Request: Source code contained syntax errors.")
                 if (configuration.showSyntaxErrorMsgs) {
                     showError("Source code contained syntax errors.")
                 }
             }
             500 -> {
+                logger.debug("500 Internal Error: Something went wrong.")
                 showError("Internal error, please see blackd output.")
             }
             else -> {
+                logger.debug("Something unexpected happened:\n$responseText")
                 showError("Something unexpected happened:\n$responseText")
             }
         }
