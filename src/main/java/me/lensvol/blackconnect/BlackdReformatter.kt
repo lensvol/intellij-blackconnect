@@ -146,9 +146,14 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
         when (responseCode) {
             200 -> {
                 logger.debug("200 OK: Code should be reformatted")
-                ApplicationManager.getApplication().invokeLater {
-                    ApplicationManager.getApplication().runWriteAction(Computable {
-                        if (progressIndicator?.isCanceled == false) {
+                with (ApplicationManager.getApplication()) {
+                    invokeLater {
+                        runWriteAction(Computable {
+                            if (progressIndicator?.isCanceled == true) {
+                                logger.debug("Reformatting cancelled before updating the document")
+                                return@Computable
+                            }
+
                             CommandProcessor.getInstance().executeCommand(
                                 project,
                                 {
@@ -160,10 +165,8 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
                                 UndoConfirmationPolicy.DEFAULT,
                                 document
                             )
-                        } else {
-                            logger.debug("Reformatting cancelled before updating the document")
-                        }
-                    })
+                        })
+                    }
                 }
             }
             204 -> {
