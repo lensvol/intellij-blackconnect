@@ -72,40 +72,42 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
     ): Pair<Int, String> {
         val url = URL(path)
 
-        try {
-            with(url.openConnection() as HttpURLConnection) {
-                requestMethod = "POST"
-                doOutput = true
+        with(url.openConnection() as HttpURLConnection) {
+            requestMethod = "POST"
+            doOutput = true
 
-                setRequestProperty("X-Protocol-Version", "1")
-                setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe")
-                setRequestProperty("X-Line-Length", lineLength.toString())
+            setRequestProperty("X-Protocol-Version", "1")
+            setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe")
+            setRequestProperty("X-Line-Length", lineLength.toString())
 
-                if (pyi) {
-                    setRequestProperty("X-Python-Variant", "pyi")
-                } else {
-                    if (!targetPythonVersions.isEmpty()) {
-                        setRequestProperty("X-Python-Variant", targetPythonVersions)
-                    }
-                }
-
-                if (skipStringNormalization) {
-                    setRequestProperty("X-Skip-String-Normalization", "yes")
-                }
-
-                try {
-                    outputStream.use { os ->
-                        val input: ByteArray = sourceCode.toByteArray()
-                        os.write(input, 0, input.size)
-                    }
-
-                    inputStream.bufferedReader().use { return Pair(responseCode, it.readText()) }
-                } catch (e: IOException) {
-                    return Pair(responseCode, errorStream.readBytes().toString())
+            if (pyi) {
+                setRequestProperty("X-Python-Variant", "pyi")
+            } else {
+                if (!targetPythonVersions.isEmpty()) {
+                    setRequestProperty("X-Python-Variant", targetPythonVersions)
                 }
             }
-        } catch (e: ConnectException) {
-            return Pair(-1, e.message ?: "Connection failed.")
+
+            if (skipStringNormalization) {
+                setRequestProperty("X-Skip-String-Normalization", "yes")
+            }
+
+            try {
+                connect()
+            } catch (e: ConnectException) {
+                return Pair(-1, e.message ?: "Connection failed.")
+            }
+
+            try {
+                outputStream.use { os ->
+                    val input: ByteArray = sourceCode.toByteArray()
+                    os.write(input, 0, input.size)
+                }
+
+                inputStream.bufferedReader().use { return Pair(responseCode, it.readText()) }
+            } catch (e: IOException) {
+                return Pair(responseCode, errorStream.readBytes().toString())
+            }
         }
     }
 
