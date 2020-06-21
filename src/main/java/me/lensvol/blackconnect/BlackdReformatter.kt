@@ -32,7 +32,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
     private val notificationGroup: NotificationGroup =
         NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
 
-    private val logger = Logger.getInstance(PluginStartupActivity::class.java.name)
+    private val logger = Logger.getInstance(BlackdReformatter::class.java.name)
 
     fun isFileSupported(file: VirtualFile): Boolean {
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
