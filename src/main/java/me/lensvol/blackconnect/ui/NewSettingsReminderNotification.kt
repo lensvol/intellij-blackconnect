@@ -1,6 +1,10 @@
 package me.lensvol.blackconnect.ui
 
-import com.intellij.notification.*
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
+import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationListener
+import com.intellij.notification.NotificationType
 import com.intellij.notification.impl.NotificationFullContent
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project

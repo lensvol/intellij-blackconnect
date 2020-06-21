@@ -5,9 +5,16 @@ import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import java.awt.*
-import javax.swing.*
-
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.FlowLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import javax.swing.JCheckBox
+import javax.swing.JPanel
+import javax.swing.JSpinner
+import javax.swing.JTextField
+import javax.swing.SpinnerNumberModel
 
 class BlackConnectSettingsPanel : JPanel() {
     private val hostnameText = JTextField("127.0.0.1")
