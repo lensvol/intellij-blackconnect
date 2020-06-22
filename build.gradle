@@ -34,7 +34,7 @@ patchPluginXml {
     changeNotes """
       <p>0.3.0</p>
       <ul>
-        <li>Nothing yet.</li>
+        <li>Fix file being reformatted multiple times if several projects are opened.</li>
       </ul>
 
       <p>0.2.1</p>
