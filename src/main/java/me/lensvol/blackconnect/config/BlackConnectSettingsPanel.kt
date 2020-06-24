@@ -1,6 +1,12 @@
 package me.lensvol.blackconnect.config
 
+import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.IdeBorderFactory
+import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
@@ -10,13 +16,16 @@ import java.awt.Component
 import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
+import com.moandjiezana.toml.Toml
+import java.util.Collections
 
-class BlackConnectSettingsPanel : JPanel() {
+class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val hostnameText = JTextField("127.0.0.1")
 
     private val portSpinnerModel = SpinnerNumberModel(45484, 1, 65535, 1)
@@ -31,10 +40,12 @@ class BlackConnectSettingsPanel : JPanel() {
 
     private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
 
-    private val targetVersions = listOf("2.7", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8")
+    private val targetVersions = mapOf("py27" to "2.7", "py33" to "3.3", "py34" to "3.4", "py35" to "3.5", "py36" to "3.6", "py37" to "3.7", "py38" to "3.8")
+
+    private val loadPyprojectTomlButton = JButton("Load from pyproject.toml")
 
     private val versionCheckboxes = sortedMapOf<String, JCheckBox>().apply {
-        targetVersions.map { version ->
+        targetVersions.values.map { version ->
             this.put("py$version", JCheckBox(version))
         }
     }
@@ -43,6 +54,37 @@ class BlackConnectSettingsPanel : JPanel() {
     private val showSyntaxErrorMsgsCheckbox = JCheckBox("Show notifications about syntax errors")
 
     init {
+        loadPyprojectTomlButton.isEnabled = true
+        loadPyprojectTomlButton.addActionListener {
+            val foundFiles = FileBasedIndex.getInstance().getContainingFiles(
+                FilenameIndex.NAME,
+                "pyproject.toml",
+                GlobalSearchScope.allScope(project)
+            )
+            if (foundFiles.count() == 0) {
+                Messages.showErrorDialog("No pyproject.toml found!", "BlackConnect")
+            } else {
+                val toml: Toml = Toml().read(foundFiles.first().inputStream)
+                if (toml.contains("tool.black")) {
+                    val blackSettings = toml.getTable("tool.black")
+                    ApplicationManager.getApplication().invokeLater {
+                        lineLengthSpinner.value = blackSettings.getLong("line-length", (lineLengthSpinner.value as Int).toLong()).toInt()
+                        val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
+                        if (targetVersionsFromFile.count() > 0) {
+                            targetSpecificVersionsCheckbox.isSelected = true
+                            targetVersions.entries.map {entry ->
+                                versionCheckboxes["py" + entry.value]?.isSelected = targetVersionsFromFile.contains(entry.key)
+                            }
+                        } else {
+                            targetSpecificVersionsCheckbox.isSelected = false
+                        }
+                        skipStringNormalCheckbox.isSelected = blackSettings.getBoolean("skip-string-normalization", skipStringNormalCheckbox.isSelected)
+                        fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", fastModeCheckbox.isSelected)
+                    }
+                }
+            }
+        }
+
         layout = GridBagLayout()
         border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
 
@@ -76,14 +118,15 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Formatting options")
 
             add(
-                    FormBuilder.createFormBuilder()
-                            .addLabeledComponent("Line length:", lineLengthSpinner)
-                            .addComponent(fastModeCheckbox)
-                            .addComponent(skipStringNormalCheckbox)
-                            .addComponent(targetSpecificVersionsCheckbox)
-                            .addComponent(targetVersionsPanel)
-                            .panel,
-                    BorderLayout.NORTH
+                FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Line length:", lineLengthSpinner)
+                    .addComponent(fastModeCheckbox)
+                    .addComponent(skipStringNormalCheckbox)
+                    .addComponent(targetSpecificVersionsCheckbox)
+                    .addComponent(targetVersionsPanel)
+                    .addComponent(loadPyprojectTomlButton)
+                    .panel,
+                BorderLayout.NORTH
             )
         }
 
@@ -94,11 +137,11 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Connection settings")
 
             add(
-                    FormBuilder.createFormBuilder()
-                            .addLabeledComponent("Hostname:", hostnameText)
-                            .addLabeledComponent("Port:", portSpinner)
-                            .panel,
-                    BorderLayout.NORTH
+                FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Hostname:", hostnameText)
+                    .addLabeledComponent("Port:", portSpinner)
+                    .panel,
+                BorderLayout.NORTH
             )
         }
 
@@ -107,11 +150,11 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
 
             add(
-                    FormBuilder.createFormBuilder()
-                            .addComponent(jupyterSupportCheckbox)
-                            .addComponent(showSyntaxErrorMsgsCheckbox)
-                            .panel,
-                    BorderLayout.NORTH
+                FormBuilder.createFormBuilder()
+                    .addComponent(jupyterSupportCheckbox)
+                    .addComponent(showSyntaxErrorMsgsCheckbox)
+                    .panel,
+                BorderLayout.NORTH
             )
         }
 
@@ -171,21 +214,21 @@ class BlackConnectSettingsPanel : JPanel() {
 
     private fun generateVersionSpec(): String {
         return versionCheckboxes
-                .filter { it.value.isSelected }
-                .map { it.key }
-                .joinToString(",")
+            .filter { it.value.isSelected }
+            .map { it.key }
+            .joinToString(",")
     }
 
     fun isModified(configuration: BlackConnectProjectSettings): Boolean {
         return hostnameText.text != configuration.hostname ||
-                portSpinner.value != configuration.port ||
-                lineLengthSpinner.value != configuration.lineLength ||
-                fastModeCheckbox.isSelected != configuration.fastMode ||
-                skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
-                triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
-                targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
-                generateVersionSpec() != configuration.pythonTargets ||
-                jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
-                showSyntaxErrorMsgsCheckbox.isSelected != configuration.showSyntaxErrorMsgs
+            portSpinner.value != configuration.port ||
+            lineLengthSpinner.value != configuration.lineLength ||
+            fastModeCheckbox.isSelected != configuration.fastMode ||
+            skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
+            triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
+            targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
+            generateVersionSpec() != configuration.pythonTargets ||
+            jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
+            showSyntaxErrorMsgsCheckbox.isSelected != configuration.showSyntaxErrorMsgs
     }
 }

@@ -7,7 +7,7 @@ import javax.swing.JComponent
 
 class BlackConnectConfigurable(project: Project) : Configurable {
     private val panel: BlackConnectSettingsPanel by lazy {
-        BlackConnectSettingsPanel()
+        BlackConnectSettingsPanel(project)
     }
 
     private val configuration: BlackConnectProjectSettings =
