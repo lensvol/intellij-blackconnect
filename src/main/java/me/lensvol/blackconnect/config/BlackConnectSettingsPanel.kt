@@ -23,6 +23,7 @@ import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 import com.moandjiezana.toml.Toml
+import java.io.BufferedReader
 import java.util.Collections
 
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
@@ -64,24 +65,8 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             if (foundFiles.count() == 0) {
                 Messages.showErrorDialog("No pyproject.toml found!", "BlackConnect")
             } else {
-                val toml: Toml = Toml().read(foundFiles.first().inputStream)
-                if (toml.contains("tool.black")) {
-                    val blackSettings = toml.getTable("tool.black")
-                    ApplicationManager.getApplication().invokeLater {
-                        lineLengthSpinner.value = blackSettings.getLong("line-length", (lineLengthSpinner.value as Int).toLong()).toInt()
-                        val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
-                        if (targetVersionsFromFile.count() > 0) {
-                            targetSpecificVersionsCheckbox.isSelected = true
-                            targetVersions.entries.map {entry ->
-                                versionCheckboxes["py" + entry.value]?.isSelected = targetVersionsFromFile.contains(entry.key)
-                            }
-                        } else {
-                            targetSpecificVersionsCheckbox.isSelected = false
-                        }
-                        skipStringNormalCheckbox.isSelected = blackSettings.getBoolean("skip-string-normalization", skipStringNormalCheckbox.isSelected)
-                        fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", fastModeCheckbox.isSelected)
-                    }
-                }
+                val contents = foundFiles.first().inputStream.bufferedReader().use(BufferedReader::readText)
+                processPyprojectToml(contents)
             }
         }
 
@@ -175,6 +160,31 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         constraints.gridx = 0
         constraints.anchor = GridBagConstraints.NORTH
         add(JPanel(), constraints)
+    }
+
+    private fun processPyprojectToml(tomlContents: String) {
+        val toml: Toml = Toml().read(tomlContents)
+        if (!toml.contains("tool.black")) {
+            return
+        }
+
+        val blackSettings = toml.getTable("tool.black")
+        ApplicationManager.getApplication().invokeLater {
+            lineLengthSpinner.value =
+                blackSettings.getLong("line-length", (lineLengthSpinner.value as Int).toLong()).toInt()
+            val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
+            if (targetVersionsFromFile.count() > 0) {
+                targetSpecificVersionsCheckbox.isSelected = true
+                targetVersions.entries.map { entry ->
+                    versionCheckboxes["py" + entry.value]?.isSelected = targetVersionsFromFile.contains(entry.key)
+                }
+            } else {
+                targetSpecificVersionsCheckbox.isSelected = false
+            }
+            skipStringNormalCheckbox.isSelected =
+                blackSettings.getBoolean("skip-string-normalization", skipStringNormalCheckbox.isSelected)
+            fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", fastModeCheckbox.isSelected)
+        }
     }
 
     fun apply(configuration: BlackConnectProjectSettings) {
