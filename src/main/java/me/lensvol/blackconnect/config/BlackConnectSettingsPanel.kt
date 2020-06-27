@@ -1,8 +1,10 @@
 package me.lensvol.blackconnect.config
 
-import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.fileChooser.FileChooser
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.fileChooser.FileElement
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.IdeBorderFactory
@@ -10,21 +12,21 @@ import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
+import com.moandjiezana.toml.Toml
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import java.io.BufferedReader
+import java.util.Collections
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
-import com.moandjiezana.toml.Toml
-import java.io.BufferedReader
-import java.util.Collections
 
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val hostnameText = JTextField("127.0.0.1")
@@ -41,7 +43,15 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
 
     private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
 
-    private val targetVersions = mapOf("py27" to "2.7", "py33" to "3.3", "py34" to "3.4", "py35" to "3.5", "py36" to "3.6", "py37" to "3.7", "py38" to "3.8")
+    private val targetVersions = mapOf(
+        "py27" to "2.7",
+        "py33" to "3.3",
+        "py34" to "3.4",
+        "py35" to "3.5",
+        "py36" to "3.6",
+        "py37" to "3.7",
+        "py38" to "3.8"
+    )
 
     private val loadPyprojectTomlButton = JButton("Load from pyproject.toml")
 
@@ -57,15 +67,15 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     init {
         loadPyprojectTomlButton.isEnabled = true
         loadPyprojectTomlButton.addActionListener {
-            val foundFiles = FileBasedIndex.getInstance().getContainingFiles(
+            val pyprojectTomlDescriptor = createPyprojectSpecificDescriptor()
+            val candidates = FileBasedIndex.getInstance().getContainingFiles(
                 FilenameIndex.NAME,
                 "pyproject.toml",
                 GlobalSearchScope.allScope(project)
             )
-            if (foundFiles.count() == 0) {
-                Messages.showErrorDialog("No pyproject.toml found!", "BlackConnect")
-            } else {
-                val contents = foundFiles.first().inputStream.bufferedReader().use(BufferedReader::readText)
+
+            FileChooser.chooseFile(pyprojectTomlDescriptor, project, parent, candidates.firstOrNull()) { file ->
+                val contents = file.inputStream.bufferedReader().use(BufferedReader::readText)
                 processPyprojectToml(contents)
             }
         }
@@ -162,6 +172,28 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         add(JPanel(), constraints)
     }
 
+    private fun createPyprojectSpecificDescriptor(): FileChooserDescriptor {
+        val fileSpecificDescriptor = object : FileChooserDescriptor(true, false, false, false, false, false) {
+            override fun isFileSelectable(file: VirtualFile?): Boolean {
+                return super.isFileSelectable(file) && file?.name.equals("pyproject.toml")
+            }
+
+            override fun isFileVisible(file: VirtualFile?, showHiddenFiles: Boolean): Boolean {
+                if (file == null) {
+                    return false
+                }
+
+                if (!showHiddenFiles && FileElement.isFileHidden(file)) {
+                    return false
+                }
+
+                return file.isDirectory || file.name == "pyproject.toml"
+            }
+        }
+        fileSpecificDescriptor.isForcedToUseIdeaFileChooser = true
+        return fileSpecificDescriptor
+    }
+
     private fun processPyprojectToml(tomlContents: String) {
         val toml: Toml = Toml().read(tomlContents)
         if (!toml.contains("tool.black")) {
@@ -169,22 +201,20 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         }
 
         val blackSettings = toml.getTable("tool.black")
-        ApplicationManager.getApplication().invokeLater {
-            lineLengthSpinner.value =
-                blackSettings.getLong("line-length", (lineLengthSpinner.value as Int).toLong()).toInt()
-            val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
-            if (targetVersionsFromFile.count() > 0) {
-                targetSpecificVersionsCheckbox.isSelected = true
-                targetVersions.entries.map { entry ->
-                    versionCheckboxes["py" + entry.value]?.isSelected = targetVersionsFromFile.contains(entry.key)
-                }
-            } else {
-                targetSpecificVersionsCheckbox.isSelected = false
+        lineLengthSpinner.value =
+            blackSettings.getLong("line-length", 88).toInt()
+        val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
+        if (targetVersionsFromFile.count() > 0) {
+            targetSpecificVersionsCheckbox.isSelected = true
+            targetVersions.entries.map { entry ->
+                versionCheckboxes["py" + entry.value]?.isSelected = targetVersionsFromFile.contains(entry.key)
             }
-            skipStringNormalCheckbox.isSelected =
-                blackSettings.getBoolean("skip-string-normalization", skipStringNormalCheckbox.isSelected)
-            fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", fastModeCheckbox.isSelected)
+        } else {
+            targetSpecificVersionsCheckbox.isSelected = false
         }
+        skipStringNormalCheckbox.isSelected =
+            blackSettings.getBoolean("skip-string-normalization", false)
+        fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", false)
     }
 
     fun apply(configuration: BlackConnectProjectSettings) {
