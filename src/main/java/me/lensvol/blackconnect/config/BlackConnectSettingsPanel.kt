@@ -4,6 +4,7 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileElement
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
@@ -28,7 +29,7 @@ import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 
 const val PYPROJECT_TOML: String = "pyproject.toml"
-const val DEFAULT_LINE_LENGTH: Long = 88
+const val DEFAULT_LINE_LENGTH: Int = 88
 const val DEFAULT_BLACKD_PORT: Int = 45484
 
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
@@ -197,12 +198,13 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private fun processPyprojectToml(tomlContents: String) {
         val toml: Toml = Toml().read(tomlContents)
         if (!toml.contains("tool.black")) {
+            Messages.showErrorDialog(this, "<b>[tool.black]</b> section not found!", "Error")
             return
         }
 
         val blackSettings = toml.getTable("tool.black")
         lineLengthSpinner.value =
-            blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH).toInt()
+            blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH.toLong()).toInt()
         val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
         if (targetVersionsFromFile.count() > 0) {
             targetSpecificVersionsCheckbox.isSelected = true
