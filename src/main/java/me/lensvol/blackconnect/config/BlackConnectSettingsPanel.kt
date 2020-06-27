@@ -68,11 +68,8 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         loadPyprojectTomlButton.isEnabled = true
         loadPyprojectTomlButton.addActionListener {
             val pyprojectTomlDescriptor = createPyprojectSpecificDescriptor()
-            val candidates = FileBasedIndex.getInstance().getContainingFiles(
-                FilenameIndex.NAME,
-                "pyproject.toml",
-                GlobalSearchScope.allScope(project)
-            )
+            val candidates =
+                FilenameIndex.getVirtualFilesByName(project, "pyproject.toml", GlobalSearchScope.projectScope(project))
 
             FileChooser.chooseFile(pyprojectTomlDescriptor, project, parent, candidates.firstOrNull()) { file ->
                 val contents = file.inputStream.bufferedReader().use(BufferedReader::readText)
