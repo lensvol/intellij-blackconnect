@@ -8,7 +8,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.IdeBorderFactory
-import com.intellij.util.indexing.FileBasedIndex
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
@@ -28,13 +27,17 @@ import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 
+const val PYPROJECT_TOML: String = "pyproject.toml"
+const val DEFAULT_LINE_LENGTH: Long = 88
+const val DEFAULT_BLACKD_PORT: Int = 45484
+
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val hostnameText = JTextField("127.0.0.1")
 
-    private val portSpinnerModel = SpinnerNumberModel(45484, 1, 65535, 1)
+    private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
 
-    private val lineLengthModel = SpinnerNumberModel(88, 45, 255, 1)
+    private val lineLengthModel = SpinnerNumberModel(DEFAULT_LINE_LENGTH, 45, 255, 1)
     private val lineLengthSpinner = JSpinner(lineLengthModel)
 
     private val fastModeCheckbox = JCheckBox("Skip sanity checks")
@@ -172,7 +175,7 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private fun createPyprojectSpecificDescriptor(): FileChooserDescriptor {
         val fileSpecificDescriptor = object : FileChooserDescriptor(true, false, false, false, false, false) {
             override fun isFileSelectable(file: VirtualFile?): Boolean {
-                return super.isFileSelectable(file) && file?.name.equals("pyproject.toml")
+                return super.isFileSelectable(file) && file?.name.equals(PYPROJECT_TOML)
             }
 
             override fun isFileVisible(file: VirtualFile?, showHiddenFiles: Boolean): Boolean {
@@ -184,7 +187,7 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
                     return false
                 }
 
-                return file.isDirectory || file.name == "pyproject.toml"
+                return file.isDirectory || file.name == PYPROJECT_TOML
             }
         }
         fileSpecificDescriptor.isForcedToUseIdeaFileChooser = true
@@ -199,7 +202,7 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
 
         val blackSettings = toml.getTable("tool.black")
         lineLengthSpinner.value =
-            blackSettings.getLong("line-length", 88).toInt()
+            blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH).toInt()
         val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
         if (targetVersionsFromFile.count() > 0) {
             targetSpecificVersionsCheckbox.isSelected = true
