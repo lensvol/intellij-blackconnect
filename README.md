@@ -17,29 +17,36 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
     * Target specific Python versions. 
+* Load formatting settings from **[tool.black]** section of `pyproject.toml`
 
 ## Installation
 
-There are several ways to do this:
+#### Stable version
 
-* Install stable version from [JetBrains Plugins Repository](https://plugins.jetbrains.com/plugin/14321-blackconnect)
-* Be brave and try out "early access preview" version:
-  * Open *"Preferences"*
-  * Select *"Plugins"* tab
-  * Click on the gear icon and choose *"Manage plugin repositories"*
-  * Add [https://plugins.jetbrains.com/plugins/eap/14321](https://plugins.jetbrains.com/plugins/eap/14321) to the list of repositories
-  * Find **BlackConnect** in the Marketplace, version should have suffix *"EAP-[timestamp]"*
-* ...or just compile it straight from the source code:
-  * Open this project in IDEA.
-  * Open _Gradle_ side tab and run `buildPlugin` task.
-  * After project is built, open your favorite IDEA-based IDE.
-  * In **Preferences** window, choose *Plugins* pane and click on the gear icon.
-  * Choose `Install Plugin from Disk` and point it to ZIP file in the `build/distributions` directory.
+Just go to the [plugin page](https://plugins.jetbrains.com/plugin/14321-blackconnect) in *JetBrains Plugins Repository* and press `Install to IDE`.
+
+#### Early Access Preview
+
+Be brave and try out "early access preview" version:
+* Open *"Preferences"*
+* Select *"Plugins"* tab
+* Click on the gear icon and choose *"Manage plugin repositories"*
+* Add [https://plugins.jetbrains.com/plugins/eap/14321](https://plugins.jetbrains.com/plugins/eap/14321) to the list of repositories
+* Find **BlackConnect** in the Marketplace, version should have suffix *"EAP-[timestamp]"*
+
+#### Development Snapshot
+
+...or just compile it straight from the source code:
+
+* Open this project in IDEA.
+* Open _Gradle_ side tab and run `buildPlugin` task.
+* After project is built, open your favorite IDEA-based IDE.
+* In **Preferences** window, choose *Plugins* pane and click on the gear icon.
+* Choose `Install Plugin from Disk` and point it to ZIP file in the `build/distributions` directory.
 
 ## TODOs
 
 * Spawn **blackd** process if not started already.
-* Load applicable **black** settings from `pyproject.toml`
 * Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
 * "Live reformatting".
 * Automatic detection of applicable Python frameworks.
@@ -48,7 +55,7 @@ There are several ways to do this:
 
 ## Special thanks
 
-* Andrey Vlasovskikh - goading me into publishing this plugin.
-* Łukasz Langa - hinting at a proper font for the icon.
-* Nazmul Idris - writing [awesome article](https://developerlife.com/2019/08/25/idea-plugin-example-intro/) about IDEA plugins.
-* Joachim Ansorg - for the most detailed guide to writing IDEA plugins.
+* [Andrey Vlasovskikh](https://github.com/vlasovskikh) - goading me into publishing this plugin.
+* [Łukasz Langa](https://github.com/ambv) - hinting at a proper font for the icon.
+* [Nazmul Idris](https://github.com/nazmulidris) - writing [awesome article](https://developerlife.com/2019/08/25/idea-plugin-example-intro/) about IDEA plugins.
+* [Joachim Ansorg](https://github.com/jansorg) - for the [most detailed guide](https://www.plugin-dev.com/intellij/) to writing IDEA plugins I could find.
