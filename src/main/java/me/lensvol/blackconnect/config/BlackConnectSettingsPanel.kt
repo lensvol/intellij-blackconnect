@@ -1,28 +1,44 @@
 package me.lensvol.blackconnect.config
 
+import com.intellij.openapi.fileChooser.FileChooser
+import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.fileChooser.FileElement
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.psi.search.FilenameIndex
+import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
+import com.moandjiezana.toml.Toml
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.FlowLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import java.io.BufferedReader
+import java.util.Collections
+import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 
-class BlackConnectSettingsPanel : JPanel() {
+const val PYPROJECT_TOML: String = "pyproject.toml"
+const val DEFAULT_LINE_LENGTH: Int = 88
+const val DEFAULT_BLACKD_PORT: Int = 45484
+
+class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val hostnameText = JTextField("127.0.0.1")
 
-    private val portSpinnerModel = SpinnerNumberModel(45484, 1, 65535, 1)
+    private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
 
-    private val lineLengthModel = SpinnerNumberModel(88, 45, 255, 1)
+    private val lineLengthModel = SpinnerNumberModel(DEFAULT_LINE_LENGTH, 45, 255, 1)
     private val lineLengthSpinner = JSpinner(lineLengthModel)
 
     private val fastModeCheckbox = JCheckBox("Skip sanity checks")
@@ -31,10 +47,20 @@ class BlackConnectSettingsPanel : JPanel() {
 
     private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
 
-    private val targetVersions = listOf("2.7", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8")
+    private val targetVersions = mapOf(
+        "py27" to "2.7",
+        "py33" to "3.3",
+        "py34" to "3.4",
+        "py35" to "3.5",
+        "py36" to "3.6",
+        "py37" to "3.7",
+        "py38" to "3.8"
+    )
+
+    private val loadPyprojectTomlButton = JButton("Load from pyproject.toml")
 
     private val versionCheckboxes = sortedMapOf<String, JCheckBox>().apply {
-        targetVersions.map { version ->
+        targetVersions.values.map { version ->
             this.put("py$version", JCheckBox(version))
         }
     }
@@ -43,6 +69,18 @@ class BlackConnectSettingsPanel : JPanel() {
     private val showSyntaxErrorMsgsCheckbox = JCheckBox("Show notifications about syntax errors")
 
     init {
+        loadPyprojectTomlButton.isEnabled = true
+        loadPyprojectTomlButton.addActionListener {
+            val pyprojectTomlDescriptor = createPyprojectSpecificDescriptor()
+            val candidates =
+                FilenameIndex.getVirtualFilesByName(project, "pyproject.toml", GlobalSearchScope.projectScope(project))
+
+            FileChooser.chooseFile(pyprojectTomlDescriptor, project, parent, candidates.firstOrNull()) { file ->
+                val contents = file.inputStream.bufferedReader().use(BufferedReader::readText)
+                processPyprojectToml(contents)
+            }
+        }
+
         layout = GridBagLayout()
         border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
 
@@ -76,14 +114,15 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Formatting options")
 
             add(
-                    FormBuilder.createFormBuilder()
-                            .addLabeledComponent("Line length:", lineLengthSpinner)
-                            .addComponent(fastModeCheckbox)
-                            .addComponent(skipStringNormalCheckbox)
-                            .addComponent(targetSpecificVersionsCheckbox)
-                            .addComponent(targetVersionsPanel)
-                            .panel,
-                    BorderLayout.NORTH
+                FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Line length:", lineLengthSpinner)
+                    .addComponent(fastModeCheckbox)
+                    .addComponent(skipStringNormalCheckbox)
+                    .addComponent(targetSpecificVersionsCheckbox)
+                    .addComponent(targetVersionsPanel)
+                    .addComponent(loadPyprojectTomlButton)
+                    .panel,
+                BorderLayout.NORTH
             )
         }
 
@@ -94,11 +133,11 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Connection settings")
 
             add(
-                    FormBuilder.createFormBuilder()
-                            .addLabeledComponent("Hostname:", hostnameText)
-                            .addLabeledComponent("Port:", portSpinner)
-                            .panel,
-                    BorderLayout.NORTH
+                FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Hostname:", hostnameText)
+                    .addLabeledComponent("Port:", portSpinner)
+                    .panel,
+                BorderLayout.NORTH
             )
         }
 
@@ -107,11 +146,11 @@ class BlackConnectSettingsPanel : JPanel() {
             border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
 
             add(
-                    FormBuilder.createFormBuilder()
-                            .addComponent(jupyterSupportCheckbox)
-                            .addComponent(showSyntaxErrorMsgsCheckbox)
-                            .panel,
-                    BorderLayout.NORTH
+                FormBuilder.createFormBuilder()
+                    .addComponent(jupyterSupportCheckbox)
+                    .addComponent(showSyntaxErrorMsgsCheckbox)
+                    .panel,
+                BorderLayout.NORTH
             )
         }
 
@@ -132,6 +171,52 @@ class BlackConnectSettingsPanel : JPanel() {
         constraints.gridx = 0
         constraints.anchor = GridBagConstraints.NORTH
         add(JPanel(), constraints)
+    }
+
+    private fun createPyprojectSpecificDescriptor(): FileChooserDescriptor {
+        val fileSpecificDescriptor = object : FileChooserDescriptor(true, false, false, false, false, false) {
+            override fun isFileSelectable(file: VirtualFile?): Boolean {
+                return super.isFileSelectable(file) && file?.name.equals(PYPROJECT_TOML)
+            }
+
+            override fun isFileVisible(file: VirtualFile?, showHiddenFiles: Boolean): Boolean {
+                if (file == null) {
+                    return false
+                }
+
+                if (!showHiddenFiles && FileElement.isFileHidden(file)) {
+                    return false
+                }
+
+                return file.isDirectory || file.name == PYPROJECT_TOML
+            }
+        }
+        fileSpecificDescriptor.isForcedToUseIdeaFileChooser = true
+        return fileSpecificDescriptor
+    }
+
+    private fun processPyprojectToml(tomlContents: String) {
+        val toml: Toml = Toml().read(tomlContents)
+        if (!toml.contains("tool.black")) {
+            Messages.showErrorDialog(this, "<b>[tool.black]</b> section not found!", "Error")
+            return
+        }
+
+        val blackSettings = toml.getTable("tool.black")
+        lineLengthSpinner.value =
+            blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH.toLong()).toInt()
+        val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
+        if (targetVersionsFromFile.count() > 0) {
+            targetSpecificVersionsCheckbox.isSelected = true
+            targetVersions.entries.map { entry ->
+                versionCheckboxes["py" + entry.value]?.isSelected = targetVersionsFromFile.contains(entry.key)
+            }
+        } else {
+            targetSpecificVersionsCheckbox.isSelected = false
+        }
+        skipStringNormalCheckbox.isSelected =
+            blackSettings.getBoolean("skip-string-normalization", false)
+        fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", false)
     }
 
     fun apply(configuration: BlackConnectProjectSettings) {
@@ -171,21 +256,21 @@ class BlackConnectSettingsPanel : JPanel() {
 
     private fun generateVersionSpec(): String {
         return versionCheckboxes
-                .filter { it.value.isSelected }
-                .map { it.key }
-                .joinToString(",")
+            .filter { it.value.isSelected }
+            .map { it.key }
+            .joinToString(",")
     }
 
     fun isModified(configuration: BlackConnectProjectSettings): Boolean {
         return hostnameText.text != configuration.hostname ||
-                portSpinner.value != configuration.port ||
-                lineLengthSpinner.value != configuration.lineLength ||
-                fastModeCheckbox.isSelected != configuration.fastMode ||
-                skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
-                triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
-                targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
-                generateVersionSpec() != configuration.pythonTargets ||
-                jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
-                showSyntaxErrorMsgsCheckbox.isSelected != configuration.showSyntaxErrorMsgs
+            portSpinner.value != configuration.port ||
+            lineLengthSpinner.value != configuration.lineLength ||
+            fastModeCheckbox.isSelected != configuration.fastMode ||
+            skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
+            triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
+            targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
+            generateVersionSpec() != configuration.pythonTargets ||
+            jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
+            showSyntaxErrorMsgsCheckbox.isSelected != configuration.showSyntaxErrorMsgs
     }
 }
