@@ -1,6 +1,5 @@
 package me.lensvol.blackconnect
 
-import com.intellij.notification.NotificationDisplayType
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.application.ApplicationManager
@@ -19,6 +18,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VirtualFile
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
+import me.lensvol.blackconnect.ui.NotificationGroupManager
 import org.jetbrains.annotations.NotNull
 import org.jetbrains.annotations.Nullable
 import java.io.IOException
@@ -29,15 +29,14 @@ import java.net.URL
 class BlackdReformatter(project: Project, configuration: BlackConnectProjectSettings) {
     private val currentProject: Project = project
     private val currentConfig: BlackConnectProjectSettings = configuration
-    private val notificationGroup: NotificationGroup =
-        NotificationGroup("BlackConnect", NotificationDisplayType.BALLOON, false)
+    private val notificationGroup: NotificationGroup = NotificationGroupManager.mainGroup()
 
     private val logger = Logger.getInstance(BlackdReformatter::class.java.name)
 
     fun isFileSupported(file: VirtualFile): Boolean {
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
-                (currentConfig.enableJupyterSupport &&
-                        (file.fileType as LanguageFileType).language.id == "Jupyter")
+            (currentConfig.enableJupyterSupport &&
+                (file.fileType as LanguageFileType).language.id == "Jupyter")
     }
 
     fun process(document: Document) {
@@ -146,7 +145,7 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
         when (responseCode) {
             200 -> {
                 logger.debug("200 OK: Code should be reformatted")
-                with (ApplicationManager.getApplication()) {
+                with(ApplicationManager.getApplication()) {
                     invokeLater {
                         runWriteAction(Computable {
                             if (progressIndicator?.isCanceled == true) {
@@ -189,5 +188,4 @@ class BlackdReformatter(project: Project, configuration: BlackConnectProjectSett
             }
         }
     }
-
 }

@@ -1,15 +1,14 @@
 package me.lensvol.blackconnect
 
 import com.intellij.AppTopics
-import com.intellij.notification.NotificationDisplayType
-import com.intellij.notification.NotificationGroup
 import com.intellij.openapi.application.ApplicationInfo
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.ui.NewSettingsReminderNotification
-import com.intellij.openapi.diagnostic.Logger
+import me.lensvol.blackconnect.ui.NotificationGroupManager
 import java.util.Properties
 
 class PluginStartupActivity : StartupActivity, DumbAware {
@@ -23,7 +22,7 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         if (versionResource != null) {
             properties.load(versionResource)
             versionResource.close()
-            logger.info("BlackConnect plugin (version: " + properties["version"] +") is ready to start.")
+            logger.info("BlackConnect plugin (version: " + properties["version"] + ") is ready to start.")
         } else {
             logger.info("Unknown version of BlackConnect plugin is ready to start.")
         }
@@ -35,12 +34,11 @@ class PluginStartupActivity : StartupActivity, DumbAware {
             project.messageBus.connect().subscribe(AppTopics.FILE_DOCUMENT_SYNC, FileSaveListener(project))
         }
 
-        val notificationGroup = NotificationGroup("BlackConnect", NotificationDisplayType.STICKY_BALLOON, false)
         val appLevelConfiguration = BlackConnectGlobalSettings.getInstance()
         if (appLevelConfiguration.showSaveTriggerOptIn) {
             logger.debug("Showing opt-in balloon.")
             val optInNotification = NewSettingsReminderNotification(
-                notificationGroup,
+                NotificationGroupManager.newsGroup(),
                 project, appLevelConfiguration
             )
             optInNotification.notify(project)
