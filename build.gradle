@@ -13,7 +13,10 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "com.moandjiezana.toml:toml4j:0.7.2"
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+
+    compile('io.sentry:sentry:1.7.30') {
+        exclude group: 'org.slf4j'
+    }
 }
 
 intellij {
