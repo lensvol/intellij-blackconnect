@@ -41,6 +41,8 @@ class SentryErrorReporter : ErrorReportSubmitter() {
 
         ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Report error to sentry.io") {
             override fun run(indicator: ProgressIndicator) {
+                indicator.isIndeterminate = true
+
                 val errors = LinkedList<SentryException>()
                 for (ideaEvent in events) {
                     if (ideaEvent is IdeaReportingEvent) {
