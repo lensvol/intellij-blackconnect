@@ -39,6 +39,7 @@ patchPluginXml {
       <p>0.3.0</p>
       <ul>
         <li>Fix file being reformatted multiple times if several projects are opened.</li>
+        <li>Improve reporting of plugin crashes.</li>
       </ul>
 
       <p>0.2.1</p>
