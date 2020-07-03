@@ -28,6 +28,10 @@ class SentryErrorReporter : ErrorReportSubmitter() {
         return "Send to author"
     }
 
+    override fun getPrivacyNoticeText(): String? {
+        return "Hereby you agree to the <a href='https://sentry.io/privacy/'>Privacy Policy of sentry.io</a>."
+    }
+
     override fun submit(
         events: Array<out IdeaLoggingEvent>,
         additionalInfo: String?,
