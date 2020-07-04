@@ -13,7 +13,10 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "com.moandjiezana.toml:toml4j:0.7.2"
-    testImplementation group: 'junit', name: 'junit', version: '4.12'
+
+    compile('io.sentry:sentry:1.7.30') {
+        exclude group: 'org.slf4j'
+    }
 }
 
 intellij {
@@ -36,6 +39,7 @@ patchPluginXml {
       <p>0.3.0</p>
       <ul>
         <li>Fix file being reformatted multiple times if several projects are opened.</li>
+        <li>Improve reporting of plugin crashes.</li>
       </ul>
 
       <p>0.2.1</p>

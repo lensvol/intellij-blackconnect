@@ -9,6 +9,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import me.lensvol.blackconnect.BlackdReformatter
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
+import java.lang.IllegalStateException
 
 class FormatUsingBlackdAction : AnAction(), DumbAware {
 

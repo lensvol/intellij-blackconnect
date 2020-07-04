@@ -77,4 +77,8 @@
                   topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"/>
     </projectListeners>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <errorHandler implementation="me.lensvol.blackconnect.sentry.SentryErrorReporter"/>
+    </extensions>
+
 </idea-plugin>
