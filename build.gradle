@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.3.0-SNAPSHOT'
+version '0.3.0'
 
 repositories {
     mavenCentral()
@@ -38,6 +38,7 @@ patchPluginXml {
     changeNotes """
       <p>0.3.0</p>
       <ul>
+        <li>Load formatting settings from <b>pyproject.toml</b>.</li>
         <li>Fix file being reformatted multiple times if several projects are opened.</li>
         <li>Improve reporting of plugin crashes.</li>
       </ul>
