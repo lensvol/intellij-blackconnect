@@ -13,20 +13,27 @@ import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.moandjiezana.toml.Toml
+import me.lensvol.blackconnect.BlackdReformatter
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
+import java.awt.Dimension
 import java.awt.FlowLayout
+import javax.swing.BoxLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.BufferedReader
 import java.util.Collections
+import javax.swing.Box
 import javax.swing.JButton
 import javax.swing.JCheckBox
+import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 const val PYPROJECT_TOML: String = "pyproject.toml"
 const val DEFAULT_LINE_LENGTH: Int = 88
@@ -37,6 +44,8 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
 
     private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
+
+    private val checkConnectionButton = JButton("Check connection")
 
     private val lineLengthModel = SpinnerNumberModel(DEFAULT_LINE_LENGTH, 45, 255, 1)
     private val lineLengthSpinner = JSpinner(lineLengthModel)
@@ -78,6 +87,36 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             FileChooser.chooseFile(pyprojectTomlDescriptor, project, parent, candidates.firstOrNull()) { file ->
                 val contents = file.inputStream.bufferedReader().use(BufferedReader::readText)
                 processPyprojectToml(contents)
+            }
+        }
+
+        hostnameText.document.addDocumentListener(object: DocumentListener {
+            override fun changedUpdate(e: DocumentEvent?) {
+                disableButtonIfNeeded(e)
+            }
+
+            override fun insertUpdate(e: DocumentEvent?) {
+                disableButtonIfNeeded(e)
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+                disableButtonIfNeeded(e)
+            }
+
+            fun disableButtonIfNeeded(e: DocumentEvent?) {
+                e?.document?.apply {
+                    checkConnectionButton.isEnabled = getText(0, length).isNotEmpty()
+                }
+            }
+        })
+
+        checkConnectionButton.addActionListener {
+            val (success, message) = BlackdReformatter.checkConnection(hostnameText.text, portSpinner.value as Int)
+
+            if (success) {
+                Messages.showInfoMessage(this,"It works!<br><br><b>blackd</b> version: ${message}", "Connection status")
+            } else {
+                Messages.showErrorDialog(this, "Cannot connect to <b>blackd</b>:<br><br><b>${message}</b>")
             }
         }
 
@@ -132,11 +171,18 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Connection settings")
 
+            val panel = FormBuilder.createFormBuilder()
+                .addLabeledComponent("Hostname:", hostnameText)
+                .addComponent(Box.createRigidArea(Dimension(8, 0)) as JComponent)
+                .addLabeledComponent("Port:", portSpinner)
+                .addComponent(Box.createRigidArea(Dimension(8, 0)) as JComponent)
+                .addComponent(checkConnectionButton)
+                .panel
+
+            panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
+
             add(
-                FormBuilder.createFormBuilder()
-                    .addLabeledComponent("Hostname:", hostnameText)
-                    .addLabeledComponent("Port:", portSpinner)
-                    .panel,
+                panel,
                 BorderLayout.NORTH
             )
         }
