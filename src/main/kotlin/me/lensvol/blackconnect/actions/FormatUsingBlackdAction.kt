@@ -7,9 +7,8 @@ import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import me.lensvol.blackconnect.BlackdReformatter
+import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import java.lang.IllegalStateException
 
 class FormatUsingBlackdAction : AnAction(), DumbAware {
 
@@ -17,7 +16,7 @@ class FormatUsingBlackdAction : AnAction(), DumbAware {
         event.project?.let { project ->
             FileEditorManagerEx.getInstance(project).selectedTextEditor?.let { editor ->
                 val configuration = BlackConnectProjectSettings.getInstance(project)
-                BlackdReformatter(project, configuration).process(editor.document)
+                CodeReformatter(project, configuration).process(editor.document)
             }
         }
     }
@@ -33,7 +32,7 @@ class FormatUsingBlackdAction : AnAction(), DumbAware {
         val configuration = BlackConnectProjectSettings.getInstance(project)
         val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
         vFile?.let {
-            event.presentation.isEnabled = BlackdReformatter(
+            event.presentation.isEnabled = CodeReformatter(
                 project,
                 configuration
             ).isFileSupported(vFile)

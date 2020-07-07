@@ -13,7 +13,8 @@ import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.moandjiezana.toml.Toml
-import me.lensvol.blackconnect.BlackdReformatter
+import me.lensvol.blackconnect.BlackdClient
+import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
@@ -111,7 +112,7 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         })
 
         checkConnectionButton.addActionListener {
-            val (success, message) = BlackdReformatter.checkConnection(hostnameText.text, portSpinner.value as Int)
+            val (success, message) = BlackdClient(hostnameText.text, portSpinner.value as Int).checkConnection()
 
             if (success) {
                 Messages.showInfoMessage(this,"It works!<br><br><b>blackd</b> version: ${message}", "Connection status")

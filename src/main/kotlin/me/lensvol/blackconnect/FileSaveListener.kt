@@ -5,7 +5,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 class FileSaveListener(project: Project) : FileDocumentManagerListener {
@@ -28,7 +27,7 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
              */
             ModuleUtil.findModuleForFile(vFile, currentProject) ?: return
 
-            val reformatter = BlackdReformatter(currentProject, configuration)
+            val reformatter = CodeReformatter(currentProject, configuration)
             if (reformatter.isFileSupported(file)) {
                 reformatter.process(document)
             }
