@@ -17,6 +17,11 @@ import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.vfs.VirtualFile
+import me.lensvol.blackconnect.BlackdResponse.Blackened
+import me.lensvol.blackconnect.BlackdResponse.InternalError
+import me.lensvol.blackconnect.BlackdResponse.NoChangesMade
+import me.lensvol.blackconnect.BlackdResponse.SyntaxError
+import me.lensvol.blackconnect.BlackdResponse.UnknownStatus
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationGroupManager
 import org.jetbrains.annotations.NotNull
@@ -76,7 +81,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
 
         val blackdClient = BlackdClient(configuration.hostname, configuration.port)
 
-        val (responseCode, responseText) = blackdClient.reformat(
+        val response = blackdClient.reformat(
             document.text,
             pyi = fileName.endsWith(".pyi"),
             lineLength = configuration.lineLength,
@@ -89,49 +94,56 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         if (progressIndicator?.isCanceled == true)
             return
 
-        when (responseCode) {
-            200 -> {
-                logger.debug("200 OK: Code should be reformatted")
-                with(ApplicationManager.getApplication()) {
-                    invokeLater {
-                        runWriteAction(Computable {
-                            if (progressIndicator?.isCanceled == true) {
-                                logger.debug("Reformatting cancelled before updating the document")
-                                return@Computable
-                            }
-
-                            CommandProcessor.getInstance().executeCommand(
-                                project,
-                                {
-                                    logger.debug("Code is going to be updated in $document")
-                                    document.setText(responseText)
-                                },
-                                "Reformat code using blackd",
-                                null,
-                                UndoConfirmationPolicy.DEFAULT,
-                                document
-                            )
-                        })
+        when (response) {
+            is Failure -> {
+                val reason = response.reason.message ?: "Connection failed."
+                showError("Failed to connect to <b>blackd</b>:\n${reason}")
+            }
+            is Success -> {
+                when (response.value) {
+                    is Blackened -> {
+                        updateCodeInDocument(project, progressIndicator, document, response.value.sourceCode)
+                    }
+                    is NoChangesMade -> {
+                        // Nothing was modified, nothing to do here, move along.
+                    }
+                    is SyntaxError -> {
+                        if (configuration.showSyntaxErrorMsgs) {
+                            showError("Source code contained syntax errors.")
+                        }
+                    }
+                    is InternalError -> {
+                        showError("Internal error, please see blackd output.")
+                    }
+                    is UnknownStatus -> {
+                        showError("Something unexpected happened:\n${response.value.responseText}")
                     }
                 }
             }
-            204 -> {
-                logger.debug("No changes to formatting, move along.")
-                // Nothing was modified, nothing to do here, move along.
-            }
-            400 -> {
-                logger.debug("400 Bad Request: Source code contained syntax errors.")
-                if (configuration.showSyntaxErrorMsgs) {
-                    showError("Source code contained syntax errors.")
-                }
-            }
-            500 -> {
-                logger.debug("500 Internal Error: Something went wrong.")
-                showError("Internal error, please see blackd output.")
-            }
-            else -> {
-                logger.debug("Something unexpected happened:\n$responseText")
-                showError("Something unexpected happened:\n$responseText")
+        }
+    }
+
+    private fun updateCodeInDocument(project: Project, progressIndicator: ProgressIndicator?, document: Document, sourceCode: String) {
+        with(ApplicationManager.getApplication()) {
+            invokeLater {
+                runWriteAction(Computable {
+                    if (progressIndicator?.isCanceled == true) {
+                        logger.debug("Reformatting cancelled before updating the document")
+                        return@Computable
+                    }
+
+                    CommandProcessor.getInstance().executeCommand(
+                        project,
+                        {
+                            logger.debug("Code is going to be updated in $document")
+                            document.setText(sourceCode)
+                        },
+                        "Reformat code using blackd",
+                        null,
+                        UndoConfirmationPolicy.DEFAULT,
+                        document
+                    )
+                })
             }
         }
     }

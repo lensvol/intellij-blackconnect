@@ -1,12 +1,25 @@
 package me.lensvol.blackconnect
 
+import com.intellij.openapi.diagnostic.Logger
 import java.io.IOException
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 
+
+sealed class BlackdResponse {
+    object NoChangesMade: BlackdResponse()
+    data class SyntaxError(val reason: String): BlackdResponse()
+    data class InternalError(val reason: String): BlackdResponse()
+    data class Blackened(val sourceCode: String): BlackdResponse()
+    data class UnknownStatus(val code: Int, val responseText: String): BlackdResponse()
+}
+
 class BlackdClient(val hostname: String, val port: Int) {
-    fun checkConnection(): Pair<Boolean, String> {
+
+    private val logger = Logger.getInstance(CodeReformatter::class.java.name)
+
+    fun checkConnection(): Result<String, String> {
         val url = URL("http://${hostname}:${port}")
 
         with(url.openConnection() as HttpURLConnection) {
@@ -16,14 +29,17 @@ class BlackdClient(val hostname: String, val port: Int) {
             try {
                 connect()
             } catch (e: ConnectException) {
-                return Pair(false, e.message ?: "Connection failed.")
+                return Failure(e.message ?: "Connection failed.")
             }
 
             return try {
                 val version = getHeaderField("X-Black-Version")
-                Pair(true, version)
+                if (version != null) {
+                    return Success(version)
+                }
+                return Failure("Someone is listenning on that address, but it is not blackd.")
             } catch (e: IOException) {
-                Pair(false, errorStream.readBytes().toString())
+                Failure(errorStream.readBytes().toString())
             }
         }
     }
@@ -35,7 +51,7 @@ class BlackdClient(val hostname: String, val port: Int) {
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
         targetPythonVersions: String = ""
-    ): Pair<Int, String> {
+    ): Result<BlackdResponse, Exception> {
         val url = URL("http://${hostname}:${port}")
 
         with(url.openConnection() as HttpURLConnection) {
@@ -61,7 +77,7 @@ class BlackdClient(val hostname: String, val port: Int) {
             try {
                 connect()
             } catch (e: ConnectException) {
-                return Pair(-1, e.message ?: "Connection failed.")
+                return Failure(e)
             }
 
             try {
@@ -70,9 +86,36 @@ class BlackdClient(val hostname: String, val port: Int) {
                     os.write(input, 0, input.size)
                 }
 
-                inputStream.bufferedReader().use { return Pair(responseCode, it.readText()) }
+                inputStream.bufferedReader().use {
+                    return Success(parseBlackdResponse(responseCode, it.readText()))
+                }
             } catch (e: IOException) {
-                return Pair(responseCode, errorStream.readBytes().toString())
+                return Failure(e)
+            }
+        }
+    }
+
+    private fun parseBlackdResponse(responseCode: Int, responseText: String): BlackdResponse {
+        return when (responseCode) {
+            200 -> {
+                logger.debug("200 OK: Code should be reformatted")
+                BlackdResponse.Blackened(responseText)
+            }
+            204 -> {
+                logger.debug("204: No changes to formatting, move along.")
+                BlackdResponse.NoChangesMade
+            }
+            400 -> {
+                logger.debug("400: Code contained syntax errors.")
+                BlackdResponse.SyntaxError(responseText)
+            }
+            500 -> {
+                logger.debug("500: Something unexpected happened:\n${responseText}")
+                BlackdResponse.InternalError(responseText)
+            }
+            else -> {
+                logger.debug("Unexpected status code received: ${responseCode} ${responseText}")
+                BlackdResponse.UnknownStatus(responseCode, responseText)
             }
         }
     }

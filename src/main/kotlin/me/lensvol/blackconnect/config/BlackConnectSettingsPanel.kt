@@ -14,18 +14,19 @@ import com.intellij.util.ui.JBUI
 import com.intellij.util.ui.UIUtil
 import com.moandjiezana.toml.Toml
 import me.lensvol.blackconnect.BlackdClient
-import me.lensvol.blackconnect.CodeReformatter
+import me.lensvol.blackconnect.Failure
+import me.lensvol.blackconnect.Success
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.FlowLayout
-import javax.swing.BoxLayout
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
 import java.io.BufferedReader
 import java.util.Collections
 import javax.swing.Box
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComponent
@@ -112,12 +113,11 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         })
 
         checkConnectionButton.addActionListener {
-            val (success, message) = BlackdClient(hostnameText.text, portSpinner.value as Int).checkConnection()
+            val result = BlackdClient(hostnameText.text, portSpinner.value as Int).checkConnection()
 
-            if (success) {
-                Messages.showInfoMessage(this,"It works!<br><br><b>blackd</b> version: ${message}", "Connection status")
-            } else {
-                Messages.showErrorDialog(this, "Cannot connect to <b>blackd</b>:<br><br><b>${message}</b>")
+            when (result) {
+                is Success -> Messages.showInfoMessage(this,"It works!<br><br><b>blackd</b> version: ${result.value}", "Connection status")
+                is Failure -> Messages.showErrorDialog(this, "Cannot connect to <b>blackd</b>:<br><br><b>${result.reason}</b>")
             }
         }
 
