@@ -24,7 +24,7 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var port: Int = 45484
 
     @Attribute
-    var lineLength: Int = 80
+    var lineLength: Int = 88
 
     @Attribute
     var fastMode: Boolean = false
