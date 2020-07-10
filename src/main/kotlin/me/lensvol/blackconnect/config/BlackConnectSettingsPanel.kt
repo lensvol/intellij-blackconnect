@@ -81,6 +81,51 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
 
     init {
         loadPyprojectTomlButton.isEnabled = true
+        portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
+        installUiListeners(project)
+
+        layout = GridBagLayout()
+        border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
+        val constraints = initBagLayoutConstraints()
+
+        triggerOnEachSave.alignmentX = Component.LEFT_ALIGNMENT
+        add(triggerOnEachSave, constraints)
+
+        val connectionSettingPanel = createConnectionSettingPanel()
+        connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
+        add(connectionSettingPanel, constraints)
+
+        val formattingPanel = createFormattingSettingsPanel()
+        formattingPanel.alignmentX = Component.LEFT_ALIGNMENT
+        add(formattingPanel, constraints)
+
+        val miscSettingsPanel = createMiscSettingsPanel()
+        miscSettingsPanel.alignmentX = Component.LEFT_ALIGNMENT
+        add(miscSettingsPanel, constraints)
+
+        addEmptyFiller(this, constraints)
+    }
+
+    private fun addEmptyFiller(container: JComponent, constraints: GridBagConstraints) {
+        // Add empty filler to push our other panels to the top
+        constraints.fill = GridBagConstraints.VERTICAL
+        constraints.gridheight = GridBagConstraints.REMAINDER
+        constraints.weighty = 2.0
+        constraints.gridx = 0
+        constraints.anchor = GridBagConstraints.NORTH
+        container.add(JPanel(), constraints)
+    }
+
+    private fun initBagLayoutConstraints(): GridBagConstraints {
+        val constraints = GridBagConstraints()
+        constraints.anchor = GridBagConstraints.NORTHWEST
+        constraints.weightx = 1.0
+        constraints.fill = GridBagConstraints.HORIZONTAL
+        constraints.gridwidth = GridBagConstraints.REMAINDER
+        return constraints
+    }
+
+    private fun installUiListeners(project: Project) {
         loadPyprojectTomlButton.addActionListener {
             val pyprojectTomlDescriptor = createPyprojectSpecificDescriptor()
             val candidates =
@@ -92,7 +137,7 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             }
         }
 
-        hostnameText.document.addDocumentListener(object: DocumentListener {
+        hostnameText.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(e: DocumentEvent?) {
                 disableButtonIfNeeded(e)
             }
@@ -113,62 +158,39 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         })
 
         checkConnectionButton.addActionListener {
-            val result = BlackdClient(hostnameText.text, portSpinner.value as Int).checkConnection()
+            val blackdClient = BlackdClient(hostnameText.text, portSpinner.value as Int)
 
-            when (result) {
-                is Success -> Messages.showInfoMessage(this,"It works!<br><br><b>blackd</b> version: ${result.value}", "Connection status")
-                is Failure -> Messages.showErrorDialog(this, "Cannot connect to <b>blackd</b>:<br><br><b>${result.reason}</b>")
+            when (val result = blackdClient.checkConnection()) {
+                is Success -> Messages.showInfoMessage(
+                    this,
+                    "It works!<br><br><b>blackd</b> version: ${result.value}",
+                    "Connection status"
+                )
+                is Failure -> Messages.showErrorDialog(
+                    this,
+                    "Cannot connect to <b>blackd</b>:<br><br><b>${result.reason}</b>"
+                )
             }
         }
+    }
 
-        layout = GridBagLayout()
-        border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
-
-        val constraints = GridBagConstraints()
-        constraints.anchor = GridBagConstraints.NORTHWEST
-        constraints.weightx = 1.0
-        constraints.fill = GridBagConstraints.HORIZONTAL
-        constraints.gridwidth = GridBagConstraints.REMAINDER
-
-        val targetVersionsPanel = JPanel().apply {
-            layout = FlowLayout(FlowLayout.LEFT)
-            border = IdeBorderFactory.createEmptyBorder(JBUI.insetsLeft(16))
-
-            versionCheckboxes.values.forEach { checkbox ->
-                this.add(checkbox)
-            }
-        }
-
-        targetVersionsPanel.components.map { checkbox ->
-            checkbox.isEnabled = false
-        }
-
-        targetSpecificVersionsCheckbox.addItemListener {
-            targetVersionsPanel.components.map { checkbox ->
-                checkbox.isEnabled = targetSpecificVersionsCheckbox.isSelected
-            }
-        }
-
-        val formattingPanel = JPanel().apply {
+    private fun createMiscSettingsPanel(): JPanel {
+        return JPanel().apply {
             layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Formatting options")
+            border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
 
             add(
                 FormBuilder.createFormBuilder()
-                    .addLabeledComponent("Line length:", lineLengthSpinner)
-                    .addComponent(fastModeCheckbox)
-                    .addComponent(skipStringNormalCheckbox)
-                    .addComponent(targetSpecificVersionsCheckbox)
-                    .addComponent(targetVersionsPanel)
-                    .addComponent(loadPyprojectTomlButton)
+                    .addComponent(jupyterSupportCheckbox)
+                    .addComponent(showSyntaxErrorMsgsCheckbox)
                     .panel,
                 BorderLayout.NORTH
             )
         }
+    }
 
-        portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
-
-        val connectionSettingPanel = JPanel().apply {
+    private fun createConnectionSettingPanel(): JPanel {
+        return JPanel().apply {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Connection settings")
 
@@ -187,37 +209,44 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
                 BorderLayout.NORTH
             )
         }
+    }
 
-        val miscSettingsPanel = JPanel().apply {
+    private fun createFormattingSettingsPanel(): JPanel {
+        return JPanel().apply {
             layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
+            border = IdeBorderFactory.createTitledBorder("Formatting options")
+
+            val targetVersionsPanel = JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT)
+                border = IdeBorderFactory.createEmptyBorder(JBUI.insetsLeft(16))
+
+                versionCheckboxes.values.forEach { checkbox ->
+                    this.add(checkbox)
+                }
+            }
+
+            targetVersionsPanel.components.map { checkbox ->
+                checkbox.isEnabled = false
+            }
+
+            targetSpecificVersionsCheckbox.addItemListener {
+                targetVersionsPanel.components.map { checkbox ->
+                    checkbox.isEnabled = targetSpecificVersionsCheckbox.isSelected
+                }
+            }
 
             add(
                 FormBuilder.createFormBuilder()
-                    .addComponent(jupyterSupportCheckbox)
-                    .addComponent(showSyntaxErrorMsgsCheckbox)
+                    .addLabeledComponent("Line length:", lineLengthSpinner)
+                    .addComponent(fastModeCheckbox)
+                    .addComponent(skipStringNormalCheckbox)
+                    .addComponent(targetSpecificVersionsCheckbox)
+                    .addComponent(targetVersionsPanel)
+                    .addComponent(loadPyprojectTomlButton)
                     .panel,
                 BorderLayout.NORTH
             )
         }
-
-        triggerOnEachSave.alignmentX = Component.LEFT_ALIGNMENT
-        connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
-        formattingPanel.alignmentX = Component.LEFT_ALIGNMENT
-        miscSettingsPanel.alignmentX = Component.LEFT_ALIGNMENT
-
-        add(triggerOnEachSave, constraints)
-        add(connectionSettingPanel, constraints)
-        add(formattingPanel, constraints)
-        add(miscSettingsPanel, constraints)
-
-        // Add empty filler to push our other panels to the top
-        constraints.fill = GridBagConstraints.VERTICAL
-        constraints.gridheight = GridBagConstraints.REMAINDER
-        constraints.weighty = 2.0
-        constraints.gridx = 0
-        constraints.anchor = GridBagConstraints.NORTH
-        add(JPanel(), constraints)
     }
 
     private fun createPyprojectSpecificDescriptor(): FileChooserDescriptor {
