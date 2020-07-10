@@ -6,9 +6,6 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
-import me.lensvol.blackconnect.ui.NewSettingsReminderNotification
-import me.lensvol.blackconnect.ui.NotificationGroupManager
 import java.util.Properties
 
 class PluginStartupActivity : StartupActivity, DumbAware {
@@ -32,16 +29,6 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         if (applicationInfo.build.baselineVersion < 201) {
             logger.debug("IDE version is too old, we manually subscribe to FILE_DOCUMENT_SYNC events.")
             project.messageBus.connect().subscribe(AppTopics.FILE_DOCUMENT_SYNC, FileSaveListener(project))
-        }
-
-        val appLevelConfiguration = BlackConnectGlobalSettings.getInstance()
-        if (appLevelConfiguration.showSaveTriggerOptIn) {
-            logger.debug("Showing opt-in balloon.")
-            val optInNotification = NewSettingsReminderNotification(
-                NotificationGroupManager.newsGroup(),
-                project, appLevelConfiguration
-            )
-            optInNotification.notify(project)
         }
     }
 }
