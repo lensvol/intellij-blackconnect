@@ -15,7 +15,7 @@ import me.lensvol.blackconnect.BlackConnectProgressTracker
 class BeforeTabClosedAction : AnAction(), DumbAware {
 
     init {
-        ActionUtil.copyFrom(this, IdeActions.ACTION_CLOSE);
+        ActionUtil.copyFrom(this, IdeActions.ACTION_CLOSE)
     }
 
     override fun actionPerformed(event: AnActionEvent) {
@@ -26,16 +26,17 @@ class BeforeTabClosedAction : AnAction(), DumbAware {
 
         val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
         val projectService = event.project!!.service<BlackConnectProgressTracker>()
-        vFile?.let {
-            file -> projectService.cancelOperationOnPath(file.path)
-
-            fileMgr.currentWindow?.findFileComposite(vFile).let {
-                fileMgr.closeFile(vFile, fileMgr.currentWindow)
+        vFile?.let { file ->
+            projectService.cancelOperationOnPath(file.path)
+            fileMgr.currentWindow?.let { window ->
+                if (window.findFileComposite(vFile) != null) {
+                    fileMgr.closeFile(vFile, window)
+                }
             }
         }
     }
 
     override fun update(e: AnActionEvent) {
-        e.presentation.isEnabled = e.project != null && e.getData(CommonDataKeys.VIRTUAL_FILE) != null;
+        e.presentation.isEnabled = e.project != null && e.getData(CommonDataKeys.VIRTUAL_FILE) != null
     }
 }
