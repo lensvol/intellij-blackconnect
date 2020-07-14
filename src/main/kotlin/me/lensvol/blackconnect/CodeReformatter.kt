@@ -25,7 +25,6 @@ import me.lensvol.blackconnect.BlackdResponse.UnknownStatus
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationGroupManager
 import org.jetbrains.annotations.NotNull
-import org.jetbrains.annotations.Nullable
 
 class CodeReformatter(project: Project, configuration: BlackConnectProjectSettings) {
     private val currentProject: Project = project
@@ -40,7 +39,31 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
                 (file.fileType as LanguageFileType).language.id == "Jupyter")
     }
 
-    fun process(document: Document) {
+    private fun updateCodeInDocument(
+        project: Project,
+        document: Document,
+        sourceCode: String
+    ) {
+        with(ApplicationManager.getApplication()) {
+            invokeLater {
+                runWriteAction(Computable {
+                    CommandProcessor.getInstance().executeCommand(
+                        project,
+                        {
+                            logger.debug("Code is going to be updated in $document")
+                            document.setText(sourceCode)
+                        },
+                        "Reformat code using blackd",
+                        null,
+                        UndoConfirmationPolicy.DEFAULT,
+                        document
+                    )
+                })
+            }
+        }
+    }
+
+    fun process(document: Document, receiver: (String) -> Unit) {
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(document)
         val fileName = vFile?.name ?: "unknown"
 
@@ -54,7 +77,9 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
             object : Task.Backgroundable(currentProject, "Calling blackd") {
                 override fun run(indicator: ProgressIndicator) {
                     logger.debug("Reformatting code in '$fileName'")
-                    reformatCodeInDocument(currentConfig, document, fileName, project)
+                    reformatWithBlackd(currentConfig, fileName, document.text)?.let {
+                        receiver(it)
+                    }
                 }
             },
             progressIndicator
@@ -68,21 +93,20 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
             .notify(currentProject)
     }
 
-    private fun reformatCodeInDocument(
+    private fun reformatWithBlackd(
         configuration: BlackConnectProjectSettings,
-        document: @Nullable Document,
         fileName: @NotNull String,
-        project: @Nullable Project
-    ) {
+        sourceCode: String
+    ): String? {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
         logger.debug("Reformatting cancelled before we could begin")
         if (progressIndicator?.isCanceled == true)
-            return
+            return null
 
         val blackdClient = BlackdClient(configuration.hostname, configuration.port)
 
         val response = blackdClient.reformat(
-            document.text,
+            sourceCode,
             pyi = fileName.endsWith(".pyi"),
             lineLength = configuration.lineLength,
             fastMode = configuration.fastMode,
@@ -92,7 +116,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
 
         logger.debug("Reformatting cancelled after call to blackd")
         if (progressIndicator?.isCanceled == true)
-            return
+            return null
 
         when (response) {
             is Failure -> {
@@ -102,7 +126,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
             is Success -> {
                 when (response.value) {
                     is Blackened -> {
-                        updateCodeInDocument(project, progressIndicator, document, response.value.sourceCode)
+                        return response.value.sourceCode
                     }
                     is NoChangesMade -> {
                         // Nothing was modified, nothing to do here, move along.
@@ -121,35 +145,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
                 }
             }
         }
-    }
 
-    private fun updateCodeInDocument(
-        project: Project,
-        progressIndicator: ProgressIndicator?,
-        document: Document,
-        sourceCode: String
-    ) {
-        with(ApplicationManager.getApplication()) {
-            invokeLater {
-                runWriteAction(Computable {
-                    if (progressIndicator?.isCanceled == true) {
-                        logger.debug("Reformatting cancelled before updating the document")
-                        return@Computable
-                    }
-
-                    CommandProcessor.getInstance().executeCommand(
-                        project,
-                        {
-                            logger.debug("Code is going to be updated in $document")
-                            document.setText(sourceCode)
-                        },
-                        "Reformat code using blackd",
-                        null,
-                        UndoConfirmationPolicy.DEFAULT,
-                        document
-                    )
-                })
-            }
-        }
+        return null
     }
 }

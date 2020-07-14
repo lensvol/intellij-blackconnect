@@ -8,33 +8,31 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
 import me.lensvol.blackconnect.CodeReformatter
+import me.lensvol.blackconnect.DocumentUtil
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 class FormatUsingBlackdAction : AnAction(), DumbAware {
 
     override fun actionPerformed(event: AnActionEvent) {
-        event.project?.let { project ->
-            FileEditorManagerEx.getInstance(project).selectedTextEditor?.let { editor ->
-                val configuration = BlackConnectProjectSettings.getInstance(project)
-                CodeReformatter(project, configuration).process(editor.document)
-            }
+        val project = event.project ?: return
+        val editor = FileEditorManagerEx.getInstance(project).selectedTextEditor ?: return
+        val configuration = BlackConnectProjectSettings.getInstance(project)
+
+        CodeReformatter(project, configuration).process(editor.document) { reformatted ->
+            DocumentUtil.updateCodeInDocument(project, editor.document, reformatted)
         }
     }
 
     override fun update(event: AnActionEvent) {
-        val project: Project? = event.project
         event.presentation.isEnabled = false
 
-        if (project == null)
-            return
-
+        val project: Project = event.project ?: return
+        val vFile: VirtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
         val configuration = BlackConnectProjectSettings.getInstance(project)
-        val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
-        vFile?.let {
-            event.presentation.isEnabled = CodeReformatter(
-                project,
-                configuration
-            ).isFileSupported(vFile)
-        }
+
+        event.presentation.isEnabled = CodeReformatter(
+            project,
+            configuration
+        ).isFileSupported(vFile)
     }
 }
