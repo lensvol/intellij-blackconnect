@@ -21,7 +21,6 @@ class FormatUsingBlackdAction : AnAction(), DumbAware {
         }
     }
 
-
     override fun update(event: AnActionEvent) {
         val project: Project? = event.project
         event.presentation.isEnabled = false

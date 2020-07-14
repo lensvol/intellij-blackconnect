@@ -6,13 +6,12 @@ import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
 
-
 sealed class BlackdResponse {
-    object NoChangesMade: BlackdResponse()
-    data class SyntaxError(val reason: String): BlackdResponse()
-    data class InternalError(val reason: String): BlackdResponse()
-    data class Blackened(val sourceCode: String): BlackdResponse()
-    data class UnknownStatus(val code: Int, val responseText: String): BlackdResponse()
+    object NoChangesMade : BlackdResponse()
+    data class SyntaxError(val reason: String) : BlackdResponse()
+    data class InternalError(val reason: String) : BlackdResponse()
+    data class Blackened(val sourceCode: String) : BlackdResponse()
+    data class UnknownStatus(val code: Int, val responseText: String) : BlackdResponse()
 }
 
 class BlackdClient(val hostname: String, val port: Int) {

@@ -14,7 +14,7 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
 
     companion object {
         fun getInstance(project: Project): BlackConnectProjectSettings =
-                ServiceManager.getService(project, BlackConnectProjectSettings::class.java)
+            ServiceManager.getService(project, BlackConnectProjectSettings::class.java)
     }
 
     @Attribute

@@ -33,6 +33,5 @@ class BlackConnectConfigurable(project: Project) : Configurable {
         panel.load(configuration)
         return panel
     }
-
 }
 

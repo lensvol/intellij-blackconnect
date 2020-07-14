@@ -8,5 +8,4 @@ class BlackConnectConfigurableProvider(private val project: Project) : Configura
     override fun createConfigurable(): Configurable? {
         return BlackConnectConfigurable(project)
     }
-
 }

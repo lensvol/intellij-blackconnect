@@ -17,7 +17,7 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
         }
 
         val vFile = FileDocumentManager.getInstance().getFile(document)
-        vFile?.let {file ->
+        vFile?.let { file ->
             /*
             When document is going to be saved, it will be passed to each instance
             of the listener and they may each reformat it according to their projects.

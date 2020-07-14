@@ -123,7 +123,12 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         }
     }
 
-    private fun updateCodeInDocument(project: Project, progressIndicator: ProgressIndicator?, document: Document, sourceCode: String) {
+    private fun updateCodeInDocument(
+        project: Project,
+        progressIndicator: ProgressIndicator?,
+        document: Document,
+        sourceCode: String
+    ) {
         with(ApplicationManager.getApplication()) {
             invokeLater {
                 runWriteAction(Computable {

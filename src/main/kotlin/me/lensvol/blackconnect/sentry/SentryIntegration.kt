@@ -14,7 +14,7 @@ import java.awt.Component
 const val DSN = "https://74ace242ccf94335bf6917d5b7f4aad6@o413179.ingest.sentry.io/5305122"
 
 fun SentryClient.showResultInUi(parentComponent: Component, consumer: Consumer<SubmittedReportInfo>) {
-    this.addEventSendCallback(object: EventSendCallback {
+    this.addEventSendCallback(object : EventSendCallback {
         override fun onSuccess(event: Event?) {
             ApplicationManager.getApplication().invokeLater {
                 Messages.showInfoMessage(

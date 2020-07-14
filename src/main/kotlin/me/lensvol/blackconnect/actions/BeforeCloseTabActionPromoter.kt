@@ -9,6 +9,6 @@ import java.util.Collections
 class BeforeCloseTabActionPromoter : ActionPromoter {
     override fun promote(actions: List<AnAction?>?, context: DataContext?): List<AnAction?>? {
         val action = ContainerUtil.findInstance(actions!!, BeforeTabClosedAction::class.java)
-        return  if (action != null) Collections.singletonList(action) else Collections.emptyList()
+        return if (action != null) Collections.singletonList(action) else Collections.emptyList()
     }
 }
