@@ -27,7 +27,7 @@ class BeforeTabClosedAction : AnAction(), DumbAware {
         val vFile: VirtualFile? = event.getData(PlatformDataKeys.VIRTUAL_FILE)
         val projectService = event.project!!.service<BlackConnectProgressTracker>()
         vFile?.let { file ->
-            projectService.cancelOperationOnPath(file.path)
+            projectService.cancelOperationOnTag(file.path)
             fileMgr.currentWindow?.let { window ->
                 if (window.findFileComposite(vFile) != null) {
                     fileMgr.closeFile(vFile, window)

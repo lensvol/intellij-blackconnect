@@ -3,6 +3,7 @@ package me.lensvol.blackconnect.actions
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
@@ -18,9 +19,14 @@ class FormatUsingBlackdAction : AnAction(), DumbAware {
         val editor = FileEditorManagerEx.getInstance(project).selectedTextEditor ?: return
         val configuration = BlackConnectProjectSettings.getInstance(project)
 
-        CodeReformatter(project, configuration).process(editor.document) { reformatted ->
-            DocumentUtil.updateCodeInDocument(project, editor.document, reformatted)
-        }
+        val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
+        val fileName = vFile?.name ?: "unknown"
+
+        CodeReformatter(project, configuration).process(
+            fileName,
+            editor.document.text,
+            fileName.endsWith(".pyi")
+        ) { reformatted -> DocumentUtil.updateCodeInDocument(project, editor.document, reformatted) }
     }
 
     override fun update(event: AnActionEvent) {

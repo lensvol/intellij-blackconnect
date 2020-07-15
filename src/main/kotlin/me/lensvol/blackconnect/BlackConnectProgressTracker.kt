@@ -8,12 +8,12 @@ import java.lang.ref.WeakReference
 class BlackConnectProgressTracker {
     private val indicators = HashMap<String, WeakReference<ProgressIndicator>>()
 
-    fun registerOperationOnPath(path: String, indicator: ProgressIndicator) {
-        cancelOperationOnPath(path)
-        indicators[path] = WeakReference(indicator)
+    fun registerOperationOnTag(tag: String, indicator: ProgressIndicator) {
+        cancelOperationOnTag(tag)
+        indicators[tag] = WeakReference(indicator)
     }
 
-    fun cancelOperationOnPath(path: String) {
-        indicators[path]?.get()?.cancel()
+    fun cancelOperationOnTag(tag: String) {
+        indicators[tag]?.get()?.cancel()
     }
 }
