@@ -11,6 +11,7 @@ import com.intellij.openapi.progress.ProgressManager
 import com.intellij.openapi.progress.Task
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.jetbrains.rd.util.string.printToString
 import me.lensvol.blackconnect.BlackdResponse.Blackened
 import me.lensvol.blackconnect.BlackdResponse.InternalError
 import me.lensvol.blackconnect.BlackdResponse.NoChangesMade
@@ -18,6 +19,13 @@ import me.lensvol.blackconnect.BlackdResponse.SyntaxError
 import me.lensvol.blackconnect.BlackdResponse.UnknownStatus
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationGroupManager
+
+data class FragmentFormatting(
+    val precedingLines: List<String>,
+    val followingLines: List<String>,
+    val indent: String,
+    val endsWithNewline: Boolean
+)
 
 class CodeReformatter(project: Project, configuration: BlackConnectProjectSettings) {
     private val currentProject: Project = project
@@ -30,6 +38,27 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
             (currentConfig.enableJupyterSupport &&
                 (file.fileType as LanguageFileType).language.id == "Jupyter")
+    }
+
+    private fun extractIndent(codeFragment: String): Pair<FragmentFormatting, String> {
+        val builder = StringBuilder()
+        val firstLine = codeFragment.lines().dropWhile { it.isBlank() }.first()
+        val indentLen = firstLine.indexOfFirst { !it.isWhitespace() }.let { if (it == -1) firstLine.length else it }
+        val indentString = "".padStart(indentLen)
+
+        val lines = codeFragment.lines()
+        val precedingEmptyLines = lines.takeWhile { it.isBlank() }.toList()
+        val followingEmptyLines = lines.takeLastWhile { it.isBlank() }.toList()
+        val codeLines = lines.subList(precedingEmptyLines.size, lines.size - followingEmptyLines.size)
+
+        codeLines.map { line ->
+            builder.appendln(line.removePrefix(indentString))
+        }
+
+        return Pair(
+            FragmentFormatting(precedingEmptyLines, followingEmptyLines, indentString, codeFragment.endsWith("\n")),
+            builder.printToString()
+        )
     }
 
     fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (String) -> Unit) {
@@ -50,6 +79,68 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
             },
             progressIndicator
         )
+    }
+
+    fun processFragment(tag: String, fragment: String, isPyi: Boolean, receiver: (String) -> Unit) {
+        val progressIndicator = EmptyProgressIndicator()
+        progressIndicator.isIndeterminate = true
+
+        val projectService = currentProject.service<BlackConnectProgressTracker>()
+        projectService.registerOperationOnTag(tag, progressIndicator)
+
+        val (formatting, deindentedFragment) = extractIndent(fragment)
+
+        ProgressManager.getInstance().runProcessWithProgressAsynchronously(
+            object : Task.Backgroundable(currentProject, "Calling blackd") {
+                override fun run(indicator: ProgressIndicator) {
+                    logger.debug("Reformatting code with tag '$tag'")
+                    reformatWithBlackd(currentConfig, deindentedFragment, isPyi)?.let {
+                        receiver(restoreFormatting(it.trimEnd('\n'), formatting))
+                    }
+                }
+            },
+            progressIndicator
+        )
+    }
+
+    private fun restoreFormatting(code: String, formatting: FragmentFormatting): String {
+        return buildString {
+            val codeLines = code.lines()
+
+            if (formatting.precedingLines.isEmpty() && formatting.followingLines.isEmpty() && codeLines.size == 1) {
+                append(formatting.indent)
+                append(code)
+                if (formatting.endsWithNewline) {
+                    append('\n')
+                }
+                return@buildString
+            }
+
+            formatting.precedingLines.map {
+                appendln(it)
+            }
+
+            for ((index, line) in codeLines.listIterator().withIndex()) {
+                if (index == codeLines.lastIndex) {
+                    append(line.prependIndent(formatting.indent))
+                } else {
+                    appendln(line.prependIndent(formatting.indent))
+                }
+            }
+
+            if (formatting.followingLines.isNotEmpty()) {
+                formatting.followingLines.slice(IntRange(0, formatting.followingLines.size - 2)).map {
+                    appendln(it)
+                }
+
+                val lastLine = formatting.followingLines.last()
+                if (formatting.endsWithNewline) {
+                    appendln(lastLine)
+                } else {
+                    append(lastLine)
+                }
+            }
+        }
     }
 
     private fun showError(text: String) {
