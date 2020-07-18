@@ -85,20 +85,18 @@ class BlackdClient(val hostname: String, val port: Int) {
                     os.write(input, 0, input.size)
                 }
 
-                inputStream.bufferedReader().use {
-                    return Success(parseBlackdResponse(responseCode, it.readText()))
-                }
+                return Success(parseBlackdResponse(this))
             } catch (e: IOException) {
                 return Failure(e)
             }
         }
     }
 
-    private fun parseBlackdResponse(responseCode: Int, responseText: String): BlackdResponse {
-        return when (responseCode) {
+    private fun parseBlackdResponse(connection: HttpURLConnection): BlackdResponse {
+        return when (connection.responseCode) {
             200 -> {
                 logger.debug("200 OK: Code should be reformatted")
-                BlackdResponse.Blackened(responseText)
+                BlackdResponse.Blackened(connection.inputStream.bufferedReader().readText())
             }
             204 -> {
                 logger.debug("204: No changes to formatting, move along.")
@@ -106,15 +104,19 @@ class BlackdClient(val hostname: String, val port: Int) {
             }
             400 -> {
                 logger.debug("400: Code contained syntax errors.")
-                BlackdResponse.SyntaxError(responseText)
+                BlackdResponse.SyntaxError(connection.errorStream.bufferedReader().readText())
             }
             500 -> {
-                logger.debug("500: Something unexpected happened:\n${responseText}")
-                BlackdResponse.InternalError(responseText)
+                val errorText = connection.errorStream.bufferedReader().readText()
+                logger.debug("500: Something unexpected happened:\n${errorText}")
+                BlackdResponse.InternalError(errorText)
             }
             else -> {
-                logger.debug("Unexpected status code received: ${responseCode} ${responseText}")
-                BlackdResponse.UnknownStatus(responseCode, responseText)
+                logger.debug("Unexpected status code received: ${connection.responseCode} ${connection}")
+                BlackdResponse.UnknownStatus(
+                    connection.responseCode,
+                    connection.inputStream.bufferedReader().readText()
+                )
             }
         }
     }
