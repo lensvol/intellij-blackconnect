@@ -117,21 +117,11 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
             }
 
             append(formatting.whitespaceBefore)
-
-            for ((index, line) in codeLines.listIterator().withIndex()) {
-                when (index) {
-                    0 -> {
-                        appendln(line)
-                    }
-                    codeLines.lastIndex -> {
-                        append(line.prependIndent(formatting.indent))
-                    }
-                    else -> {
-                        appendln(line.prependIndent(formatting.indent))
-                    }
-                }
+            append(codeLines.first())
+            for (line in codeLines.listIterator(1)) {
+                appendln()
+                append(line.prependIndent(formatting.indent))
             }
-
             append(formatting.whitespaceAfter)
         }
     }
