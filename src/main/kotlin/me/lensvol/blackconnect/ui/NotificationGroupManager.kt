@@ -13,7 +13,7 @@ class NotificationGroupManager {
                 return existingGroup
             }
 
-            return NotificationGroup.balloonGroup(MAIN_DISPLAY_ID)
+            return NotificationGroup(MAIN_DISPLAY_ID, NotificationDisplayType.BALLOON, false)
         }
     }
 }
