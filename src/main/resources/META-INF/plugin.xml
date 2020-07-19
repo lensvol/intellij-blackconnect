@@ -56,14 +56,23 @@
     <depends>com.intellij.modules.lang</depends>
 
     <actions>
-        <action id="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
-                class="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
-                text="Format Code Using Blackd"
-                description="Try to reformat code in current tab."
-                icon="/icons/blackconnect.svg">
-            <keyboard-shortcut first-keystroke="alt shift b" keymap="$default"/>
+        <group id="me.lensvol.blackconnect.groups.MainGroup" text="BlackConnect" popup="true" icon="/icons/blackconnect.svg">
+            <action id="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
+                    class="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
+                    text="Reformat Whole File"
+                    description="Try to reformat code in current tab."
+                    icon="AllIcons.FileTypes.Any_type">
+                <keyboard-shortcut first-keystroke="alt shift b" keymap="$default"/>
+            </action>
+            <action id="me.lensvol.blackconnect.actions.ReformatSelectedFragmentAction"
+                    class="me.lensvol.blackconnect.actions.ReformatSelectedFragmentAction"
+                    text="Reformat Selected Fragment"
+                    description="Try to reformat selected fragment."
+                    icon="AllIcons.Actions.InSelection">
+                <keyboard-shortcut first-keystroke="alt shift ctrl b" keymap="$default"/>
+            </action>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
+        </group>
         <action id="me.lensvol.blackconnect.actions.BeforeTabClosedAction" class="me.lensvol.blackconnect.actions.BeforeTabClosedAction"
                 use-shortcut-of="CloseContent"/>
     </actions>
