@@ -21,8 +21,8 @@ import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationGroupManager
 
 data class FragmentFormatting(
-    val precedingLines: List<String>,
-    val followingLines: List<String>,
+    val whitespaceBefore: String,
+    val whitespaceAfter: String,
     val indent: String,
     val endsWithNewline: Boolean
 )
@@ -38,27 +38,6 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
             (currentConfig.enableJupyterSupport &&
                 (file.fileType as LanguageFileType).language.id == "Jupyter")
-    }
-
-    private fun extractIndent(codeFragment: String): Pair<FragmentFormatting, String> {
-        val builder = StringBuilder()
-        val firstLine = codeFragment.lines().dropWhile { it.isBlank() }.first()
-        val indentLen = firstLine.indexOfFirst { !it.isWhitespace() }.let { if (it == -1) firstLine.length else it }
-        val indentString = "".padStart(indentLen)
-
-        val lines = codeFragment.lines()
-        val precedingEmptyLines = lines.takeWhile { it.isBlank() }.toList()
-        val followingEmptyLines = lines.takeLastWhile { it.isBlank() }.toList()
-        val codeLines = lines.subList(precedingEmptyLines.size, lines.size - followingEmptyLines.size)
-
-        codeLines.map { line ->
-            builder.appendln(line.removePrefix(indentString))
-        }
-
-        return Pair(
-            FragmentFormatting(precedingEmptyLines, followingEmptyLines, indentString, codeFragment.endsWith("\n")),
-            builder.printToString()
-        )
     }
 
     fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (String) -> Unit) {
@@ -103,11 +82,32 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         )
     }
 
+    private fun extractIndent(codeFragment: String): Pair<FragmentFormatting, String> {
+        val builder = StringBuilder()
+        val firstLine = codeFragment.lines().dropWhile { it.isBlank() }.first()
+        val indentLen = firstLine.indexOfFirst { !it.isWhitespace() }.let { if (it == -1) firstLine.length else it }
+        val indentString = "".padStart(indentLen)
+
+        val whitespacePrefix = codeFragment.takeWhile { it.isWhitespace() }
+        val whitespaceSuffix = codeFragment.takeLastWhile { it.isWhitespace() }
+        val actualCode = codeFragment.substring(whitespacePrefix.length, codeFragment.length - whitespaceSuffix.length)
+
+        actualCode.lines()
+            .map { line ->
+                builder.appendln(line.removePrefix(indentString))
+            }
+
+        return Pair(
+            FragmentFormatting(whitespacePrefix, whitespaceSuffix, indentString, actualCode.endsWith("\n")),
+            builder.printToString()
+        )
+    }
+
     private fun restoreFormatting(code: String, formatting: FragmentFormatting): String {
         return buildString {
             val codeLines = code.lines()
 
-            if (formatting.precedingLines.isEmpty() && formatting.followingLines.isEmpty() && codeLines.size == 1) {
+            if (formatting.whitespaceBefore.indexOf('\n') == -1 && formatting.whitespaceAfter.indexOf('\n') == -1) {
                 append(formatting.indent)
                 append(code)
                 if (formatting.endsWithNewline) {
@@ -116,30 +116,23 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
                 return@buildString
             }
 
-            formatting.precedingLines.map {
-                appendln(it)
-            }
+            append(formatting.whitespaceBefore)
 
             for ((index, line) in codeLines.listIterator().withIndex()) {
-                if (index == codeLines.lastIndex) {
-                    append(line.prependIndent(formatting.indent))
-                } else {
-                    appendln(line.prependIndent(formatting.indent))
+                when (index) {
+                    0 -> {
+                        appendln(line)
+                    }
+                    codeLines.lastIndex -> {
+                        append(line.prependIndent(formatting.indent))
+                    }
+                    else -> {
+                        appendln(line.prependIndent(formatting.indent))
+                    }
                 }
             }
 
-            if (formatting.followingLines.isNotEmpty()) {
-                formatting.followingLines.slice(IntRange(0, formatting.followingLines.size - 2)).map {
-                    appendln(it)
-                }
-
-                val lastLine = formatting.followingLines.last()
-                if (formatting.endsWithNewline) {
-                    appendln(lastLine)
-                } else {
-                    append(lastLine)
-                }
-            }
+            append(formatting.whitespaceAfter)
         }
     }
 
