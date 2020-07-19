@@ -36,16 +36,15 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
+      <p>0.4.0</p>
+      <ul>
+        <li>Added "Reformat Selected Fragment" action to support partial reformatting./li>
+        <li>Reformatting actions now live in <b>BlackConnect</b> submenu under "Tools".</li>
+      </ul>
+
       <p>0.3.1</p>
       <ul>
         <li>Fix default line length being set to 80 instead of 88 (reported by Piotr Mazur).</li>
-      </ul>
-
-      <p>0.3.0</p>
-      <ul>
-        <li>Load formatting settings from <b>pyproject.toml</b>.</li>
-        <li>Fix file being reformatted multiple times if several projects are opened.</li>
-        <li>Improve reporting of plugin crashes.</li>
       </ul>
       """
 }

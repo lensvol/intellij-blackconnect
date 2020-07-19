@@ -19,6 +19,7 @@
       –&nbsp;Automatic Python type stub (.pyi) detection.<br>
       –&nbsp;Configurable options: hostname, port, preferred line length, etc.<br>
       –&nbsp;Trigger automatically when saving changed files.<br>
+      -&nbsp;Ability to reformat only selected code fragment.<br>
       –&nbsp;Support for <b>[tool.black]</b> section in <i>pyproject.toml</i>.<br>
       –&nbsp;Rough support for "Jupyter" file type.<br>
     </p>

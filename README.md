@@ -16,7 +16,8 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
-    * Target specific Python versions. 
+    * Target specific Python versions.
+* Ability to reformat selected fragment only instead of whole file. 
 * Load formatting settings from **[tool.black]** section of `pyproject.toml`
 
 ## Installation
@@ -51,7 +52,6 @@ Be brave and try out "early access preview" version:
 * "Live reformatting".
 * Automatic detection of applicable Python frameworks.
 * Get line length from Python code style settings.
-* Re-format only selected code fragment.
 
 ## Special thanks
 
