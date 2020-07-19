@@ -1,16 +1,10 @@
 package me.lensvol.blackconnect
 
-import com.intellij.openapi.application.ApplicationManager
-import com.intellij.openapi.command.CommandProcessor
-import com.intellij.openapi.command.UndoConfirmationPolicy
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.module.ModuleUtil
-import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Computable
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 class FileSaveListener(project: Project) : FileDocumentManagerListener {
