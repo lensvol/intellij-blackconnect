@@ -13,7 +13,6 @@ class DocumentUtil {
         fun updateCodeInDocument(
             project: Project,
             document: Document,
-            sourceCode: String,
             receiver: () -> Unit
         ) {
             with(ApplicationManager.getApplication()) {

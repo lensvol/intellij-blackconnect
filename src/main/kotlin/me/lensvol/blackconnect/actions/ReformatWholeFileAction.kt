@@ -8,7 +8,6 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.vfs.VirtualFile
 import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.DocumentUtil
@@ -31,7 +30,7 @@ class FormatUsingBlackdAction : AnAction(), DumbAware {
             editor.document.text,
             fileName.endsWith(".pyi")
         ) { reformatted ->
-            DocumentUtil.updateCodeInDocument(project, editor.document, reformatted) {
+            DocumentUtil.updateCodeInDocument(project, editor.document) {
                 logger.debug("Code is going to be updated in ${editor.document}")
                 editor.document.setText(reformatted)
             }

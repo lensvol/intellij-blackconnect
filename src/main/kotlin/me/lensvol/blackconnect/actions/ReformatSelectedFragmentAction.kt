@@ -34,9 +34,11 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
             primaryCaret.selectionEnd
         }
 
+        logger.debug("Reformatting fragment $selectionStart-$selectionStart of '$fileName'")
+
         val fragment = editor.document.getText(TextRange.create(selectionStart, selectionEnd))
         codeReformatter.processFragment(fileName, fragment, fileName.endsWith(".pyi")) { reformatted ->
-            DocumentUtil.updateCodeInDocument(project, editor.document, reformatted) {
+            DocumentUtil.updateCodeInDocument(project, editor.document) {
                 editor.document.replaceString(selectionStart, selectionEnd, reformatted)
             }
         }
