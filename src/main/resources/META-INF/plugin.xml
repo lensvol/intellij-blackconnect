@@ -58,8 +58,8 @@
 
     <actions>
         <group id="me.lensvol.blackconnect.groups.MainGroup" text="BlackConnect" popup="true" icon="/icons/blackconnect.svg">
-            <action id="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
-                    class="me.lensvol.blackconnect.actions.FormatUsingBlackdAction"
+            <action id="me.lensvol.blackconnect.actions.ReformatWholeFileAction"
+                    class="me.lensvol.blackconnect.actions.ReformatWholeFileAction"
                     text="Reformat Whole File"
                     description="Try to reformat code in current tab."
                     icon="AllIcons.FileTypes.Any_type">

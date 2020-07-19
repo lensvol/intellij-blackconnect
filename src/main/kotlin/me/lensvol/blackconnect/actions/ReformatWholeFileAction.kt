@@ -13,8 +13,8 @@ import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.DocumentUtil
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
-class FormatUsingBlackdAction : AnAction(), DumbAware {
-    private val logger = Logger.getInstance(FormatUsingBlackdAction::class.java.name)
+class ReformatWholeFileAction : AnAction(), DumbAware {
+    private val logger = Logger.getInstance(ReformatWholeFileAction::class.java.name)
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
