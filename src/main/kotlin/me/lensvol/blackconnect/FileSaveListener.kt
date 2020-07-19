@@ -36,7 +36,7 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
             val reformatter = CodeReformatter(currentProject, configuration)
             if (reformatter.isFileSupported(file)) {
                 reformatter.process(vFile.name, document.text, vFile.name.endsWith(".pyi")) { reformatted ->
-                    DocumentUtil.updateCodeInDocument(currentProject, document, reformatted) {
+                    DocumentUtil.updateCodeInDocument(currentProject, document) {
                         document.setText(reformatted)
                     }
                 }
