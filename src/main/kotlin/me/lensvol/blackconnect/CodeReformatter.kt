@@ -107,7 +107,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         return buildString {
             val codeLines = code.lines()
 
-            if (formatting.whitespaceBefore.indexOf('\n') == -1 && formatting.whitespaceAfter.indexOf('\n') == -1) {
+            if (!code.contains('\n')) {
                 append(formatting.indent)
                 append(code)
                 if (formatting.endsWithNewline) {
