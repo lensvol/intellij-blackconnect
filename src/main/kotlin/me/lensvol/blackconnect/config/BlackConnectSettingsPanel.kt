@@ -196,14 +196,13 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
 
             val panel = FormBuilder.createFormBuilder()
                 .addLabeledComponent("Hostname:", hostnameText)
-                .addComponent(Box.createRigidArea(Dimension(8, 0)) as JComponent)
+                .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
                 .addLabeledComponent("Port:", portSpinner)
-                .addComponent(Box.createRigidArea(Dimension(8, 0)) as JComponent)
-                .addComponent(checkConnectionButton)
                 .panel
 
             panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
 
+            add(checkConnectionButton, BorderLayout.SOUTH)
             add(
                 panel,
                 BorderLayout.NORTH
