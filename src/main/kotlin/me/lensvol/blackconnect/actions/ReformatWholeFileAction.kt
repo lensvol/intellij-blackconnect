@@ -5,6 +5,7 @@ import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
 import com.intellij.openapi.project.DumbAware
@@ -17,46 +18,59 @@ import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationGroupManager
 
 class ReformatWholeFileAction : AnAction(), DumbAware {
-    private val logger = Logger.getInstance(ReformatWholeFileAction::class.java.name)
+    companion object {
+        private val logger = Logger.getInstance(ReformatWholeFileAction::class.java.name)
 
-    private fun showError(currentProject: Project, text: String) {
-        NotificationGroupManager.mainGroup()
-            .createNotification(text, NotificationType.ERROR)
-            .setTitle("BlackConnect")
-            .notify(currentProject)
+        private fun showError(currentProject: Project, text: String) {
+            NotificationGroupManager.mainGroup()
+                .createNotification(text, NotificationType.ERROR)
+                .setTitle("BlackConnect")
+                .notify(currentProject)
+        }
+
+        fun reformatWholeDocument(
+            fileName: String,
+            project: Project,
+            document: Document
+        ) {
+            val configuration = BlackConnectProjectSettings.getInstance(project)
+            val codeReformatter = CodeReformatter(project, configuration)
+            codeReformatter.process(
+                fileName,
+                document.text,
+                fileName.endsWith(".pyi")
+            ) { response ->
+                when (response) {
+                    is BlackdResponse.Blackened -> {
+                        DocumentUtil.updateCodeInDocument(project, document) {
+                            logger.debug("Code is going to be updated in $document")
+                            document.setText(response.sourceCode)
+                        }
+                    }
+                    BlackdResponse.NoChangesMade -> {
+                    }
+                    is BlackdResponse.SyntaxError -> {
+                        if (configuration.showSyntaxErrorMsgs) {
+                            showError(project, "Source code contained syntax errors.")
+                        }
+                    }
+                    is BlackdResponse.InternalError -> showError(project, "Internal error, please see blackd output.")
+                    is BlackdResponse.UnknownStatus -> showError(
+                        project,
+                        "Something unexpected happened:\n${response.responseText}"
+                    )
+                }
+            }
+        }
     }
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val editor = FileEditorManagerEx.getInstance(project).selectedTextEditor ?: return
-        val configuration = BlackConnectProjectSettings.getInstance(project)
-        val codeReformatter = CodeReformatter(project, configuration)
 
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
         val fileName = vFile?.name ?: "unknown"
-
-        codeReformatter.process(
-            fileName,
-            editor.document.text,
-            fileName.endsWith(".pyi")
-        ) { response ->
-            when (response) {
-                is BlackdResponse.Blackened -> {
-                    DocumentUtil.updateCodeInDocument(project, editor.document) {
-                        logger.debug("Code is going to be updated in ${editor.document}")
-                        editor.document.setText(response.sourceCode)
-                    }
-                }
-                BlackdResponse.NoChangesMade -> {}
-                is BlackdResponse.SyntaxError -> {
-                    if (configuration.showSyntaxErrorMsgs) {
-                        showError(project, "Source code contained syntax errors.")
-                    }
-                }
-                is BlackdResponse.InternalError -> showError(project, "Internal error, please see blackd output.")
-                is BlackdResponse.UnknownStatus -> showError(project, "Something unexpected happened:\n${response.responseText}")
-            }
-        }
+        reformatWholeDocument(fileName, project, editor.document)
     }
 
     override fun update(event: AnActionEvent) {
