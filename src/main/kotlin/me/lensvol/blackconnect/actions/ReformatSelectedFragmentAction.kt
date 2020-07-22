@@ -1,7 +1,6 @@
 package me.lensvol.blackconnect.actions
 
 import com.intellij.codeInsight.hint.HintManager
-import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -67,8 +66,23 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
                         hintManager.showErrorHint(editor, "Fragment has invalid syntax.")
                     }
                 }
-                is BlackdResponse.InternalError -> showError(project, "Internal error, please see blackd output.")
-                is BlackdResponse.UnknownStatus -> showError(project, "Something unexpected happened:\n${response.responseText}")
+                is BlackdResponse.InternalError -> {
+                    // In some cases trying to reformat syntactically fragment will give out error code 500 instead of
+                    // 400. This is due to how Python tokenizer works. The only consistent case that I was able to find
+                    // was with fragments like `   if (\n', which trigger error mentioned in the following condition.
+                    // This heuristic should make it a little bit easier to see that problem is not with blackd per se.
+                    if (response.reason.contains("EOF in multi-line statement")) {
+                        ApplicationManager.getApplication().invokeLater {
+                            hintManager.showErrorHint(editor, "Fragment has invalid syntax.")
+                        }
+                    } else {
+                        showError(project, "Internal error, please see blackd output.")
+                    }
+                }
+                is BlackdResponse.UnknownStatus -> showError(
+                    project,
+                    "Something unexpected happened:\n${response.responseText}"
+                )
             }
         }
     }
