@@ -59,3 +59,7 @@ processResources {
         expand(properties)
     }
 }
+
+publishPlugin {
+    token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
+}
