@@ -38,8 +38,11 @@ patchPluginXml {
     changeNotes """
       <p>0.4.0</p>
       <ul>
+        <li>Added "Check connection" button to "Settings" screen.</li> 
         <li>Added "Reformat Selected Fragment" action to support partial reformatting./li>
-        <li>Reformatting actions now live in <b>BlackConnect</b> submenu under "Tools".</li>
+        <li>Reformatting actions moved to <b>BlackConnect</b> submenu under "Tools".</li>
+        <li>Fix crash when closing tab with window handle set to null.</li>
+        <li>Notification balloons no longer show up in "Event log".</li>
       </ul>
 
       <p>0.3.1</p>

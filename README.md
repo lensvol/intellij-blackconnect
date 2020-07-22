@@ -11,14 +11,14 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 * Automatic handling of Python type stubs (`.pyi`).
 * Ability to trigger on each file save.
 * Rough support for Jupyter Notebook files.
+* Ability to reformat selected fragment only instead of whole file.
+* Load formatting settings from **[tool.black]** section of `pyproject.toml`
 * Configurable options:
     * Hostname and port.
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
     * Target specific Python versions.
-* Ability to reformat selected fragment only instead of whole file. 
-* Load formatting settings from **[tool.black]** section of `pyproject.toml`
 
 ## Installation
 
