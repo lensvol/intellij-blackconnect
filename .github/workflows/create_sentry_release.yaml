@@ -1,0 +1,15 @@
+name: publish
+on:
+  release:
+    types: [published]
+jobs:
+  gradle:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Create a Sentry.io release
+      uses: tclindner/sentry-releases-action@v1.2.0
+      env:
+        SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+        SENTRY_ORG: lensvol
+        SENTRY_PROJECT: intellij-blackconnect
