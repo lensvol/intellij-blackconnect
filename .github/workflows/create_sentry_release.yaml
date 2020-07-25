@@ -3,7 +3,7 @@ on:
   release:
     types: [published]
 jobs:
-  gradle:
+  sentry-cli:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
@@ -13,3 +13,5 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_ORG: lensvol
         SENTRY_PROJECT: intellij-blackconnect
+      with:
+        tagName: ${{ github.ref }}
