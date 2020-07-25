@@ -36,7 +36,9 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
             one of the modules in project associated with this instance.
              */
             ModuleUtil.findModuleForFile(vFile, currentProject) ?: return
-            ReformatWholeFileAction.reformatWholeDocument(file.name, currentProject, document)
+            if (CodeReformatter(currentProject, configuration).isFileSupported(vFile)) {
+                ReformatWholeFileAction.reformatWholeDocument(file.name, currentProject, document)
+            }
         }
     }
 }

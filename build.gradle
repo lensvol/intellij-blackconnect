@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.4.0'
+version '0.4.1'
 
 repositories {
     mavenCentral()
@@ -36,6 +36,12 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
+      <p>0.4.1</p>
+      <ul>
+        <li>Fix regression with file save trigger reformatting non-Python files (reported by Matthew R. Scott
+).</li>
+      </ul>
+
       <p>0.4.0</p>
       <ul>
         <li>Added "Check connection" button to "Settings" screen.</li> 
@@ -43,11 +49,6 @@ patchPluginXml {
         <li>Reformatting actions moved to <b>BlackConnect</b> submenu under "Tools".</li>
         <li>Fix rare crash when closing tab with window handle set to <i>null</i>.</li>
         <li>Notification balloons no longer show up in "Event log".</li>
-      </ul>
-
-      <p>0.3.1</p>
-      <ul>
-        <li>Fix default line length being set to 80 instead of 88 (reported by Piotr Mazur).</li>
       </ul>
       """
 }
