@@ -19,7 +19,7 @@ class BlackdClient(val hostname: String, val port: Int) {
     private val logger = Logger.getInstance(CodeReformatter::class.java.name)
 
     fun checkConnection(): Result<String, String> {
-        val url = URL("http://${hostname}:${port}")
+        val url = URL("http://$hostname:$port")
 
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
@@ -51,7 +51,7 @@ class BlackdClient(val hostname: String, val port: Int) {
         skipStringNormalization: Boolean = false,
         targetPythonVersions: String = ""
     ): Result<BlackdResponse, Exception> {
-        val url = URL("http://${hostname}:${port}")
+        val url = URL("http://$hostname:$port")
 
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
@@ -108,11 +108,11 @@ class BlackdClient(val hostname: String, val port: Int) {
             }
             500 -> {
                 val errorText = connection.errorStream.bufferedReader().readText()
-                logger.debug("500: Something unexpected happened:\n${errorText}")
+                logger.debug("500: Something unexpected happened:\n$errorText")
                 BlackdResponse.InternalError(errorText)
             }
             else -> {
-                logger.debug("Unexpected status code received: ${connection.responseCode} ${connection}")
+                logger.debug("Unexpected status code received: ${connection.responseCode} $connection")
                 BlackdResponse.UnknownStatus(
                     connection.responseCode,
                     connection.inputStream.bufferedReader().readText()

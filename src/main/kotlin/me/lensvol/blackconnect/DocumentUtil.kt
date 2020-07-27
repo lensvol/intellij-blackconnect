@@ -16,18 +16,20 @@ class DocumentUtil {
         ) {
             with(ApplicationManager.getApplication()) {
                 invokeLater {
-                    runWriteAction(Computable {
-                        CommandProcessor.getInstance().executeCommand(
-                            project,
-                            {
-                                receiver()
-                            },
-                            "Reformat code using blackd",
-                            null,
-                            UndoConfirmationPolicy.DEFAULT,
-                            document
-                        )
-                    })
+                    runWriteAction(
+                        Computable {
+                            CommandProcessor.getInstance().executeCommand(
+                                project,
+                                {
+                                    receiver()
+                                },
+                                "Reformat code using blackd",
+                                null,
+                                UndoConfirmationPolicy.DEFAULT,
+                                document
+                            )
+                        }
+                    )
                 }
             }
         }

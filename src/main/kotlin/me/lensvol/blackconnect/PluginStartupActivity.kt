@@ -32,4 +32,3 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         }
     }
 }
-

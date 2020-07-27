@@ -34,13 +34,14 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
             .notify(currentProject)
     }
 
-
     private val logger = Logger.getInstance(CodeReformatter::class.java.name)
 
     fun isFileSupported(file: VirtualFile): Boolean {
         return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
-            (currentConfig.enableJupyterSupport &&
-                (file.fileType as LanguageFileType).language.id == "Jupyter")
+            (
+                currentConfig.enableJupyterSupport &&
+                    (file.fileType as LanguageFileType).language.id == "Jupyter"
+                )
     }
 
     fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (BlackdResponse) -> Unit) {
@@ -162,7 +163,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         return when (response) {
             is Failure -> {
                 val reason = response.reason.message ?: "Connection failed."
-                showError("Failed to connect to <b>blackd</b>:<br>${reason}")
+                showError("Failed to connect to <b>blackd</b>:<br>$reason")
                 null
             }
             is Success -> {
