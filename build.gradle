@@ -1,6 +1,7 @@
 plugins {
     id 'org.jetbrains.intellij' version '0.4.20'
     id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id 'jacoco'
 }
 
 group 'me.lensvol'
@@ -64,4 +65,11 @@ processResources {
 
 publishPlugin {
     token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
 }
