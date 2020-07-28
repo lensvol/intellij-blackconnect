@@ -16,7 +16,7 @@ jobs:
     - name: Run tests
       uses: eskatos/gradle-command-action@v1
       with:
-        arguments: test jacocoTestReport --warning-mode none
+        arguments: test jacocoTestReport  -Dorg.gradle.warning.mode=summary
         gradle-version: 6.5
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
