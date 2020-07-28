@@ -14,7 +14,7 @@ jobs:
     - uses: eskatos/gradle-command-action@v1
       with:
         arguments: test jacocoTestReport
-        gradle-version: 6.
+        gradle-version: 6.5
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
       with:
