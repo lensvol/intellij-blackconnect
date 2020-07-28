@@ -22,3 +22,7 @@ jobs:
       with:
         arguments: buildPlugin
         gradle-version: 6.5
+    - uses: eskatos/gradle-command-action@v1
+      with:
+        arguments: test
+        gradle-version: 6.5
