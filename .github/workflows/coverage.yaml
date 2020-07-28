@@ -18,8 +18,11 @@ jobs:
     - uses: eskatos/gradle-command-action@v1
       with:
         arguments: jacocoTestReport
-        gradle-version: 6.5
-    - name: Upload to codecov.io
-      run: bash <(curl -s https://codecov.io/bash)
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        gradle-version: 6.
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ./build/reports/jacoco/test/jacocoTestReport.xml
+        fail_ci_if_error: true
+        path_to_write_report: ./coverage/codecov_report.gz
