@@ -1,4 +1,4 @@
-# ![logo](https://raw.githubusercontent.com/lensvol/intellij-blackconnect/master/src/main/resources/icons/blackconnect@2x.svg) intellij-blackconnect
+# ![logo](https://raw.githubusercontent.com/lensvol/intellij-blackconnect/master/_static/readme_logo.svg) intellij-blackconnect
 
 [![GitHub](https://img.shields.io/github/license/lensvol/intellij-blackconnect)](https://github.com/lensvol/intellij-blackconnect/blob/master/LICENSE) [![JetBrains IntelliJ Plugins](https://img.shields.io/jetbrains/plugin/v/14321-blackconnect)](https://plugins.jetbrains.com/plugin/14321-blackconnect/versions) [![JetBrains IntelliJ plugins](https://img.shields.io/jetbrains/plugin/d/14321-blackconnect)](https://plugins.jetbrains.com/plugin/14321-blackconnect) [![build](https://github.com/lensvol/intellij-blackconnect/workflows/build/badge.svg)](https://github.com/lensvol/intellij-blackconnect/actions?query=workflow%3Abuild) [![codecov](https://codecov.io/gh/lensvol/intellij-blackconnect/branch/master/graph/badge.svg)](https://codecov.io/gh/lensvol/intellij-blackconnect)
 
