@@ -8,6 +8,7 @@ import com.intellij.openapi.command.CommandListener
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.TestActionEvent
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
+import junit.framework.TestCase
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
 import org.junit.Test
 import org.mockserver.integration.ClientAndServer
@@ -15,7 +16,7 @@ import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
 import java.util.concurrent.locks.ReentrantLock
 
-class SmokeTestCase : BasePlatformTestCase() {
+class WholeFileReformatTestCase : BasePlatformTestCase() {
     lateinit var mockServer: ClientAndServer
 
     @Test
@@ -46,6 +47,28 @@ class SmokeTestCase : BasePlatformTestCase() {
         waitOnCommand("Reformat code using blackd", codeUnderTest) {
             myFixture.checkResultByFile("reformatted.py")
         }
+    }
+
+    @Test
+    fun test_menu_item_is_not_active_for_non_python() {
+        val unformattedFile = myFixture.copyFileToProject("not_python.txt")
+        myFixture.openFileInEditor(unformattedFile)
+        val event = eventForFile(unformattedFile)
+
+        ReformatWholeFileAction().update(event)
+
+        TestCase.assertFalse(event.presentation.isEnabled)
+    }
+
+    @Test
+    fun test_menu_item_is_not_active_for_python() {
+        val unformattedFile = myFixture.copyFileToProject("unformatted.py")
+        myFixture.openFileInEditor(unformattedFile)
+        val event = eventForFile(unformattedFile)
+
+        ReformatWholeFileAction().update(event)
+
+        TestCase.assertTrue(event.presentation.isEnabled)
     }
 
     override fun setUp() {
