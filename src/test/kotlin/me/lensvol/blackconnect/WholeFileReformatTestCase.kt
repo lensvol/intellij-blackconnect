@@ -1,19 +1,25 @@
 package me.lensvol.blackconnect
 
 import com.intellij.ide.IdeEventQueue
+import com.intellij.notification.Notification
+import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.CommandEvent
 import com.intellij.openapi.command.CommandListener
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.TestActionEvent
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import junit.framework.TestCase
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
+import org.jetbrains.concurrency.AsyncPromise
+import org.jetbrains.concurrency.Promise
 import org.junit.Test
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.model.HttpRequest.request
 import org.mockserver.model.HttpResponse.response
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.locks.ReentrantLock
 
 class WholeFileReformatTestCase : BasePlatformTestCase() {
@@ -44,7 +50,7 @@ class WholeFileReformatTestCase : BasePlatformTestCase() {
             actionUnderTest.actionPerformed(event)
         }
 
-        waitOnCommand("Reformat code using blackd", codeUnderTest) {
+        checkWhenCommandCompletes("Reformat code using blackd", codeUnderTest) {
             myFixture.checkResultByFile("reformatted.py")
         }
     }
@@ -69,6 +75,31 @@ class WholeFileReformatTestCase : BasePlatformTestCase() {
         ReformatWholeFileAction().update(event)
 
         TestCase.assertTrue(event.presentation.isEnabled)
+    }
+
+    @Test
+    fun test_error_message_is_displayed_on_syntax_error() {
+        val unformattedFile = myFixture.copyFileToProject("broken.py")
+        val event = eventForFile(unformattedFile)
+
+        myFixture.openFileInEditor(unformattedFile)
+        mockServer.apply {
+            this.`when`(
+                request()
+                    .withMethod("POST")
+                    .withPath("/")
+            ).respond(
+                response()
+                    .withStatusCode(400)
+                    .withBody("Syntax error")
+            )
+        }
+
+        checkNotificationIsShown("Source code contained syntax errors.") {
+            val actionUnderTest = ReformatWholeFileAction()
+            actionUnderTest.beforeActionPerformedUpdate(event)
+            actionUnderTest.actionPerformed(event)
+        }
     }
 
     override fun setUp() {
@@ -97,17 +128,19 @@ class WholeFileReformatTestCase : BasePlatformTestCase() {
         return System.getProperty("user.dir") + "/src/test/testData"
     }
 
-    fun waitOnCommand(commandName: String, codeBlock: () -> Unit, check: () -> Unit) {
+    private fun checkWhenCommandCompletes(commandName: String, codeBlock: () -> Unit, check: () -> Unit) {
         val lock = ReentrantLock()
         lock.lock()
+
+        val completionPromise = AsyncPromise<Boolean>()
 
         myFixture.project.messageBus.connect().subscribe(
             CommandListener.TOPIC,
             object : CommandListener {
                 override fun commandFinished(event: CommandEvent) {
                     if (event.commandName == commandName) {
-                        lock.unlock()
                         check()
+                        completionPromise.setResult(true)
                     }
                 }
             }
@@ -115,8 +148,27 @@ class WholeFileReformatTestCase : BasePlatformTestCase() {
 
         codeBlock()
 
-        while (lock.isLocked) {
-            IdeEventQueue.getInstance().flushQueue()
-        }
+        PlatformTestUtil.waitForPromise(completionPromise, 3 * 60 * 1000)
+    }
+
+    private fun checkNotificationIsShown(expectedContent: String, codeBlock: () -> Unit) {
+        val completionPromise = AsyncPromise<Boolean>()
+
+        myFixture.project.messageBus.connect().subscribe(
+            Notifications.TOPIC,
+            object : Notifications {
+                override fun notify(notification: Notification) {
+                    if (notification.hasContent()) {
+                        TestCase.assertEquals(expectedContent, notification.content)
+                        completionPromise.setResult(true)
+                    }
+                }
+            }
+        )
+
+        codeBlock()
+
+        PlatformTestUtil.waitForPromise(completionPromise, 3 * 60 * 1000)
+        assertTrue("Expected notification was not shown.", completionPromise.isSucceeded)
     }
 }
