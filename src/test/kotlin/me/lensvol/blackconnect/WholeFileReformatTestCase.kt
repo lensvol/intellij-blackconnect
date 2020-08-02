@@ -83,4 +83,58 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
             actionUnderTest.actionPerformed(event)
         }
     }
+
+    @Test
+    fun test_error_message_is_displayed_on_blackd_internal_error() {
+        val unformattedFile = myFixture.copyFileToProject("broken.py")
+        val event = eventForFile(unformattedFile)
+
+        myFixture.openFileInEditor(unformattedFile)
+        mockServer.apply {
+            this.`when`(
+                request()
+                    .withMethod("POST")
+                    .withPath("/")
+            ).respond(
+                response()
+                    .withStatusCode(500)
+                    .withBody("SNAFU")
+            )
+        }
+
+        checkNotificationIsShown("Internal error, please see blackd output.") {
+            val actionUnderTest = ReformatWholeFileAction()
+            actionUnderTest.beforeActionPerformedUpdate(event)
+            actionUnderTest.actionPerformed(event)
+        }
+    }
+
+    @Test
+    fun test_error_message_is_displayed_on_unknown_status_from_blackd() {
+        val unformattedFile = myFixture.copyFileToProject("broken.py")
+        val event = eventForFile(unformattedFile)
+
+        myFixture.openFileInEditor(unformattedFile)
+        mockServer.apply {
+            this.`when`(
+                request()
+                    .withMethod("POST")
+                    .withPath("/")
+            ).respond(
+                response()
+                    .withStatusCode(417)
+                    .withBody("I'm A Teapot!")
+            )
+        }
+
+        val expectedErrorMessage = "Failed to connect to <b>blackd</b>:" +
+                                    "<br>Server returned HTTP response code: 417 for URL: " +
+                                    "http://localhost:${mockServer.port}"
+
+        checkNotificationIsShown(expectedErrorMessage) {
+            val actionUnderTest = ReformatWholeFileAction()
+            actionUnderTest.beforeActionPerformedUpdate(event)
+            actionUnderTest.actionPerformed(event)
+        }
+    }
 }
