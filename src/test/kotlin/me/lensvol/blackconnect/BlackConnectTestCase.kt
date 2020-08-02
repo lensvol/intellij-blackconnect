@@ -65,12 +65,14 @@ abstract class BlackConnectTestCase : BasePlatformTestCase() {
     protected fun checkNotificationIsShown(expectedContent: String, codeBlock: () -> Unit) {
         val completionPromise = AsyncPromise<Boolean>()
 
-        myFixture.project.messageBus.connect().subscribe(
+        val busConnection = myFixture.project.messageBus.connect()
+        busConnection.subscribe(
             Notifications.TOPIC,
             object : Notifications {
                 override fun notify(notification: Notification) {
                     if (notification.hasContent()) {
                         TestCase.assertEquals(expectedContent, notification.content)
+                        busConnection.disconnect()
                         completionPromise.setResult(true)
                     }
                 }
