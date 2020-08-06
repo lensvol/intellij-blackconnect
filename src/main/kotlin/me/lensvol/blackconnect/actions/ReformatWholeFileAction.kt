@@ -1,9 +1,9 @@
 package me.lensvol.blackconnect.actions
 
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
@@ -15,18 +15,11 @@ import me.lensvol.blackconnect.BlackdResponse
 import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.DocumentUtil
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import me.lensvol.blackconnect.ui.NotificationGroupManager
+import me.lensvol.blackconnect.ui.NotificationManager
 
 class ReformatWholeFileAction : AnAction(), DumbAware {
     companion object {
         private val logger = Logger.getInstance(ReformatWholeFileAction::class.java.name)
-
-        private fun showError(currentProject: Project, text: String) {
-            NotificationGroupManager.mainGroup()
-                .createNotification(text, NotificationType.ERROR)
-                .setTitle("BlackConnect")
-                .notify(currentProject)
-        }
 
         fun reformatWholeDocument(
             fileName: String,
@@ -35,6 +28,8 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
         ) {
             val configuration = BlackConnectProjectSettings.getInstance(project)
             val codeReformatter = CodeReformatter(project, configuration)
+            val notificationService = project.service<NotificationManager>()
+
             codeReformatter.process(
                 fileName,
                 document.text,
@@ -51,12 +46,11 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                     }
                     is BlackdResponse.SyntaxError -> {
                         if (configuration.showSyntaxErrorMsgs) {
-                            showError(project, "Source code contained syntax errors.")
+                            notificationService.showError("Source code contained syntax errors.")
                         }
                     }
-                    is BlackdResponse.InternalError -> showError(project, "Internal error, please see blackd output.")
-                    is BlackdResponse.UnknownStatus -> showError(
-                        project,
+                    is BlackdResponse.InternalError -> notificationService.showError("Internal error, please see blackd output.")
+                    is BlackdResponse.UnknownStatus -> notificationService.showError(
                         "Something unexpected happened:\n${response.responseText}"
                     )
                 }

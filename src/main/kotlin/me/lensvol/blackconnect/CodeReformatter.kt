@@ -1,7 +1,5 @@
 package me.lensvol.blackconnect
 
-import com.intellij.notification.NotificationGroup
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.LanguageFileType
@@ -14,7 +12,7 @@ import com.intellij.openapi.vfs.VirtualFile
 import com.jetbrains.rd.util.string.printToString
 import me.lensvol.blackconnect.BlackdResponse.Blackened
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import me.lensvol.blackconnect.ui.NotificationGroupManager
+import me.lensvol.blackconnect.ui.NotificationManager
 
 data class FragmentFormatting(
     val whitespaceBefore: String,
@@ -26,13 +24,7 @@ data class FragmentFormatting(
 class CodeReformatter(project: Project, configuration: BlackConnectProjectSettings) {
     private val currentProject: Project = project
     private val currentConfig: BlackConnectProjectSettings = configuration
-    private val notificationGroup: NotificationGroup = NotificationGroupManager.mainGroup()
-    private fun showError(text: String) {
-        notificationGroup
-            .createNotification(text, NotificationType.ERROR)
-            .setTitle("BlackConnect")
-            .notify(currentProject)
-    }
+    private val notificationService = project.service<NotificationManager>()
 
     private val logger = Logger.getInstance(CodeReformatter::class.java.name)
 
@@ -163,7 +155,7 @@ class CodeReformatter(project: Project, configuration: BlackConnectProjectSettin
         return when (response) {
             is Failure -> {
                 val reason = response.reason.message ?: "Connection failed."
-                showError("Failed to connect to <b>blackd</b>:<br>$reason")
+                notificationService.showError("Failed to connect to <b>blackd</b>:<br>$reason")
                 null
             }
             is Success -> {

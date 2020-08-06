@@ -1,10 +1,10 @@
 package me.lensvol.blackconnect.actions
 
 import com.intellij.codeInsight.hint.HintManager
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
+import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.ex.FileEditorManagerEx
@@ -16,17 +16,10 @@ import me.lensvol.blackconnect.BlackdResponse
 import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.DocumentUtil
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import me.lensvol.blackconnect.ui.NotificationGroupManager
+import me.lensvol.blackconnect.ui.NotificationManager
 
 class ReformatSelectedFragmentAction : AnAction(), DumbAware {
     private val logger = Logger.getInstance(ReformatSelectedFragmentAction::class.java.name)
-
-    private fun showError(currentProject: Project, text: String) {
-        NotificationGroupManager.mainGroup()
-            .createNotification(text, NotificationType.ERROR)
-            .setTitle("BlackConnect")
-            .notify(currentProject)
-    }
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
@@ -34,6 +27,7 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
         val configuration = BlackConnectProjectSettings.getInstance(project)
         val hintManager = HintManager.getInstance()
         val codeReformatter = CodeReformatter(project, configuration)
+        val notificationService = project.service<NotificationManager>()
 
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
         val fileName = vFile?.name ?: "unknown"
@@ -76,11 +70,10 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
                             hintManager.showErrorHint(editor, "Fragment has invalid syntax.")
                         }
                     } else {
-                        showError(project, "Internal error, please see blackd output.")
+                        notificationService.showError("Internal error, please see blackd output.")
                     }
                 }
-                is BlackdResponse.UnknownStatus -> showError(
-                    project,
+                is BlackdResponse.UnknownStatus -> notificationService.showError(
                     "Something unexpected happened:\n${response.responseText}"
                 )
             }

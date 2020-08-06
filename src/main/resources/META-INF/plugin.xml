@@ -51,6 +51,7 @@
         <applicationService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectGlobalSettings"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectProjectSettings"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProgressTracker"/>
+        <projectService serviceImplementation="me.lensvol.blackconnect.ui.NotificationManager"/>
         <actionPromoter implementation="me.lensvol.blackconnect.actions.BeforeCloseTabActionPromoter"/>
     </extensions>
 

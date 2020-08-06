@@ -1,6 +1,5 @@
 package me.lensvol.blackconnect
 
-import com.intellij.notification.NotificationType
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
@@ -8,17 +7,9 @@ import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import me.lensvol.blackconnect.ui.NotificationGroupManager
 
 class FileSaveListener(project: Project) : FileDocumentManagerListener {
     private val currentProject: Project = project
-
-    private fun showError(currentProject: Project, text: String) {
-        NotificationGroupManager.mainGroup()
-            .createNotification(text, NotificationType.ERROR)
-            .setTitle("BlackConnect")
-            .notify(currentProject)
-    }
 
     override fun beforeDocumentSaving(document: Document) {
         val configuration = BlackConnectProjectSettings.getInstance(currentProject)
