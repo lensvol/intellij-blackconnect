@@ -7,7 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 
 @Service
-class NotificationManager(project: Project) {
+open class NotificationManager(project: Project) {
     val MAIN_DISPLAY_ID = "BlackConnect"
     val currentProject = project
 
@@ -20,7 +20,7 @@ class NotificationManager(project: Project) {
         return NotificationGroup(MAIN_DISPLAY_ID, NotificationDisplayType.BALLOON, false)
     }
 
-    fun showError(text: String) {
+    open fun showError(text: String) {
         mainGroup()
             .createNotification(text, NotificationType.ERROR)
             .setTitle("BlackConnect")

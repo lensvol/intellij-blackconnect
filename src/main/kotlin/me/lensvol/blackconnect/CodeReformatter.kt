@@ -23,7 +23,7 @@ data class FragmentFormatting(
 )
 
 @Service
-class CodeReformatter(project: Project) {
+open class CodeReformatter(project: Project) {
     private val currentProject: Project = project
     private val currentConfig = BlackConnectProjectSettings.getInstance(project)
     private val notificationService: NotificationManager = project.service<NotificationManager>()
@@ -38,7 +38,7 @@ class CodeReformatter(project: Project) {
                 )
     }
 
-    fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (BlackdResponse) -> Unit) {
+    open fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (BlackdResponse) -> Unit) {
         val progressIndicator = EmptyProgressIndicator()
         progressIndicator.isIndeterminate = true
 
