@@ -27,7 +27,7 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
             document: Document
         ) {
             val configuration = BlackConnectProjectSettings.getInstance(project)
-            val codeReformatter = CodeReformatter(project, configuration)
+            val codeReformatter = project.service<CodeReformatter>()
             val notificationService = project.service<NotificationManager>()
 
             codeReformatter.process(
@@ -72,11 +72,8 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
 
         val project: Project = event.project ?: return
         val vFile: VirtualFile = event.getData(PlatformDataKeys.VIRTUAL_FILE) ?: return
-        val configuration = BlackConnectProjectSettings.getInstance(project)
 
-        event.presentation.isEnabled = CodeReformatter(
-            project,
-            configuration
-        ).isFileSupported(vFile)
+        val codeReformatter = project.service<CodeReformatter>()
+        event.presentation.isEnabled = codeReformatter.isFileSupported(vFile)
     }
 }

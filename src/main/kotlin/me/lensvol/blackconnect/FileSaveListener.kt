@@ -1,5 +1,6 @@
 package me.lensvol.blackconnect
 
+import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
 import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
@@ -10,6 +11,7 @@ import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 class FileSaveListener(project: Project) : FileDocumentManagerListener {
     private val currentProject: Project = project
+    private val codeReformatter = project.service<CodeReformatter>()
 
     override fun beforeDocumentSaving(document: Document) {
         val configuration = BlackConnectProjectSettings.getInstance(currentProject)
@@ -27,7 +29,7 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
             one of the modules in project associated with this instance.
              */
             ModuleUtil.findModuleForFile(vFile, currentProject) ?: return
-            if (CodeReformatter(currentProject, configuration).isFileSupported(vFile)) {
+            if (codeReformatter.isFileSupported(vFile)) {
                 ReformatWholeFileAction.reformatWholeDocument(file.name, currentProject, document)
             }
         }

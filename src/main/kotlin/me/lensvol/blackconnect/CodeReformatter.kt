@@ -1,5 +1,6 @@
 package me.lensvol.blackconnect
 
+import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.LanguageFileType
@@ -21,10 +22,11 @@ data class FragmentFormatting(
     val endsWithNewline: Boolean
 )
 
-class CodeReformatter(project: Project, configuration: BlackConnectProjectSettings) {
+@Service
+class CodeReformatter(project: Project) {
     private val currentProject: Project = project
-    private val currentConfig: BlackConnectProjectSettings = configuration
-    private val notificationService = project.service<NotificationManager>()
+    private val currentConfig = BlackConnectProjectSettings.getInstance(project)
+    private val notificationService: NotificationManager = project.service<NotificationManager>()
 
     private val logger = Logger.getInstance(CodeReformatter::class.java.name)
 

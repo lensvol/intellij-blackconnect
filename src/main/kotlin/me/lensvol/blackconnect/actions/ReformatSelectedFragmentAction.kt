@@ -15,7 +15,6 @@ import com.intellij.openapi.vfs.VirtualFile
 import me.lensvol.blackconnect.BlackdResponse
 import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.DocumentUtil
-import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationManager
 
 class ReformatSelectedFragmentAction : AnAction(), DumbAware {
@@ -24,10 +23,10 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return
         val editor = FileEditorManagerEx.getInstance(project).selectedTextEditor ?: return
-        val configuration = BlackConnectProjectSettings.getInstance(project)
+
         val hintManager = HintManager.getInstance()
-        val codeReformatter = CodeReformatter(project, configuration)
         val notificationService = project.service<NotificationManager>()
+        val codeReformatter = project.service<CodeReformatter>()
 
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
         val fileName = vFile?.name ?: "unknown"
