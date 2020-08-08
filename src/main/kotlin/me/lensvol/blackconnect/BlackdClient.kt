@@ -16,7 +16,7 @@ sealed class BlackdResponse {
 
 class BlackdClient(val hostname: String, val port: Int) {
 
-    private val logger = Logger.getInstance(CodeReformatter::class.java.name)
+    private val logger = Logger.getInstance(BlackdClient::class.java.name)
 
     fun checkConnection(): Result<String, String> {
         val url = URL("http://$hostname:$port")
