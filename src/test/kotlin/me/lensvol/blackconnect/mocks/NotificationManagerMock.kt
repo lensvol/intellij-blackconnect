@@ -16,4 +16,8 @@ class NotificationManagerMock(project: Project) : NotificationManager(project) {
     fun assertNotificationShown(expectedText: String) {
         TestCase.assertTrue(shownNotifications.contains(expectedText))
     }
+
+    fun assertNotificationNotShown(expectedText: String) {
+        TestCase.assertFalse(shownNotifications.contains(expectedText))
+    }
 }

@@ -3,6 +3,7 @@ package me.lensvol.blackconnect
 import com.intellij.testFramework.TestActionEvent
 import junit.framework.TestCase
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
+import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import org.junit.Test
 
 class WholeFileReformatTestCase : BlackConnectTestCase() {
@@ -38,6 +39,20 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         runActionForEvent(event)
 
         mockNotificationManager.assertNotificationShown("Source code contained syntax errors.")
+    }
+
+    @Test
+    fun test_error_message_is_not_displayed_on_syntax_error_if_option_set() {
+        val unformattedFile = myFixture.copyFileToProject("broken.py")
+        myFixture.openFileInEditor(unformattedFile)
+        setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
+
+        val configuration = BlackConnectProjectSettings.getInstance(myFixture.project)
+        configuration.showSyntaxErrorMsgs = false
+        val event = eventForFile(unformattedFile)
+        runActionForEvent(event)
+
+        mockNotificationManager.assertNotificationNotShown("Source code contained syntax errors.")
     }
 
     @Test
