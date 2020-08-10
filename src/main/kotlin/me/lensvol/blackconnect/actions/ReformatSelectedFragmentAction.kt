@@ -27,6 +27,7 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
         val hintManager = HintManager.getInstance()
         val notificationService = project.service<NotificationManager>()
         val codeReformatter = project.service<CodeReformatter>()
+        val documentUtil = project.service<DocumentUtil>()
 
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
         val fileName = vFile?.name ?: "unknown"
@@ -45,7 +46,7 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
         codeReformatter.processFragment(fileName, fragment, fileName.endsWith(".pyi")) { response ->
             when (response) {
                 is BlackdResponse.Blackened -> {
-                    DocumentUtil.updateCodeInDocument(project, editor.document) {
+                    documentUtil.updateCodeInDocument(editor.document) {
                         editor.document.replaceString(selectionStart, selectionEnd, response.sourceCode)
                     }
                 }

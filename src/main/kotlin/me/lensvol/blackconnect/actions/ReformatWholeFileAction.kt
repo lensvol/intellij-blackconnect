@@ -29,6 +29,7 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
             val configuration = BlackConnectProjectSettings.getInstance(project)
             val codeReformatter = project.service<CodeReformatter>()
             val notificationService = project.service<NotificationManager>()
+            val documentUtil = project.service<DocumentUtil>()
 
             codeReformatter.process(
                 fileName,
@@ -37,7 +38,7 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
             ) { response ->
                 when (response) {
                     is BlackdResponse.Blackened -> {
-                        DocumentUtil.updateCodeInDocument(project, document) {
+                        documentUtil.updateCodeInDocument(document) {
                             logger.debug("Code is going to be updated in $document")
                             document.setText(response.sourceCode)
                         }

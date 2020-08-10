@@ -7,15 +7,21 @@ import com.intellij.testFramework.TestActionEvent
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.testFramework.replaceService
 import me.lensvol.blackconnect.mocks.CodeReformatterMock
+import me.lensvol.blackconnect.mocks.DocumentUtilMock
 import me.lensvol.blackconnect.mocks.NotificationManagerMock
+import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationManager
 
 abstract class BlackConnectTestCase : BasePlatformTestCase() {
     lateinit var mockNotificationManager: NotificationManagerMock
     lateinit var mockCodeReformatter: CodeReformatterMock
+    lateinit var mockDocumentUtil: DocumentUtil
+    lateinit var pluginConfiguration: BlackConnectProjectSettings
 
     override fun setUp() {
         super.setUp()
+
+        pluginConfiguration = BlackConnectProjectSettings.getInstance(myFixture.project)
 
         setupMocks()
     }
@@ -27,6 +33,9 @@ abstract class BlackConnectTestCase : BasePlatformTestCase() {
 
         mockCodeReformatter = CodeReformatterMock(myFixture.project)
         myFixture.project.replaceService(CodeReformatter::class.java, mockCodeReformatter, testRootDisposable)
+
+        mockDocumentUtil = DocumentUtilMock(myFixture.project)
+        myFixture.project.replaceService(DocumentUtil::class.java, mockDocumentUtil, testRootDisposable)
     }
 
     protected fun eventForFile(file: VirtualFile): TestActionEvent {
@@ -43,5 +52,15 @@ abstract class BlackConnectTestCase : BasePlatformTestCase() {
 
     override fun getTestDataPath(): String {
         return System.getProperty("user.dir") + "/src/test/testData"
+    }
+
+    fun setupBlackdResponse(response: BlackdResponse) {
+        mockCodeReformatter.setResponse(response)
+    }
+
+    fun openFileInEditor(filePath: String): VirtualFile {
+        val file = myFixture.copyFileToProject(filePath)
+        myFixture.openFileInEditor(file)
+        return file
     }
 }

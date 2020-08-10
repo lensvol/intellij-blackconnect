@@ -3,16 +3,25 @@ package me.lensvol.blackconnect
 import com.intellij.testFramework.TestActionEvent
 import junit.framework.TestCase
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
-import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import org.junit.Test
 
 class WholeFileReformatTestCase : BlackConnectTestCase() {
     @Test
-    fun test_menu_item_is_not_active_for_non_python() {
-        val unformattedFile = myFixture.copyFileToProject("not_python.txt")
-        myFixture.openFileInEditor(unformattedFile)
+    fun test_whole_file_is_reformatted_if_needed() {
+        setupBlackdResponse(BlackdResponse.Blackened("print(\"123\")"))
+        val unformattedFile = openFileInEditor("unformatted.py")
 
         val event = eventForFile(unformattedFile)
+        runActionForEvent(event)
+
+        myFixture.checkResultByFile("reformatted.py")
+    }
+
+    @Test
+    fun test_menu_item_is_not_active_for_non_python() {
+        val nonPythonFile = openFileInEditor("not_python.txt")
+
+        val event = eventForFile(nonPythonFile)
         ReformatWholeFileAction().update(event)
 
         TestCase.assertFalse(event.presentation.isEnabled)
@@ -20,8 +29,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
 
     @Test
     fun test_menu_item_is_not_active_for_python() {
-        val unformattedFile = myFixture.copyFileToProject("unformatted.py")
-        myFixture.openFileInEditor(unformattedFile)
+        val unformattedFile = openFileInEditor("unformatted.py")
 
         val event = eventForFile(unformattedFile)
         ReformatWholeFileAction().update(event)
@@ -31,11 +39,10 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
 
     @Test
     fun test_error_message_is_displayed_on_syntax_error() {
-        val unformattedFile = myFixture.copyFileToProject("broken.py")
-        myFixture.openFileInEditor(unformattedFile)
         setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
+        val brokenSyntaxFile = openFileInEditor("broken.py")
 
-        val event = eventForFile(unformattedFile)
+        val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
 
         mockNotificationManager.assertNotificationShown("Source code contained syntax errors.")
@@ -43,13 +50,11 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
 
     @Test
     fun test_error_message_is_not_displayed_on_syntax_error_if_option_set() {
-        val unformattedFile = myFixture.copyFileToProject("broken.py")
-        myFixture.openFileInEditor(unformattedFile)
         setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
+        val brokenSyntaxFile = openFileInEditor("broken.py")
 
-        val configuration = BlackConnectProjectSettings.getInstance(myFixture.project)
-        configuration.showSyntaxErrorMsgs = false
-        val event = eventForFile(unformattedFile)
+        pluginConfiguration.showSyntaxErrorMsgs = false
+        val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
 
         mockNotificationManager.assertNotificationNotShown("Source code contained syntax errors.")
@@ -57,11 +62,10 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
 
     @Test
     fun test_error_message_is_displayed_on_blackd_internal_error() {
-        val unformattedFile = myFixture.copyFileToProject("broken.py")
-        myFixture.openFileInEditor(unformattedFile)
         setupBlackdResponse(BlackdResponse.InternalError("SNAFU"))
+        val brokenSyntaxFile = openFileInEditor("broken.py")
 
-        val event = eventForFile(unformattedFile)
+        val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
 
         mockNotificationManager.assertNotificationShown("Internal error, please see blackd output.")
@@ -69,9 +73,8 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
 
     @Test
     fun test_error_message_is_displayed_on_unknown_status_from_blackd() {
-        val unformattedFile = myFixture.copyFileToProject("broken.py")
-        myFixture.openFileInEditor(unformattedFile)
         setupBlackdResponse(BlackdResponse.UnknownStatus(417, "I'm A Teapot!"))
+        val unformattedFile = openFileInEditor("unformatted.py")
 
         val event = eventForFile(unformattedFile)
         runActionForEvent(event)
@@ -83,9 +86,5 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         val actionUnderTest = ReformatWholeFileAction()
         actionUnderTest.beforeActionPerformedUpdate(event)
         actionUnderTest.actionPerformed(event)
-    }
-
-    private fun setupBlackdResponse(response: BlackdResponse) {
-        mockCodeReformatter.setResponse(response)
     }
 }
