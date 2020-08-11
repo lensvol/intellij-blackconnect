@@ -2,6 +2,8 @@ package me.lensvol.blackconnect
 
 import com.intellij.openapi.actionSystem.DataContext
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.editor.Document
+import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.testFramework.TestActionEvent
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
@@ -17,6 +19,8 @@ abstract class BlackConnectTestCase : BasePlatformTestCase() {
     lateinit var mockCodeReformatter: CodeReformatterMock
     lateinit var mockDocumentUtil: DocumentUtil
     lateinit var pluginConfiguration: BlackConnectProjectSettings
+
+    fun documentForFile(file: VirtualFile): Document = FileDocumentManager.getInstance().getDocument(file)!!
 
     override fun setUp() {
         super.setUp()
