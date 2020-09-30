@@ -16,6 +16,7 @@ import com.moandjiezana.toml.Toml
 import me.lensvol.blackconnect.BlackdClient
 import me.lensvol.blackconnect.Failure
 import me.lensvol.blackconnect.Success
+import me.lensvol.blackconnect.config.sections.ConnectionSettingsSection
 import me.lensvol.blackconnect.config.sections.SaveTriggerSection
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
@@ -44,15 +45,9 @@ const val DEFAULT_BLACKD_PORT: Int = 45484
 
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val configSections = listOf(
-        SaveTriggerSection()
+        SaveTriggerSection(),
+        ConnectionSettingsSection()
     )
-
-    private val hostnameText = JTextField("127.0.0.1")
-
-    private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
-    private val portSpinner = JSpinner(portSpinnerModel)
-
-    private val checkConnectionButton = JButton("Check connection")
 
     private val lineLengthModel = SpinnerNumberModel(DEFAULT_LINE_LENGTH, 45, 255, 1)
     private val lineLengthSpinner = JSpinner(lineLengthModel)
@@ -84,7 +79,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
 
     init {
         loadPyprojectTomlButton.isEnabled = true
-        portSpinner.editor = JSpinner.NumberEditor(portSpinner, "#")
         installUiListeners(project)
 
         layout = GridBagLayout()
@@ -94,10 +88,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         configSections.map {
             add(it.panel, constraints)
         }
-
-        val connectionSettingPanel = createConnectionSettingPanel()
-        connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
-        add(connectionSettingPanel, constraints)
 
         val formattingPanel = createFormattingSettingsPanel()
         formattingPanel.alignmentX = Component.LEFT_ALIGNMENT
@@ -140,42 +130,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
                 processPyprojectToml(contents)
             }
         }
-
-        hostnameText.document.addDocumentListener(object : DocumentListener {
-            override fun changedUpdate(e: DocumentEvent?) {
-                disableButtonIfNeeded(e)
-            }
-
-            override fun insertUpdate(e: DocumentEvent?) {
-                disableButtonIfNeeded(e)
-            }
-
-            override fun removeUpdate(e: DocumentEvent?) {
-                disableButtonIfNeeded(e)
-            }
-
-            fun disableButtonIfNeeded(e: DocumentEvent?) {
-                e?.document?.apply {
-                    checkConnectionButton.isEnabled = getText(0, length).isNotEmpty()
-                }
-            }
-        })
-
-        checkConnectionButton.addActionListener {
-            val blackdClient = BlackdClient(hostnameText.text, portSpinner.value as Int)
-
-            when (val result = blackdClient.checkConnection()) {
-                is Success -> Messages.showInfoMessage(
-                    this,
-                    "It works!<br><br><b>blackd</b> version: ${result.value}",
-                    "Connection status"
-                )
-                is Failure -> Messages.showErrorDialog(
-                    this,
-                    "Cannot connect to <b>blackd</b>:<br><br><b>${result.reason}</b>"
-                )
-            }
-        }
     }
 
     private fun createMiscSettingsPanel(): JPanel {
@@ -188,27 +142,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
                     .addComponent(jupyterSupportCheckbox)
                     .addComponent(showSyntaxErrorMsgsCheckbox)
                     .panel,
-                BorderLayout.NORTH
-            )
-        }
-    }
-
-    private fun createConnectionSettingPanel(): JPanel {
-        return JPanel().apply {
-            layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Connection settings")
-
-            val panel = FormBuilder.createFormBuilder()
-                .addLabeledComponent("Hostname:", hostnameText)
-                .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
-                .addLabeledComponent("Port:", portSpinner)
-                .panel
-
-            panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
-
-            add(checkConnectionButton, BorderLayout.SOUTH)
-            add(
-                panel,
                 BorderLayout.NORTH
             )
         }
@@ -303,8 +236,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             it.saveTo(configuration)
         }
 
-        configuration.hostname = hostnameText.text.ifBlank { "localhost" }
-        configuration.port = portSpinner.value as Int
         configuration.lineLength = lineLengthSpinner.value as Int
         configuration.fastMode = fastModeCheckbox.isSelected
         configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
@@ -319,8 +250,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             it.loadFrom(configuration)
         }
 
-        hostnameText.text = configuration.hostname
-        portSpinner.value = configuration.port
         lineLengthSpinner.value = configuration.lineLength
         fastModeCheckbox.isSelected = configuration.fastMode
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
@@ -352,8 +281,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
             { changed, section -> changed || section.isModified(configuration) }
         )
         return anyChangesInSections ||
-            hostnameText.text != configuration.hostname ||
-            portSpinner.value != configuration.port ||
             lineLengthSpinner.value != configuration.lineLength ||
             fastModeCheckbox.isSelected != configuration.fastMode ||
             skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
