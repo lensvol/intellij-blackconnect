@@ -1,14 +1,15 @@
 package me.lensvol.blackconnect.config.sections
 
+import com.intellij.openapi.project.Project
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import javax.swing.JPanel
 
-interface ConfigSection {
-    val panel: JPanel
+abstract class ConfigSection(project: Project) {
+    abstract val panel: JPanel
 
-    fun loadFrom(configuration: BlackConnectProjectSettings)
+    abstract fun loadFrom(configuration: BlackConnectProjectSettings)
 
-    fun saveTo(configuration: BlackConnectProjectSettings)
+    abstract fun saveTo(configuration: BlackConnectProjectSettings)
 
-    fun isModified(configuration: BlackConnectProjectSettings): Boolean
+    abstract fun isModified(configuration: BlackConnectProjectSettings): Boolean
 }

@@ -1,12 +1,13 @@
 package me.lensvol.blackconnect.config.sections
 
+import com.intellij.openapi.project.Project
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
 import javax.swing.JCheckBox
 import javax.swing.JPanel
 
-class SaveTriggerSection : ConfigSection {
+class SaveTriggerSection(project: Project) : ConfigSection(project) {
     private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
 
     override val panel: JPanel by lazy {
