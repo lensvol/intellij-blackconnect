@@ -16,6 +16,7 @@ import com.moandjiezana.toml.Toml
 import me.lensvol.blackconnect.BlackdClient
 import me.lensvol.blackconnect.Failure
 import me.lensvol.blackconnect.Success
+import me.lensvol.blackconnect.config.sections.SaveTriggerSection
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
@@ -42,6 +43,10 @@ const val DEFAULT_LINE_LENGTH: Int = 88
 const val DEFAULT_BLACKD_PORT: Int = 45484
 
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
+    private val configSections = listOf(
+        SaveTriggerSection()
+    )
+
     private val hostnameText = JTextField("127.0.0.1")
 
     private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
@@ -55,8 +60,6 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val fastModeCheckbox = JCheckBox("Skip sanity checks")
     private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
     private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
-
-    private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
 
     private val targetVersions = mapOf(
         "py27" to "2.7",
@@ -88,8 +91,9 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         border = IdeBorderFactory.createEmptyBorder(UIUtil.PANEL_SMALL_INSETS)
         val constraints = initBagLayoutConstraints()
 
-        triggerOnEachSave.alignmentX = Component.LEFT_ALIGNMENT
-        add(triggerOnEachSave, constraints)
+        configSections.map {
+            add(it.panel, constraints)
+        }
 
         val connectionSettingPanel = createConnectionSettingPanel()
         connectionSettingPanel.alignmentX = Component.LEFT_ALIGNMENT
@@ -295,12 +299,15 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     }
 
     fun apply(configuration: BlackConnectProjectSettings) {
+        configSections.map {
+            it.saveTo(configuration)
+        }
+
         configuration.hostname = hostnameText.text.ifBlank { "localhost" }
         configuration.port = portSpinner.value as Int
         configuration.lineLength = lineLengthSpinner.value as Int
         configuration.fastMode = fastModeCheckbox.isSelected
         configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
-        configuration.triggerOnEachSave = triggerOnEachSave.isSelected
         configuration.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
         configuration.pythonTargets = generateVersionSpec()
         configuration.enableJupyterSupport = jupyterSupportCheckbox.isSelected
@@ -308,12 +315,15 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     }
 
     fun load(configuration: BlackConnectProjectSettings) {
+        configSections.map {
+            it.loadFrom(configuration)
+        }
+
         hostnameText.text = configuration.hostname
         portSpinner.value = configuration.port
         lineLengthSpinner.value = configuration.lineLength
         fastModeCheckbox.isSelected = configuration.fastMode
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
-        triggerOnEachSave.isSelected = configuration.triggerOnEachSave
         jupyterSupportCheckbox.isSelected = configuration.enableJupyterSupport
         showSyntaxErrorMsgsCheckbox.isSelected = configuration.showSyntaxErrorMsgs
 
@@ -337,12 +347,16 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     }
 
     fun isModified(configuration: BlackConnectProjectSettings): Boolean {
-        return hostnameText.text != configuration.hostname ||
+        val anyChangesInSections = configSections.fold(
+            false,
+            { changed, section -> changed || section.isModified(configuration) }
+        )
+        return anyChangesInSections ||
+            hostnameText.text != configuration.hostname ||
             portSpinner.value != configuration.port ||
             lineLengthSpinner.value != configuration.lineLength ||
             fastModeCheckbox.isSelected != configuration.fastMode ||
             skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
-            triggerOnEachSave.isSelected != configuration.triggerOnEachSave ||
             targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
             generateVersionSpec() != configuration.pythonTargets ||
             jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
