@@ -23,7 +23,7 @@ import javax.swing.SpinnerNumberModel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
-class ConnectionSettingsSection(project: Project) : ConfigSection(project) {
+class ConnectionSection(project: Project) : ConfigSection(project) {
     private val hostnameText = JTextField("127.0.0.1")
     private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
