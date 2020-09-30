@@ -18,15 +18,15 @@ class SaveTriggerSection : ConfigSection {
         }
     }
 
-    override fun loadFrom(projectConfig: BlackConnectProjectSettings) {
-        triggerOnEachSave.isSelected = projectConfig.triggerOnEachSave
+    override fun loadFrom(configuration: BlackConnectProjectSettings) {
+        triggerOnEachSave.isSelected = configuration.triggerOnEachSave
     }
 
-    override fun saveTo(projectConfig: BlackConnectProjectSettings) {
-        projectConfig.triggerOnEachSave = triggerOnEachSave.isSelected
+    override fun saveTo(configuration: BlackConnectProjectSettings) {
+        configuration.triggerOnEachSave = triggerOnEachSave.isSelected
     }
 
-    override fun isModified(projectConfig: BlackConnectProjectSettings): Boolean {
-        return projectConfig.triggerOnEachSave != triggerOnEachSave.isSelected
+    override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
+        return configuration.triggerOnEachSave != triggerOnEachSave.isSelected
     }
 }

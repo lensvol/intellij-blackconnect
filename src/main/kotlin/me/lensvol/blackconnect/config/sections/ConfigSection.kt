@@ -6,9 +6,9 @@ import javax.swing.JPanel
 interface ConfigSection {
     val panel: JPanel
 
-    fun loadFrom(projectConfig: BlackConnectProjectSettings)
+    fun loadFrom(configuration: BlackConnectProjectSettings)
 
-    fun saveTo(projectConfig: BlackConnectProjectSettings)
+    fun saveTo(configuration: BlackConnectProjectSettings)
 
-    fun isModified(projectConfig: BlackConnectProjectSettings): Boolean
+    fun isModified(configuration: BlackConnectProjectSettings): Boolean
 }
