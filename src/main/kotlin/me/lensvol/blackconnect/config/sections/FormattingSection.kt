@@ -45,21 +45,13 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         "py38" to "3.8"
     )
 
-    private val loadPyprojectTomlButton = JButton("Load from pyproject.toml")
-
     private val versionCheckboxes = sortedMapOf<String, JCheckBox>().apply {
         targetVersions.values.map { version ->
             this.put("py$version", JCheckBox(version))
         }
     }
 
-    override val panel: JPanel
-
-    init {
-        loadPyprojectTomlButton.isEnabled = true
-
-        panel = createPanel()
-    }
+    override val panel: JPanel by lazy { createPanel() }
 
     private fun createPyprojectSpecificDescriptor(): FileChooserDescriptor {
         val fileSpecificDescriptor = object : FileChooserDescriptor(true, false, false, false, false, false) {
@@ -91,8 +83,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         }
 
         val blackSettings = toml.getTable("tool.black")
-        lineLengthSpinner.value =
-            blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH.toLong()).toInt()
+
         val targetVersionsFromFile = blackSettings.getList<String>("target-version", Collections.emptyList())
         if (targetVersionsFromFile.count() > 0) {
             targetSpecificVersionsCheckbox.isSelected = true
@@ -102,8 +93,9 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         } else {
             targetSpecificVersionsCheckbox.isSelected = false
         }
-        skipStringNormalCheckbox.isSelected =
-            blackSettings.getBoolean("skip-string-normalization", false)
+
+        lineLengthSpinner.value = blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH.toLong()).toInt()
+        skipStringNormalCheckbox.isSelected = blackSettings.getBoolean("skip-string-normalization", false)
         fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", false)
     }
 
@@ -113,18 +105,47 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             border = IdeBorderFactory.createTitledBorder("Formatting options")
             alignmentX = Component.LEFT_ALIGNMENT
 
-            val targetVersionsPanel = JPanel().apply {
-                layout = FlowLayout(FlowLayout.LEFT)
-                border = IdeBorderFactory.createEmptyBorder(JBUI.insetsLeft(16))
+            val targetVersionsPanel = createTargetVersionsPanel()
 
-                versionCheckboxes.values.forEach { checkbox ->
-                    this.add(checkbox)
+            targetSpecificVersionsCheckbox.addItemListener {
+                targetVersionsPanel.components.map { checkbox ->
+                    checkbox.isEnabled = targetSpecificVersionsCheckbox.isSelected
                 }
-
-                components.map { checkbox -> checkbox.isEnabled = false }
             }
 
-            loadPyprojectTomlButton.addActionListener {
+            val loadPyprojectTomlButton = createPyprojectTomlButton()
+
+            add(
+                FormBuilder.createFormBuilder()
+                    .addLabeledComponent("Line length:", lineLengthSpinner)
+                    .addComponent(fastModeCheckbox)
+                    .addComponent(skipStringNormalCheckbox)
+                    .addComponent(targetSpecificVersionsCheckbox)
+                    .addComponent(targetVersionsPanel)
+                    .addComponent(loadPyprojectTomlButton)
+                    .panel,
+                BorderLayout.NORTH
+            )
+        }
+    }
+
+    private fun createTargetVersionsPanel(): JPanel {
+        return JPanel().apply {
+            layout = FlowLayout(FlowLayout.LEFT)
+            border = IdeBorderFactory.createEmptyBorder(JBUI.insetsLeft(16))
+
+            versionCheckboxes.values.forEach { checkbox ->
+                checkbox.isEnabled = false
+                add(checkbox)
+            }
+        }
+    }
+
+    private fun createPyprojectTomlButton(): JButton {
+        return JButton("Load from pyproject.toml").apply {
+            isEnabled = true
+
+            addActionListener {
                 val pyprojectTomlDescriptor = createPyprojectSpecificDescriptor()
                 val candidates =
                     FilenameIndex.getVirtualFilesByName(
@@ -138,24 +159,6 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
                     processPyprojectToml(contents)
                 }
             }
-
-            targetSpecificVersionsCheckbox.addItemListener {
-                targetVersionsPanel.components.map { checkbox ->
-                    checkbox.isEnabled = targetSpecificVersionsCheckbox.isSelected
-                }
-            }
-
-            add(
-                FormBuilder.createFormBuilder()
-                    .addLabeledComponent("Line length:", lineLengthSpinner)
-                    .addComponent(fastModeCheckbox)
-                    .addComponent(skipStringNormalCheckbox)
-                    .addComponent(targetSpecificVersionsCheckbox)
-                    .addComponent(targetVersionsPanel)
-                    .addComponent(loadPyprojectTomlButton)
-                    .panel,
-                BorderLayout.NORTH
-            )
         }
     }
 
@@ -199,3 +202,4 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             generateVersionSpec() != configuration.pythonTargets
     }
 }
+
