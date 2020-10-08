@@ -8,8 +8,8 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 
 ## Features
 
-* Automatic handling of Python type stubs (`.pyi`).
 * Ability to trigger on each file save.
+* Automatic handling of Python type stubs (`.pyi`).
 * Rough support for Jupyter Notebook files.
 * Ability to reformat selected fragment only instead of whole file.
 * Load formatting settings from **[tool.black]** section of `pyproject.toml`
@@ -21,6 +21,10 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
     * Target specific Python versions.
 
 ## Installation
+
+**NB:** If you plan on triggering reformat on each save, please make sure to disable features in other plugins (e.g. [Save Actions](https://plugins.jetbrains.com/plugin/7642-save-actions)) which may trigger standard "Reformat code" action. 
+
+Also, please make sure to disable **black** in "Settings / Tools / File Watchers" if you installed it previously using [the example from documentation](https://black.readthedocs.io/en/stable/editor_integration.html).
 
 #### Stable version
 
@@ -52,6 +56,9 @@ Be brave and try out "early access preview" version:
 * "Live reformatting".
 * Automatic detection of applicable Python frameworks.
 * Get line length from Python code style settings.
+* Hook into standard "Reformat Code" command.
+* Detection of possible conflicts with other plugins / File Watchers.
+* Better integration with Jupyter Notebooks.
 
 ## Special thanks
 
