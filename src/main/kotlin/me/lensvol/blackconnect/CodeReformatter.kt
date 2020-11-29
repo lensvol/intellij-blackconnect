@@ -161,6 +161,7 @@ open class CodeReformatter(project: Project) {
                 null
             }
             is Success -> {
+                notificationService.expireAllErrors()
                 response.value
             }
         }
