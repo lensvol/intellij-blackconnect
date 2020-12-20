@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.4.1'
+version '0.4.2-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -41,6 +41,11 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
+      <p>0.4.2</p>
+      <ul>
+        <li>Automatically close any outstanding error messages on successful call to blackd.</li>
+      </ul>
+
       <p>0.4.1</p>
       <ul>
         <li>Fix regression with file save trigger reformatting non-Python files (reported by Matthew R. Scott).</li>
