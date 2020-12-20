@@ -28,26 +28,31 @@ class SentryErrorReporter : ErrorReportSubmitter() {
         return "Send to author"
     }
 
-    override fun getPrivacyNoticeText(): String? {
+    override fun getPrivacyNoticeText(): String {
         return "Hereby you agree to the <a href='https://sentry.io/privacy/'>Privacy Policy of sentry.io</a>."
     }
 
     override fun submit(
-        events: Array<out IdeaLoggingEvent>,
+        events: Array<out IdeaLoggingEvent>?,
         additionalInfo: String?,
         parentComponent: Component,
-        consumer: Consumer<SubmittedReportInfo>
+        consumer: Consumer<in SubmittedReportInfo>
     ): Boolean {
         val context = DataManager.getInstance().getDataContext(parentComponent)
         val project: Project? = CommonDataKeys.PROJECT.getData(context)
 
         val sentryClient = SentryIntegration.client()
 
-        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Report error to sentry.io") {
+        ProgressManager.getInstance().run(object : Task.Backgroundable(project, "Report error via sentry.io") {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
 
                 val errors = LinkedList<SentryException>()
+
+                if (events == null) {
+                    return
+                }
+
                 for (ideaEvent in events) {
                     if (ideaEvent is IdeaReportingEvent) {
                         val ex: Throwable = ideaEvent.data.throwable
