@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.4.2-SNAPSHOT'
+version '0.4.2'
 
 repositories {
     mavenCentral()
@@ -44,6 +44,7 @@ patchPluginXml {
       <p>0.4.2</p>
       <ul>
         <li>Automatically close any outstanding error messages on successful call to blackd.</li>
+        <li>Bump lower compatibility boundary to IDEA 2020.1.4 and up.</li>
       </ul>
 
       <p>0.4.1</p>
