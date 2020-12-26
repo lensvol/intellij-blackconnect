@@ -2,12 +2,15 @@ plugins {
     id 'org.jetbrains.intellij' version '0.6.5'
     id 'org.jetbrains.kotlin.jvm' version '1.4.21'
     id 'jacoco'
+
+    id("io.gitlab.arturbosch.detekt") version '1.15.0'
 }
 
 group 'me.lensvol'
 version '0.4.3-SNAPSHOT'
 
 repositories {
+    jcenter()
     mavenCentral()
 }
 
@@ -22,6 +25,8 @@ dependencies {
     implementation('io.sentry:sentry:1.7.30') {
         exclude group: 'org.slf4j'
     }
+
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
 
 intellij {
@@ -86,3 +91,18 @@ jacocoTestReport {
         html.enabled = true
     }
 }
+
+detekt {
+    config = files("./detekt-config.yml")
+    buildUponDefaultConfig = true // preconfigure defaults
+    baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
+
+    reports {
+        html.enabled = false // observe findings in your browser with structure and code snippets
+        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
+        txt.enabled = false // similar to the console output, contains issue signature to manually edit baseline files
+        sarif.enabled = false // SARIF integration (https://sarifweb.azurewebsites.net/) for integrations with Github
+    }
+}
+
+tasks.detekt.jvmTarget = "1.8"
