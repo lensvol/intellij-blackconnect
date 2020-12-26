@@ -136,8 +136,7 @@ open class CodeReformatter(project: Project) {
     ): BlackdResponse? {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
         logger.debug("Reformatting cancelled before we could begin")
-        if (progressIndicator?.isCanceled == true)
-            return null
+        if (progressIndicator?.isCanceled == true) return null
 
         val blackdClient = BlackdClient(configuration.hostname, configuration.port)
 
@@ -151,8 +150,7 @@ open class CodeReformatter(project: Project) {
         )
 
         logger.debug("Reformatting cancelled after call to blackd")
-        if (progressIndicator?.isCanceled == true)
-            return null
+        if (progressIndicator?.isCanceled == true) return null
 
         return when (response) {
             is Failure -> {

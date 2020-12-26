@@ -8,5 +8,4 @@ object Constants {
     const val HTTP_NO_CHANGES_NEEDED = 204
     const val HTTP_INVALID_REQUEST = 400
     const val HTTP_INTERNAL_ERROR = 500
-
 }

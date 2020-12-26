@@ -19,8 +19,7 @@ class BeforeTabClosedAction : AnAction(), DumbAware {
     }
 
     override fun actionPerformed(event: AnActionEvent) {
-        if (event.project == null)
-            return
+        if (event.project == null) return
 
         val fileMgr = FileEditorManagerEx.getInstanceEx(event.project!!)
 
