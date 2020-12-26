@@ -39,15 +39,13 @@ fun SentryClient.showResultInUi(parentComponent: Component, consumer: Consumer<i
     })
 }
 
-class SentryIntegration {
-    companion object {
-        fun client(): SentryClient {
-            val sentryClient: SentryClient = SentryClientFactory.sentryClient(DSN)
-            sentryClient.addBuilderHelper { e ->
-                val build = ApplicationInfo.getInstance().build.asString()
-                e.withTag("ide.build", build)
-            }
-            return sentryClient
+object SentryIntegration {
+    fun client(): SentryClient {
+        val sentryClient: SentryClient = SentryClientFactory.sentryClient(DSN)
+        sentryClient.addBuilderHelper { e ->
+            val build = ApplicationInfo.getInstance().build.asString()
+            e.withTag("ide.build", build)
         }
+        return sentryClient
     }
 }

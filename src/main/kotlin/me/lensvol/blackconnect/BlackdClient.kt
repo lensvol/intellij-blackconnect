@@ -94,19 +94,19 @@ class BlackdClient(val hostname: String, val port: Int) {
 
     private fun parseBlackdResponse(connection: HttpURLConnection): BlackdResponse {
         return when (connection.responseCode) {
-            200 -> {
+            Constants.HTTP_RESPONSE_OK -> {
                 logger.debug("200 OK: Code should be reformatted")
                 BlackdResponse.Blackened(connection.inputStream.bufferedReader().readText())
             }
-            204 -> {
+            Constants.HTTP_NO_CHANGES_NEEDED -> {
                 logger.debug("204: No changes to formatting, move along.")
                 BlackdResponse.NoChangesMade
             }
-            400 -> {
+            Constants.HTTP_INVALID_REQUEST -> {
                 logger.debug("400: Code contained syntax errors.")
                 BlackdResponse.SyntaxError(connection.errorStream.bufferedReader().readText())
             }
-            500 -> {
+            Constants.HTTP_INTERNAL_ERROR -> {
                 val errorText = connection.errorStream.bufferedReader().readText()
                 logger.debug("500: Something unexpected happened:\n$errorText")
                 BlackdResponse.InternalError(errorText)

@@ -202,4 +202,3 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             generateVersionSpec() != configuration.pythonTargets
     }
 }
-

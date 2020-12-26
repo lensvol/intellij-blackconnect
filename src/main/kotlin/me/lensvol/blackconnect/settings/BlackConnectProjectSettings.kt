@@ -8,6 +8,7 @@ import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.project.Project
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Attribute
+import me.lensvol.blackconnect.Constants
 
 @State(name = "BlackConnectSettings", storages = [Storage(StoragePathMacros.WORKSPACE_FILE)])
 class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProjectSettings> {
@@ -21,10 +22,10 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var hostname: String = "localhost"
 
     @Attribute
-    var port: Int = 45484
+    var port: Int = Constants.DEFAULT_BLACKD_PORT
 
     @Attribute
-    var lineLength: Int = 88
+    var lineLength: Int = Constants.DEFAULT_LINE_LENGTH
 
     @Attribute
     var fastMode: Boolean = false

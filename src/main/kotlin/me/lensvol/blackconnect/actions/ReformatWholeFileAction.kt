@@ -50,7 +50,9 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                             notificationService.showError("Source code contained syntax errors.")
                         }
                     }
-                    is BlackdResponse.InternalError -> notificationService.showError("Internal error, please see blackd output.")
+                    is BlackdResponse.InternalError -> {
+                        notificationService.showError("Internal error, please see blackd output.")
+                    }
                     is BlackdResponse.UnknownStatus -> notificationService.showError(
                         "Something unexpected happened:\n${response.responseText}"
                     )

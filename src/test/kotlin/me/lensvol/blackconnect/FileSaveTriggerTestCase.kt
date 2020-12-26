@@ -39,3 +39,4 @@ class FileSaveTriggerTestCase: BlackConnectTestCase() {
         myFixture.checkResultByFile("not_python.txt")
     }
 }
+

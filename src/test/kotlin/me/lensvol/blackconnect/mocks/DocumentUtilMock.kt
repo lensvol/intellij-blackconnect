@@ -24,3 +24,4 @@ class DocumentUtilMock(project: Project) : DocumentUtil(project) {
 
     }
 }
+
