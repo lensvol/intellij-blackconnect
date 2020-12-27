@@ -19,7 +19,7 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     }
 
     @Attribute
-    var hostname: String = "localhost"
+    var hostname: String = Constants.DEFAULT_HOST_BINDING
 
     @Attribute
     var port: Int = Constants.DEFAULT_BLACKD_PORT

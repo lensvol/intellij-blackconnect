@@ -5,9 +5,9 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import me.lensvol.blackconnect.BlackdClient
+import me.lensvol.blackconnect.Constants
 import me.lensvol.blackconnect.Failure
 import me.lensvol.blackconnect.Success
-import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
@@ -24,8 +24,8 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 class ConnectionSection(project: Project) : ConfigSection(project) {
-    private val hostnameText = JTextField("127.0.0.1")
-    private val portSpinnerModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
+    private val hostnameText = JTextField(Constants.DEFAULT_HOST_BINDING)
+    private val portSpinnerModel = SpinnerNumberModel(Constants.DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
     private val checkConnectionButton = JButton("Check connection")
 
@@ -104,7 +104,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     }
 
     override fun saveTo(configuration: BlackConnectProjectSettings) {
-        configuration.hostname = hostnameText.text.ifBlank { "localhost" }
+        configuration.hostname = hostnameText.text.ifBlank { Constants.DEFAULT_HOST_BINDING }
         configuration.port = portSpinner.value as Int
     }
 
