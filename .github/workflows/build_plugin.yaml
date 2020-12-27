@@ -29,14 +29,20 @@ jobs:
         arguments: buildPlugin
         gradle-version: 6.5
 
-    - name: Run Linters and Test
+    - name: Run Linters and Tests
       uses: eskatos/gradle-command-action@v1
-      run: ./gradlew check
+      with:
+        arguments: check
+        gradle-version: 6.5
 
     - name: Verify Plugin
       uses: eskatos/gradle-command-action@v1
-      run: ./gradlew verifyPlugin
+      with:
+        arguments: verifyPlugin
+        gradle-version: 6.5
 
     - name: Check Compatibility Against Different IDEs
       uses: eskatos/gradle-command-action@v1
-      run: ./gradlew runPluginVerifier -Pplugin.verifier.home.dir=~/.pluginVerifier
+      with:
+        arguments: runPluginVerifier -Pplugin.verifier.home.dir=~/.pluginVerifier
+        gradle-version: 6.5
