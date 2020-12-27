@@ -68,7 +68,7 @@ class SmokeTestCase : BlackConnectTestCase() {
             actionUnderTest.actionPerformed(event)
         }
 
-        checkWhenCommandCompletes("Reformat code using blackd", codeUnderTest) {
+        checkWhenCommandCompletes("Reformat Code Using Black", codeUnderTest) {
             myFixture.checkResultByFile("reformatted.py")
         }
     }
