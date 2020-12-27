@@ -30,10 +30,13 @@ jobs:
         gradle-version: 6.5
 
     - name: Run Linters and Test
+      uses: eskatos/gradle-command-action@v1
       run: ./gradlew check
 
     - name: Verify Plugin
+      uses: eskatos/gradle-command-action@v1
       run: ./gradlew verifyPlugin
 
-    - name: Run Plugin Verifier
+    - name: Check Compatibility Against Different IDEs
+      uses: eskatos/gradle-command-action@v1
       run: ./gradlew runPluginVerifier -Pplugin.verifier.home.dir=~/.pluginVerifier
