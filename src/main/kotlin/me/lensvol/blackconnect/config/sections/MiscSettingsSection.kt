@@ -17,7 +17,7 @@ class MiscSettingsSection(project: Project) : ConfigSection(project) {
     private fun createPanel(): JPanel {
         return JPanel().apply {
             layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Miscellaneous settings")
+            border = IdeBorderFactory.createTitledBorder("Miscellaneous Settings")
 
             add(
                 FormBuilder.createFormBuilder()

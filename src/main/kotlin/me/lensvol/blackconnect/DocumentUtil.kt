@@ -27,7 +27,7 @@ open class DocumentUtil(project: Project) {
                             {
                                 receiver()
                             },
-                            "Reformat code using blackd",
+                            "Reformat Code Using Black",
                             null,
                             UndoConfirmationPolicy.DEFAULT,
                             document

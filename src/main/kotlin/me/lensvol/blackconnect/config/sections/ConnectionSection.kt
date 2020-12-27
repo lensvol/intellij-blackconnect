@@ -41,7 +41,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     private fun createPanel(): JPanel {
         return JPanel().apply {
             layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Connection settings")
+            border = IdeBorderFactory.createTitledBorder("Connection Settings")
             alignmentX = Component.LEFT_ALIGNMENT
 
             val panel = FormBuilder.createFormBuilder()
@@ -88,7 +88,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
                 is Success -> Messages.showInfoMessage(
                     this.panel,
                     "It works!<br><br><b>blackd</b> version: ${result.value}",
-                    "Connection status"
+                    "Connection Status"
                 )
                 is Failure -> Messages.showErrorDialog(
                     this.panel,

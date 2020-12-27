@@ -25,7 +25,7 @@ class SentryErrorReporter : ErrorReportSubmitter() {
         article by Joachim Ansorg. Kudos to him!
     */
     override fun getReportActionText(): String {
-        return "Send to author"
+        return "Send to Author"
     }
 
     override fun getPrivacyNoticeText(): String {

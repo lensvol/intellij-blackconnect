@@ -102,7 +102,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
     private fun createPanel(): JPanel {
         return JPanel().apply {
             layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Formatting options")
+            border = IdeBorderFactory.createTitledBorder("Formatting Options")
             alignmentX = Component.LEFT_ALIGNMENT
 
             val targetVersionsPanel = createTargetVersionsPanel()
