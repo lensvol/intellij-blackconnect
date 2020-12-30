@@ -48,7 +48,7 @@ patchPluginXml {
     changeNotes """
       <p>0.4.3</p>
       <ul>
-        <li> TBA.
+        <li> Fix rare crash when processing source code with CR/LF sequence inside. 
       </ul>
 
       <p>0.4.2</p>

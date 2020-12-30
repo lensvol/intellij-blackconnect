@@ -2,7 +2,7 @@ package me.lensvol.blackconnect
 
 import org.junit.Test
 
-class FileSaveTriggerTestCase: BlackConnectTestCase() {
+class FileSaveTriggerTestCase : BlackConnectTestCase() {
     @Test
     fun test_file_reformatted_on_save_if_enabled() {
         val unformattedFile = openFileInEditor("unformatted.py")
@@ -39,4 +39,3 @@ class FileSaveTriggerTestCase: BlackConnectTestCase() {
         myFixture.checkResultByFile("not_python.txt")
     }
 }
-

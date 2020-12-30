@@ -96,7 +96,12 @@ class BlackdClient(val hostname: String, val port: Int) {
         return when (connection.responseCode) {
             Constants.HTTP_RESPONSE_OK -> {
                 logger.debug("200 OK: Code should be reformatted")
-                BlackdResponse.Blackened(connection.inputStream.bufferedReader().readText())
+                val reformattedCode = connection.inputStream.bufferedReader().readText()
+                /*
+                IDEA internally uses "\n" as a separator, and attempt to set any document's
+                text to something with "\r\n" inside will trip internal assertion check.
+                */
+                BlackdResponse.Blackened(reformattedCode.replace("\r\n", "\n"))
             }
             Constants.HTTP_NO_CHANGES_NEEDED -> {
                 logger.debug("204: No changes to formatting, move along.")
