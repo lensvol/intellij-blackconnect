@@ -100,7 +100,7 @@ open class CodeReformatter(project: Project) {
 
         actualCode.lines()
             .map { line ->
-                builder.appendln(line.removePrefix(indentString))
+                builder.appendLine(line.removePrefix(indentString))
             }
 
         return Pair(
@@ -125,7 +125,7 @@ open class CodeReformatter(project: Project) {
             append(formatting.whitespaceBefore)
             append(codeLines.first())
             for (line in codeLines.listIterator(1)) {
-                appendln()
+                appendLine()
                 append(line.prependIndent(formatting.indent))
             }
             append(formatting.whitespaceAfter)
