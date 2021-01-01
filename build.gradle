@@ -48,7 +48,8 @@ patchPluginXml {
     changeNotes """
       <p>0.4.3</p>
       <ul>
-        <li> Fix rare crash when processing source code with CR/LF sequence inside. 
+        <li>Fix rare crash when processing source code with CR/LF sequence inside.</li>
+        <li>Fix rare crash when saving files without type and Jupyter support is enabled.</li>
       </ul>
 
       <p>0.4.2</p>

@@ -4,6 +4,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileTypes.LanguageFileType
+import com.intellij.openapi.fileTypes.UnknownFileType
 import com.intellij.openapi.progress.EmptyProgressIndicator
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.ProgressManager
@@ -31,11 +32,13 @@ open class CodeReformatter(project: Project) {
     private val logger = Logger.getInstance(CodeReformatter::class.java.name)
 
     fun isFileSupported(file: VirtualFile): Boolean {
-        return file.name.endsWith(".py") || file.name.endsWith(".pyi") ||
-            (
-                currentConfig.enableJupyterSupport &&
-                    (file.fileType as LanguageFileType).language.id == "Jupyter"
-                )
+        if (file.name.endsWith(".py") || file.name.endsWith(".pyi")) {
+            return true
+        }
+
+        return currentConfig.enableJupyterSupport &&
+            file.fileType !is UnknownFileType &&
+            (file.fileType as LanguageFileType).language.id == "Jupyter"
     }
 
     open fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (BlackdResponse) -> Unit) {
