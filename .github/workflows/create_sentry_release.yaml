@@ -13,6 +13,7 @@ jobs:
         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         SENTRY_ORG: lensvol
         SENTRY_PROJECT: intellij-blackconnect
+        SENTRY_LOG_LEVEL: debug
       with:
         tagName: ${{ github.ref }}
         environment: production
