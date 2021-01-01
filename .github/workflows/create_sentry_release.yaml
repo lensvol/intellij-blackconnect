@@ -1,6 +1,5 @@
 name: create_sentry_release
 on:
-  workflow_dispatch
   release:
     types: [published]
 jobs:
