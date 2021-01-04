@@ -46,6 +46,11 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
+      <p>0.4.4</p>
+      <ul>
+        <li>Add button to copy line length settings from the IDE ("right margin").</li>
+      </ul>
+
       <p>0.4.3</p>
       <ul>
         <li>Fix rare crash when processing source code with CR/LF sequence inside.</li>

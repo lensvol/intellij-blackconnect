@@ -1,5 +1,7 @@
 package me.lensvol.blackconnect.config.sections
 
+import com.intellij.application.options.CodeStyle
+import com.intellij.lang.Language
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileElement
@@ -114,10 +116,16 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             }
 
             val loadPyprojectTomlButton = createPyprojectTomlButton()
+            val lineLengthPanel = JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT)
+
+                add(lineLengthSpinner)
+                add(createIdeMarginCopyButton())
+            }
 
             add(
                 FormBuilder.createFormBuilder()
-                    .addLabeledComponent("Line length:", lineLengthSpinner)
+                    .addLabeledComponent("Line length:", lineLengthPanel)
                     .addComponent(fastModeCheckbox)
                     .addComponent(skipStringNormalCheckbox)
                     .addComponent(targetSpecificVersionsCheckbox)
@@ -126,6 +134,16 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
                     .panel,
                 BorderLayout.NORTH
             )
+        }
+    }
+
+    private fun createIdeMarginCopyButton(): JButton {
+        return JButton("Copy from IDE").apply {
+            isEnabled = true
+            addActionListener {
+                val pythonLanguage = Language.findLanguageByID("Python")
+                lineLengthSpinner.value = CodeStyle.getSettings(project).getRightMargin(pythonLanguage)
+            }
         }
     }
 
