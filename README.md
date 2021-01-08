@@ -14,7 +14,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 * Ability to reformat selected fragment only instead of whole file.
 * Load formatting settings from **[tool.black]** section of `pyproject.toml`
 * Configurable options:
-    * Hostname,port and https.
+    * Hostname, port and https.
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.

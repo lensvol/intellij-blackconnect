@@ -15,10 +15,10 @@ import java.awt.Dimension
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JSpinner
-import javax.swing.JCheckBox
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 import javax.swing.event.DocumentEvent
@@ -46,6 +46,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
             border = IdeBorderFactory.createTitledBorder("Connection Settings")
             alignmentX = Component.LEFT_ALIGNMENT
             val panel = FormBuilder.createFormBuilder().addLabeledComponent("Https:", httpsCheckBox)
+                .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
                 .addLabeledComponent("Hostname:", hostnameText)
                 .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
                 .addLabeledComponent("Port:", portSpinner)
