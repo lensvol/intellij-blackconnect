@@ -19,7 +19,7 @@ class BlackdClient(val hostname: String, val port: Int) {
     private val logger = Logger.getInstance(BlackdClient::class.java.name)
 
     fun checkConnection(): Result<String, String> {
-        val url = URL("http://$hostname:$port")
+        val url = URL("https://$hostname:$port")
 
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
@@ -51,7 +51,7 @@ class BlackdClient(val hostname: String, val port: Int) {
         skipStringNormalization: Boolean = false,
         targetPythonVersions: String = ""
     ): Result<BlackdResponse, Exception> {
-        val url = URL("http://$hostname:$port")
+        val url = URL("https://$hostname:$port")
 
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
