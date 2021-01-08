@@ -12,11 +12,23 @@ import com.intellij.util.xmlb.annotations.Attribute
 class BlackConnectGlobalSettings : PersistentStateComponent<BlackConnectGlobalSettings> {
 
     companion object {
-        fun getInstance(): BlackConnectGlobalSettings = service()
+        fun getInstance() = service<BlackConnectGlobalSettings>()
     }
 
     @Attribute
+    var spawnBlackdOnStartup: Boolean = true
+
+    @Attribute
     var showSaveTriggerOptIn: Boolean = true
+
+    @Attribute
+    var bindOnHostname: String = "localhost"
+
+    @Attribute
+    var bindOnPort: Int = 45484
+
+    @Attribute
+    var blackdBinaryPath: String = "/Users/lensvol/.local/bin/blackd"
 
     override fun getState() = this
 

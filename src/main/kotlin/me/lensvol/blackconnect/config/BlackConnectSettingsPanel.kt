@@ -5,8 +5,10 @@ import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.UIUtil
 import me.lensvol.blackconnect.config.sections.ConnectionSection
 import me.lensvol.blackconnect.config.sections.FormattingSection
+import me.lensvol.blackconnect.config.sections.LocalDaemonSection
 import me.lensvol.blackconnect.config.sections.MiscSettingsSection
 import me.lensvol.blackconnect.config.sections.SaveTriggerSection
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
@@ -21,6 +23,7 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val configSections = listOf(
         SaveTriggerSection(project),
         ConnectionSection(project),
+        LocalDaemonSection(project),
         FormattingSection(project),
         MiscSettingsSection(project)
     )
@@ -56,22 +59,25 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
         return constraints
     }
 
-    fun apply(configuration: BlackConnectProjectSettings) {
+    fun apply(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
         configSections.map {
-            it.saveTo(configuration)
+            it.saveTo(globalConfig, projectConfig)
         }
     }
 
-    fun load(configuration: BlackConnectProjectSettings) {
+    fun load(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
         configSections.map {
-            it.loadFrom(configuration)
+            it.loadFrom(globalConfig, projectConfig)
         }
     }
 
-    fun isModified(configuration: BlackConnectProjectSettings): Boolean {
+    fun isModified(
+        globalConfig: BlackConnectGlobalSettings,
+        projectConfig: BlackConnectProjectSettings
+    ): Boolean {
         return configSections.fold(
             false,
-            { changed, section -> changed || section.isModified(configuration) }
+            { changed, section -> changed || section.isModified(globalConfig, projectConfig) }
         )
     }
 }

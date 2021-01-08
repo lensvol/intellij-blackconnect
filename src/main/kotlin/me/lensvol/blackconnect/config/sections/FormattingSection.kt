@@ -16,6 +16,7 @@ import com.intellij.util.ui.JBUI
 import com.moandjiezana.toml.Toml
 import me.lensvol.blackconnect.config.DEFAULT_LINE_LENGTH
 import me.lensvol.blackconnect.config.PYPROJECT_TOML
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
@@ -180,16 +181,16 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         }
     }
 
-    override fun loadFrom(configuration: BlackConnectProjectSettings) {
-        lineLengthSpinner.value = configuration.lineLength
-        fastModeCheckbox.isSelected = configuration.fastMode
-        skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
+    override fun loadFrom(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        lineLengthSpinner.value = projectConfig.lineLength
+        fastModeCheckbox.isSelected = projectConfig.fastMode
+        skipStringNormalCheckbox.isSelected = projectConfig.skipStringNormalization
 
-        configuration.pythonTargets.split(",").forEach { version ->
+        projectConfig.pythonTargets.split(",").forEach { version ->
             versionCheckboxes[version]?.isSelected = true
         }
 
-        if (configuration.targetSpecificVersions) {
+        if (projectConfig.targetSpecificVersions) {
             // This is done to trigger dependent item change logic
             // and enable version checkboxes
             targetSpecificVersionsCheckbox.doClick()
@@ -204,19 +205,22 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             .joinToString(",")
     }
 
-    override fun saveTo(configuration: BlackConnectProjectSettings) {
-        configuration.lineLength = lineLengthSpinner.value as Int
-        configuration.fastMode = fastModeCheckbox.isSelected
-        configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
-        configuration.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
-        configuration.pythonTargets = generateVersionSpec()
+    override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        projectConfig.lineLength = lineLengthSpinner.value as Int
+        projectConfig.fastMode = fastModeCheckbox.isSelected
+        projectConfig.skipStringNormalization = skipStringNormalCheckbox.isSelected
+        projectConfig.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
+        projectConfig.pythonTargets = generateVersionSpec()
     }
 
-    override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
-        return lineLengthSpinner.value != configuration.lineLength ||
-            fastModeCheckbox.isSelected != configuration.fastMode ||
-            skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
-            targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
-            generateVersionSpec() != configuration.pythonTargets
+    override fun isModified(
+        globalConfig: BlackConnectGlobalSettings,
+        projectConfig: BlackConnectProjectSettings
+    ): Boolean {
+        return lineLengthSpinner.value != projectConfig.lineLength ||
+            fastModeCheckbox.isSelected != projectConfig.fastMode ||
+            skipStringNormalCheckbox.isSelected != projectConfig.skipStringNormalization ||
+            targetSpecificVersionsCheckbox.isSelected != projectConfig.targetSpecificVersions ||
+            generateVersionSpec() != projectConfig.pythonTargets
     }
 }

@@ -9,6 +9,10 @@ plugins {
 group 'me.lensvol'
 version '0.4.4-SNAPSHOT'
 
+compileKotlin {
+    kotlinOptions.freeCompilerArgs = ['-Xjvm-default=enable']
+}
+
 repositories {
     jcenter()
     mavenCentral()
@@ -36,11 +40,11 @@ intellij {
 }
 
 compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 compileTestKotlin {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 patchPluginXml {

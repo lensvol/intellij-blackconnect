@@ -1,6 +1,7 @@
 package me.lensvol.blackconnect.config.sections
 
 import com.intellij.openapi.project.Project
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import java.awt.Component
@@ -19,15 +20,15 @@ class SaveTriggerSection(project: Project) : ConfigSection(project) {
         }
     }
 
-    override fun loadFrom(configuration: BlackConnectProjectSettings) {
-        triggerOnEachSave.isSelected = configuration.triggerOnEachSave
+    override fun loadFrom(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        triggerOnEachSave.isSelected = projectConfig.triggerOnEachSave
     }
 
-    override fun saveTo(configuration: BlackConnectProjectSettings) {
-        configuration.triggerOnEachSave = triggerOnEachSave.isSelected
+    override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        projectConfig.triggerOnEachSave = triggerOnEachSave.isSelected
     }
 
-    override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
-        return configuration.triggerOnEachSave != triggerOnEachSave.isSelected
+    override fun isModified(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings): Boolean {
+        return projectConfig.triggerOnEachSave != triggerOnEachSave.isSelected
     }
 }

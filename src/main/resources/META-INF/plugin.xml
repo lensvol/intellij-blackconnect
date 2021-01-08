@@ -49,6 +49,7 @@
                              id="me.lensvol.blackconnect.settings"
                              provider="me.lensvol.blackconnect.config.BlackConnectConfigurableProvider"/>
         <applicationService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectGlobalSettings"/>
+        <applicationService serviceImplementation="me.lensvol.blackconnect.BlackdExecutor"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectProjectSettings"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProgressTracker"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.ui.NotificationManager"/>
