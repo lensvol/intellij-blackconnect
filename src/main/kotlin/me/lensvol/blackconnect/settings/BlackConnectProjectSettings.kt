@@ -19,13 +19,13 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     }
 
     @Attribute
-    var https: Boolean = Constants.DEFAULT_USE_SSL
-
-    @Attribute
     var hostname: String = Constants.DEFAULT_HOST_BINDING
 
     @Attribute
     var port: Int = Constants.DEFAULT_BLACKD_PORT
+
+    @Attribute
+    var useSSL: Boolean = Constants.DEFAULT_USE_SSL
 
     @Attribute
     var lineLength: Int = Constants.DEFAULT_LINE_LENGTH

@@ -101,18 +101,18 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     override fun loadFrom(configuration: BlackConnectProjectSettings) {
         hostnameText.text = configuration.hostname
         portSpinner.value = configuration.port
-        httpsCheckBox.isSelected = configuration.https
+        httpsCheckBox.isSelected = configuration.useSSL
     }
 
     override fun saveTo(configuration: BlackConnectProjectSettings) {
         configuration.hostname = hostnameText.text.ifBlank { Constants.DEFAULT_HOST_BINDING }
         configuration.port = portSpinner.value as Int
-        configuration.https = httpsCheckBox.isSelected
+        configuration.useSSL = httpsCheckBox.isSelected
     }
 
     override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
         return hostnameText.text != configuration.hostname ||
                 portSpinner.value != configuration.port ||
-                httpsCheckBox.isSelected != configuration.https
+                httpsCheckBox.isSelected != configuration.useSSL
     }
 }
