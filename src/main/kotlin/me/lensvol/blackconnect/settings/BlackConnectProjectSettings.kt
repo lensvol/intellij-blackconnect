@@ -19,6 +19,9 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     }
 
     @Attribute
+    var https: Boolean = Constants.DEFAULT_HTTPS_ENABLED
+
+    @Attribute
     var hostname: String = Constants.DEFAULT_HOST_BINDING
 
     @Attribute

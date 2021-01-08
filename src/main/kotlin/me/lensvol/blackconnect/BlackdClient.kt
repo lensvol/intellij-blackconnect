@@ -14,12 +14,15 @@ sealed class BlackdResponse {
     data class UnknownStatus(val code: Int, val responseText: String) : BlackdResponse()
 }
 
-class BlackdClient(val hostname: String, val port: Int) {
+class BlackdClient(val hostname: String, val port: Int, val https: Boolean) {
 
     private val logger = Logger.getInstance(BlackdClient::class.java.name)
 
     fun checkConnection(): Result<String, String> {
-        val url = URL("https://$hostname:$port")
+        var url = URL("http://$hostname:$port")
+        if (https) {
+            url = URL("https://$hostname:$port")
+        }
 
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
@@ -51,8 +54,10 @@ class BlackdClient(val hostname: String, val port: Int) {
         skipStringNormalization: Boolean = false,
         targetPythonVersions: String = ""
     ): Result<BlackdResponse, Exception> {
-        val url = URL("https://$hostname:$port")
-
+        var url = URL("http://$hostname:$port")
+        if (https) {
+            url = URL("https://$hostname:$port")
+        }
         with(url.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
             doOutput = true

@@ -18,6 +18,7 @@ import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JPanel
 import javax.swing.JSpinner
+import javax.swing.JCheckBox
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 import javax.swing.event.DocumentEvent
@@ -27,8 +28,8 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     private val hostnameText = JTextField(Constants.DEFAULT_HOST_BINDING)
     private val portSpinnerModel = SpinnerNumberModel(Constants.DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
+    private val httpsCheckBox = JCheckBox()
     private val checkConnectionButton = JButton("Check connection")
-    private val httpsText = JTextField(Constants.DEFAULT_PROTOCOL_BINDING)
 
     override val panel: JPanel
 
@@ -44,8 +45,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Connection Settings")
             alignmentX = Component.LEFT_ALIGNMENT
-            val panel = FormBuilder.createFormBuilder()
-                .addLabeledComponent("HTTP/S", httpsText)
+            val panel = FormBuilder.createFormBuilder().addLabeledComponent("Https:", httpsCheckBox)
                 .addLabeledComponent("Hostname:", hostnameText)
                 .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
                 .addLabeledComponent("Port:", portSpinner)
@@ -83,7 +83,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
         })
 
         checkConnectionButton.addActionListener {
-            val blackdClient = BlackdClient(hostnameText.text, portSpinner.value as Int)
+            val blackdClient = BlackdClient(hostnameText.text, portSpinner.value as Int, httpsCheckBox.isSelected)
 
             when (val result = blackdClient.checkConnection()) {
                 is Success -> Messages.showInfoMessage(
@@ -102,15 +102,18 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     override fun loadFrom(configuration: BlackConnectProjectSettings) {
         hostnameText.text = configuration.hostname
         portSpinner.value = configuration.port
+        httpsCheckBox.isSelected = configuration.https
     }
 
     override fun saveTo(configuration: BlackConnectProjectSettings) {
         configuration.hostname = hostnameText.text.ifBlank { Constants.DEFAULT_HOST_BINDING }
         configuration.port = portSpinner.value as Int
+        configuration.https = httpsCheckBox.isSelected
     }
 
     override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
         return hostnameText.text != configuration.hostname ||
-            portSpinner.value != configuration.port
+                portSpinner.value != configuration.port ||
+                httpsCheckBox.isSelected != configuration.https
     }
 }

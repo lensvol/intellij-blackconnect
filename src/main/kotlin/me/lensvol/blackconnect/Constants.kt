@@ -4,7 +4,7 @@ object Constants {
     const val DEFAULT_BLACKD_PORT = 45484
     const val DEFAULT_LINE_LENGTH = 88
     const val DEFAULT_HOST_BINDING = "localhost"
-    const val DEFAULT_PROTOCOL_BINDING = "http"
+    const val DEFAULT_HTTPS_ENABLED = false
 
     const val HTTP_RESPONSE_OK = 200
     const val HTTP_NO_CHANGES_NEEDED = 204

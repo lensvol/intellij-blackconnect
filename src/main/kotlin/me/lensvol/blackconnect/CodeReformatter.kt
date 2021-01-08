@@ -140,8 +140,7 @@ open class CodeReformatter(project: Project) {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
         logger.debug("Reformatting cancelled before we could begin")
         if (progressIndicator?.isCanceled == true) return null
-
-        val blackdClient = BlackdClient(configuration.hostname, configuration.port)
+        val blackdClient = BlackdClient(configuration.hostname, configuration.port, configuration.https)
 
         val response = blackdClient.reformat(
             sourceCode,

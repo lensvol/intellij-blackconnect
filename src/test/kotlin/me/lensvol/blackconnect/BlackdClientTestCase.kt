@@ -35,7 +35,7 @@ class BlackdClientTestCase : BlackConnectTestCase() {
             )
         }
 
-        val blackdClient = BlackdClient("localhost", 45484)
+        val blackdClient = BlackdClient("localhost", 45484, false)
         val response = blackdClient.reformat("with function(x) as f:\r\n    pass")
 
         Assert.assertTrue(response is Success)
@@ -59,7 +59,7 @@ class BlackdClientTestCase : BlackConnectTestCase() {
             )
         }
 
-        val blackdClient = BlackdClient("localhost", 45484)
+        val blackdClient = BlackdClient("localhost", 45484, false)
         val response = blackdClient.reformat("with function(x) as f:\n    pass")
 
         Assert.assertTrue(response is Success)
