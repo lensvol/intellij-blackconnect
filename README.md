@@ -14,7 +14,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 * Ability to reformat selected fragment only instead of whole file.
 * Load formatting settings from **[tool.black]** section of `pyproject.toml`
 * Configurable options:
-    * Hostname and port.
+    * Hostname, port and https.
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
@@ -60,9 +60,12 @@ Be brave and try out "early access preview" version:
 * Detection of possible conflicts with other plugins / File Watchers.
 * Better integration with Jupyter Notebooks.
 
+## Special usage example
+* run the blackd Daemon on a remote server in docker like this https://hub.docker.com/r/paterit/blackd
+
 ## Special thanks
 
 * [Andrey Vlasovskikh](https://github.com/vlasovskikh) - goading me into publishing this plugin.
 * [Łukasz Langa](https://github.com/ambv) - hinting at a proper font for the icon.
-* [Nazmul Idris](https://github.com/nazmulidris) - writing [awesome article](https://developerlife.com/2019/08/25/idea-plugin-example-intro/) about IDEA plugins.
+* [Nazmul Idris](https://github.com/nazmulidris) - writing [awesome article](https://developerlife.com/2020/11/21/idea-plugin-example-intro/) about IDEA plugins.
 * [Joachim Ansorg](https://github.com/jansorg) - for the [most detailed guide](https://www.plugin-dev.com/intellij/) to writing IDEA plugins I could find.
