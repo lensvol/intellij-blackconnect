@@ -28,7 +28,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     private val hostnameText = JTextField(Constants.DEFAULT_HOST_BINDING)
     private val portSpinnerModel = SpinnerNumberModel(Constants.DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
-    private val httpsCheckBox = JCheckBox()
+    private val httpsCheckBox = JCheckBox("Use HTTPS for connecting to the black[d] server")
     private val checkConnectionButton = JButton("Check connection")
 
     override val panel: JPanel
@@ -45,15 +45,13 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
             layout = BorderLayout()
             border = IdeBorderFactory.createTitledBorder("Connection Settings")
             alignmentX = Component.LEFT_ALIGNMENT
-            val panel = FormBuilder.createFormBuilder().addLabeledComponent("Https:", httpsCheckBox)
-                .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
-                .addLabeledComponent("Hostname:", hostnameText)
+            val panel = FormBuilder.createFormBuilder().addLabeledComponent("Hostname:", hostnameText)
                 .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
                 .addLabeledComponent("Port:", portSpinner)
                 .panel
 
             panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
-
+            add(httpsCheckBox)
             add(checkConnectionButton, BorderLayout.SOUTH)
             add(
                 panel,
