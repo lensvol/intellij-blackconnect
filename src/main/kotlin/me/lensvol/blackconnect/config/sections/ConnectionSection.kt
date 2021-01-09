@@ -28,7 +28,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     private val hostnameText = JTextField(Constants.DEFAULT_HOST_BINDING)
     private val portSpinnerModel = SpinnerNumberModel(Constants.DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val portSpinner = JSpinner(portSpinnerModel)
-    private val httpsCheckBox = JCheckBox("Use HTTPS for connecting to the black[d] server")
+    private val httpsCheckBox = JCheckBox("Use SSL (e.g. for Dockerized blackd)")
     private val checkConnectionButton = JButton("Check connection")
 
     override val panel: JPanel
