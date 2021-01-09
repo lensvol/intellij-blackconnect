@@ -19,7 +19,7 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
     private val logger = Logger.getInstance(BlackdClient::class.java.name)
     private val protocol = if (useSsl) "https" else "http"
     val blackdUrl: URL
-        get() =  URL("$protocol://$hostname:$port")
+        get() = URL("$protocol://$hostname:$port")
 
     fun checkConnection(): Result<String, String> {
 

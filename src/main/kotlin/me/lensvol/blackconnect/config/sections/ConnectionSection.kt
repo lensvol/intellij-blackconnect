@@ -112,7 +112,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
 
     override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
         return hostnameText.text != configuration.hostname ||
-                portSpinner.value != configuration.port ||
-                httpsCheckBox.isSelected != configuration.useSSL
+            portSpinner.value != configuration.port ||
+            httpsCheckBox.isSelected != configuration.useSSL
     }
 }
