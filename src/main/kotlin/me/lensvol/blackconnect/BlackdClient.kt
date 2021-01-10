@@ -5,6 +5,7 @@ import java.io.IOException
 import java.net.ConnectException
 import java.net.HttpURLConnection
 import java.net.URL
+import javax.net.ssl.SSLException
 
 sealed class BlackdResponse {
     object NoChangesMade : BlackdResponse()
@@ -31,6 +32,8 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
                 connect()
             } catch (e: ConnectException) {
                 return Failure(e.message ?: "Connection failed.")
+            } catch (e: SSLException) {
+                return Failure(e.message ?: "Failed to connect using SSL")
             }
 
             return try {
@@ -38,7 +41,7 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
                 if (version != null) {
                     return Success(version)
                 }
-                return Failure("Someone is listenning on that address, but it is not blackd.")
+                return Failure("Someone is listening on that address, but it is not blackd.")
             } catch (e: IOException) {
                 Failure(errorStream.readBytes().toString())
             }
@@ -77,6 +80,8 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
             try {
                 connect()
             } catch (e: ConnectException) {
+                return Failure(e)
+            } catch (e: SSLException) {
                 return Failure(e)
             }
 
