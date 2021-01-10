@@ -13,6 +13,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 * Rough support for Jupyter Notebook files.
 * Ability to reformat selected fragment only instead of whole file.
 * Load formatting settings from **[tool.black]** section of `pyproject.toml`
+* Connect to **blackd** over SSL if needed (e.g. blackd behind nginx)
 * Configurable options:
     * Hostname, port and https.
     * Preferred line length (default: 88).
@@ -30,15 +31,6 @@ Also, please make sure to disable **black** in "Settings / Tools / File Watchers
 
 Just go to the [plugin page](https://plugins.jetbrains.com/plugin/14321-blackconnect) in *JetBrains Plugins Repository* and press `Install to IDE`.
 
-#### Early Access Preview
-
-Be brave and try out "early access preview" version:
-* Open *"Preferences"*
-* Select *"Plugins"* tab
-* Click on the gear icon and choose *"Manage plugin repositories"*
-* Add [https://plugins.jetbrains.com/plugins/eap/14321](https://plugins.jetbrains.com/plugins/eap/14321) to the list of repositories
-* Find **BlackConnect** in the Marketplace, version should have suffix *"EAP-[timestamp]"*
-
 #### Development Snapshot
 
 ...or just compile it straight from the source code:
@@ -55,13 +47,9 @@ Be brave and try out "early access preview" version:
 * Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
 * "Live reformatting".
 * Automatic detection of applicable Python frameworks.
-* Get line length from Python code style settings.
 * Hook into standard "Reformat Code" command.
 * Detection of possible conflicts with other plugins / File Watchers.
 * Better integration with Jupyter Notebooks.
-
-## Special usage example
-* run the blackd Daemon on a remote server in docker like this https://hub.docker.com/r/paterit/blackd
 
 ## Special thanks
 
