@@ -49,6 +49,7 @@ patchPluginXml {
       <p>0.4.4</p>
       <ul>
         <li>Add button to copy line length settings from the IDE ("right margin").</li>
+        <li>Support for connecting to blackd over SSL (kudos to studioj)</li> 
       </ul>
 
       <p>0.4.3</p>
