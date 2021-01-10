@@ -156,8 +156,7 @@ open class CodeReformatter(project: Project) {
 
         return when (response) {
             is Failure -> {
-                val reason = response.reason.message ?: "Connection failed."
-                notificationService.showError("Failed to connect to <b>blackd</b>:<br>$reason")
+                notificationService.showError("Failed to connect to <b>blackd</b>:<br>${response.reason}")
                 null
             }
             is Success -> {

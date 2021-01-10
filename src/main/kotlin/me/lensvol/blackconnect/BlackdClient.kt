@@ -4,6 +4,7 @@ import com.intellij.openapi.diagnostic.Logger
 import java.io.IOException
 import java.net.ConnectException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
 import javax.net.ssl.SSLException
 
@@ -23,17 +24,19 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
         get() = URL("$protocol://$hostname:$port")
 
     fun checkConnection(): Result<String, String> {
-
         with(blackdUrl.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
+
+            // Sometimes SSL negotiation can hang and we need to handle this by bailing quickly
+            connectTimeout = Constants.DEFAULT_CONNECTION_TIMEOUT
+            readTimeout = Constants.DEFAULT_READ_TIMEOUT
+
             setRequestProperty("X-Protocol-Version", "1")
 
             try {
                 connect()
-            } catch (e: ConnectException) {
-                return Failure(e.message ?: "Connection failed.")
-            } catch (e: SSLException) {
-                return Failure(e.message ?: "Failed to connect using SSL")
+            } catch (e: IOException) {
+                return Failure(retrieveIoExceptionMessage(e))
             }
 
             return try {
@@ -48,6 +51,16 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
         }
     }
 
+    private fun retrieveIoExceptionMessage(e: IOException): String {
+        val defaultMessage = when (e) {
+            is ConnectException -> "Connection failed."
+            is SSLException -> "Failed to connect using SSL."
+            is SocketTimeoutException -> "Read timed out."
+            else -> "Something went wrong."
+        }
+        return (e.message ?: defaultMessage).capitalize()
+    }
+
     fun reformat(
         sourceCode: String,
         pyi: Boolean = false,
@@ -55,7 +68,7 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
         targetPythonVersions: String = ""
-    ): Result<BlackdResponse, Exception> {
+    ): Result<BlackdResponse, String> {
 
         with(blackdUrl.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
@@ -77,23 +90,17 @@ class BlackdClient(val hostname: String, val port: Int, val useSsl: Boolean = fa
                 setRequestProperty("X-Skip-String-Normalization", "yes")
             }
 
-            try {
+            return try {
                 connect()
-            } catch (e: ConnectException) {
-                return Failure(e)
-            } catch (e: SSLException) {
-                return Failure(e)
-            }
 
-            try {
                 outputStream.use { os ->
                     val input: ByteArray = sourceCode.toByteArray()
                     os.write(input, 0, input.size)
                 }
 
-                return Success(parseBlackdResponse(this))
+                Success(parseBlackdResponse(this))
             } catch (e: IOException) {
-                return Failure(e)
+                Failure(retrieveIoExceptionMessage(e))
             }
         }
     }
