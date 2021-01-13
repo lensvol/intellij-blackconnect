@@ -11,6 +11,6 @@ object Constants {
     const val HTTP_INVALID_REQUEST = 400
     const val HTTP_INTERNAL_ERROR = 500
 
-    const val DEFAULT_CONNECTION_TIMEOUT = 1
-    const val DEFAULT_READ_TIMEOUT = 3
+    const val DEFAULT_CONNECTION_TIMEOUT = 1000
+    const val DEFAULT_READ_TIMEOUT = 3000
 }
