@@ -56,6 +56,9 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                     is BlackdResponse.UnknownStatus -> notificationService.showError(
                         "Something unexpected happened:\n${response.responseText}"
                     )
+                    is BlackdResponse.InvalidRequest -> notificationService.showError(
+                        "Server did not understand our request.<br>Maybe you need to connect over SSL?"
+                    )
                 }
             }
         }

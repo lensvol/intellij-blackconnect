@@ -12,6 +12,7 @@ sealed class BlackdResponse {
     object NoChangesMade : BlackdResponse()
     data class SyntaxError(val reason: String) : BlackdResponse()
     data class InternalError(val reason: String) : BlackdResponse()
+    data class InvalidRequest(val reason: String) : BlackdResponse()
     data class Blackened(val sourceCode: String) : BlackdResponse()
     data class UnknownStatus(val code: Int, val responseText: String) : BlackdResponse()
 }
@@ -119,8 +120,20 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
                 BlackdResponse.NoChangesMade
             }
             Constants.HTTP_INVALID_REQUEST -> {
-                logger.debug("400: Code contained syntax errors.")
-                BlackdResponse.SyntaxError(connection.errorStream.bufferedReader().readText())
+                val errorText = connection.errorStream.bufferedReader().readText()
+
+                /*
+                 Heuristics are bad, but "blackd behind ngingx/whatever" setup can also reply with 400
+                 if you are sending request to an SSL port over non-SSL connections, so we to somehow
+                 distinguish between them.
+                 */
+                if (errorText.startsWith("Cannot parse")) {
+                    logger.debug("400: Code contained syntax errors.")
+                    BlackdResponse.SyntaxError(errorText)
+                } else {
+                    logger.debug("400: Invalid request was sent:\n$errorText")
+                    BlackdResponse.InvalidRequest(errorText)
+                }
             }
             Constants.HTTP_INTERNAL_ERROR -> {
                 val errorText = connection.errorStream.bufferedReader().readText()

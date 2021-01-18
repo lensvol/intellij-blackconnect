@@ -142,7 +142,7 @@ open class CodeReformatter(project: Project) {
         if (progressIndicator?.isCanceled == true) return null
         val blackdClient = BlackdClient(configuration.hostname, configuration.port, configuration.useSSL)
 
-        val response = blackdClient.reformat(
+        val result = blackdClient.reformat(
             sourceCode,
             pyi = isPyi,
             lineLength = configuration.lineLength,
@@ -154,14 +154,14 @@ open class CodeReformatter(project: Project) {
         logger.debug("Reformatting cancelled after call to blackd")
         if (progressIndicator?.isCanceled == true) return null
 
-        return when (response) {
+        return when (result) {
             is Failure -> {
-                notificationService.showError("Failed to connect to <b>blackd</b>:<br>${response.reason}")
+                notificationService.showError("Failed to connect to <b>blackd</b>:<br>${result.reason}")
                 null
             }
             is Success -> {
                 notificationService.expireAllErrors()
-                response.value
+                result.value
             }
         }
     }
