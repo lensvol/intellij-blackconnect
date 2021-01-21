@@ -68,7 +68,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
 
-        mockNotificationManager.assertNotificationShown("Internal error, please see blackd output.")
+        mockNotificationManager.assertNotificationShown("Internal server error, please see blackd output.")
     }
 
     @Test
@@ -79,7 +79,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         val event = eventForFile(unformattedFile)
         runActionForEvent(event)
 
-        mockNotificationManager.assertNotificationShown("Something unexpected happened:\nI'm A Teapot!")
+        mockNotificationManager.assertNotificationShown("Something unexpected happened:<br>I'm A Teapot!")
     }
 
     private fun runActionForEvent(event: TestActionEvent) {

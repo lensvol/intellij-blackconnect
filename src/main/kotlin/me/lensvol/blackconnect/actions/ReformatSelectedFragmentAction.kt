@@ -70,7 +70,7 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
                             hintManager.showErrorHint(editor, "Fragment has invalid syntax.")
                         }
                     } else {
-                        notificationService.showError("Internal error, please see blackd output.")
+                        notificationService.showError("Internal server error, please see blackd output.")
                     }
                 }
                 is BlackdResponse.UnknownStatus -> notificationService.showError(

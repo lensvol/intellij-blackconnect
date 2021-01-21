@@ -51,13 +51,19 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                         }
                     }
                     is BlackdResponse.InternalError -> {
-                        notificationService.showError("Internal error, please see blackd output.")
+                        notificationService.showError(
+                            "Internal server error, please see blackd output.",
+                            viewPromptText = "View response",
+                            additionalInfo = response.reason
+                        )
                     }
                     is BlackdResponse.UnknownStatus -> notificationService.showError(
                         "Something unexpected happened:<br>${response.responseText}"
                     )
                     is BlackdResponse.InvalidRequest -> notificationService.showError(
-                        "Server did not understand our request.<br>Maybe you need to connect over SSL?"
+                        "Server did not understand our request.<br>Maybe you need to connect over SSL?",
+                        viewPromptText = "View response",
+                        additionalInfo = response.reason
                     )
                 }
             }

@@ -9,7 +9,7 @@ import me.lensvol.blackconnect.ui.NotificationManager
 class NotificationManagerMock(project: Project) : NotificationManager(project) {
     private val shownNotifications = mutableListOf<String>()
 
-    override fun showError(text: String) {
+    override fun showError(text: String, additionalInfo: String?, viewPromptText: String) {
         shownNotifications.add(text)
     }
 
