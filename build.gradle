@@ -47,11 +47,15 @@ patchPluginXml {
     version project.version
     changeNotes """
       <p>0.4.4</p>
+      <br>
+      <p>This release is dedicated to the memory of our cat <b>Luna</b>, who passed away due to cancer last year.</p><br> 
+      <p>She was kind, smart and loyal. Best cat in the world.</p><br>
+      <p><b>We miss you, girl.</b></p>
       <ul>
         <li>Add button to copy line length settings from the IDE ("right margin").</li>
         <li>Support for connecting to blackd over SSL (kudos to studioj)</li>
         <li>Make server error notifications more descriptive.</li>
-        <li>Miscellaneous fixes and improvements.</li> 
+        <li>Miscellaneous fixes and improvements.</li>
       </ul>
 
       <p>0.4.3</p>
