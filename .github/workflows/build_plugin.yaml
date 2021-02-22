@@ -34,15 +34,3 @@ jobs:
       with:
         arguments: check
         gradle-version: 6.5
-
-    - name: Verify Plugin
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: verifyPlugin
-        gradle-version: 6.5
-
-    - name: Check Compatibility Against Different IDEs
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: runPluginVerifier -Pplugin.verifier.home.dir=~/.pluginVerifier
-        gradle-version: 6.5
