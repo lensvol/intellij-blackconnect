@@ -1,4 +1,4 @@
-name: IntelliJ Platform Plugin Compatibility
+name: Verify IDE compatibility
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: create_sentry_release
+name: Create release in Sentry
 on:
   release:
     types: [published]
