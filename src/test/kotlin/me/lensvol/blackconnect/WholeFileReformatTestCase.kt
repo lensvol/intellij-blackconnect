@@ -38,9 +38,10 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
     }
 
     @Test
-    fun test_error_message_is_displayed_on_syntax_error() {
+    fun test_error_message_is_displayed_on_syntax_error_if_option_is_set() {
         setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
         val brokenSyntaxFile = openFileInEditor("broken.py")
+        pluginConfiguration.showSyntaxErrorMsgs = true
 
         val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
@@ -49,7 +50,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
     }
 
     @Test
-    fun test_error_message_is_not_displayed_on_syntax_error_if_option_set() {
+    fun test_error_message_is_not_displayed_on_syntax_error_if_option_is_not_set() {
         setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
         val brokenSyntaxFile = openFileInEditor("broken.py")
 
