@@ -49,7 +49,7 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var enableJupyterSupport: Boolean = false
 
     @Attribute
-    var showSyntaxErrorMsgs: Boolean = true
+    var showSyntaxErrorMsgs: Boolean = false
 
     override fun getState() = this
 
