@@ -3,6 +3,7 @@ package me.lensvol.blackconnect
 import com.intellij.testFramework.TestActionEvent
 import junit.framework.TestCase
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
+import me.lensvol.blackconnect.mocks.DocumentUtilMock
 import org.junit.Test
 
 class WholeFileReformatTestCase : BlackConnectTestCase() {
@@ -15,6 +16,19 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         runActionForEvent(event)
 
         myFixture.checkResultByFile("reformatted.py")
+    }
+
+    @Test
+    fun test_file_is_not_reformatted_if_is_in_undo_or_redo() {
+        setupBlackdResponse(BlackdResponse.Blackened("print(\"123\")"))
+        val unformattedFile = openFileInEditor("unformatted.py")
+        val documentUtilMock = myFixture.project.getService(DocumentUtil::class.java) as DocumentUtilMock
+
+        documentUtilMock.enterUndo()
+        val event = eventForFile(unformattedFile)
+        runActionForEvent(event)
+
+        myFixture.checkResultByFile("unformatted.py")
     }
 
     @Test

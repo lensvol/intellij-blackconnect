@@ -7,6 +7,12 @@ import com.intellij.openapi.util.Computable
 import me.lensvol.blackconnect.DocumentUtil
 
 class DocumentUtilMock(project: Project) : DocumentUtil(project) {
+    private var imitateUndoRedo: Boolean = false
+
+    init {
+        resetUndoRedo()
+    }
+
     override fun updateCodeInDocument(document: Document, receiver: () -> Unit) {
         val application = ApplicationManager.getApplication()
 
@@ -19,5 +25,17 @@ class DocumentUtilMock(project: Project) : DocumentUtil(project) {
                 )
             }
         }
+    }
+
+    override fun isInUndoRedo(): Boolean {
+        return imitateUndoRedo
+    }
+
+    private fun resetUndoRedo() {
+        imitateUndoRedo = false
+    }
+
+    fun enterUndo() {
+        imitateUndoRedo = true
     }
 }

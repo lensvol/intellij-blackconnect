@@ -40,7 +40,9 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                     is BlackdResponse.Blackened -> {
                         documentUtil.updateCodeInDocument(document) {
                             logger.debug("Code is going to be updated in $document")
-                            document.setText(response.sourceCode)
+                            if (!documentUtil.isInUndoRedo()) {
+                                document.setText(response.sourceCode)
+                            }
                         }
                     }
                     BlackdResponse.NoChangesMade -> {
