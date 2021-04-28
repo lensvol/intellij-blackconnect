@@ -66,6 +66,7 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
         lineLength: Int = 88,
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
+        skipMagicTrailingComma: Boolean = false,
         targetPythonVersions: String = ""
     ): Result<BlackdResponse, String> {
 
@@ -87,6 +88,10 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
 
             if (skipStringNormalization) {
                 setRequestProperty("X-Skip-String-Normalization", "yes")
+            }
+
+            if (skipMagicTrailingComma) {
+                setRequestProperty("X-Skip-Magic-Trailing-Comma", "yes")
             }
 
             return try {
