@@ -38,17 +38,18 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
     private val skipMagicTrailingCommaCheckbox = JCheckBox("Don't use trailing commas as a reason to split lines.")
     private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
 
-    private val targetVersions = mapOf(
+    private val targetVersions = linkedMapOf(
         "py27" to "2.7",
         "py33" to "3.3",
         "py34" to "3.4",
         "py35" to "3.5",
         "py36" to "3.6",
         "py37" to "3.7",
-        "py38" to "3.8"
+        "py38" to "3.8",
+        "py39" to "3.9"
     )
 
-    private val versionCheckboxes = sortedMapOf<String, JCheckBox>().apply {
+    private val versionCheckboxes = linkedMapOf<String, JCheckBox>().apply {
         targetVersions.values.map { version ->
             this.put("py$version", JCheckBox(version))
         }
