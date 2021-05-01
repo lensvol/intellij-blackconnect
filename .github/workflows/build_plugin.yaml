@@ -1,4 +1,4 @@
-name: build
+name: Build plugin
 on:
   push:
     branches:
@@ -7,12 +7,13 @@ on:
       - 'build.gradle'
       - 'gradle.properties'
       - 'src/**'
+      - '.github/workflows/build_plugin.yaml'
 jobs:
   gradle:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    runs-on: macos-latest
     steps:
 
     - name: Checkout code from repo
@@ -33,16 +34,4 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         arguments: check
-        gradle-version: 6.5
-
-    - name: Verify Plugin
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: verifyPlugin
-        gradle-version: 6.5
-
-    - name: Check Compatibility Against Different IDEs
-      uses: eskatos/gradle-command-action@v1
-      with:
-        arguments: runPluginVerifier -Pplugin.verifier.home.dir=~/.pluginVerifier
         gradle-version: 6.5

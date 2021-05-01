@@ -25,6 +25,9 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var port: Int = Constants.DEFAULT_BLACKD_PORT
 
     @Attribute
+    var useSSL: Boolean = Constants.DEFAULT_USE_SSL
+
+    @Attribute
     var lineLength: Int = Constants.DEFAULT_LINE_LENGTH
 
     @Attribute
@@ -46,7 +49,7 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var enableJupyterSupport: Boolean = false
 
     @Attribute
-    var showSyntaxErrorMsgs: Boolean = true
+    var showSyntaxErrorMsgs: Boolean = false
 
     override fun getState() = this
 

@@ -3,6 +3,7 @@ package me.lensvol.blackconnect
 import com.intellij.testFramework.TestActionEvent
 import junit.framework.TestCase
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
+import me.lensvol.blackconnect.mocks.DocumentUtilMock
 import org.junit.Test
 
 class WholeFileReformatTestCase : BlackConnectTestCase() {
@@ -15,6 +16,19 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         runActionForEvent(event)
 
         myFixture.checkResultByFile("reformatted.py")
+    }
+
+    @Test
+    fun test_file_is_not_reformatted_if_is_in_undo_or_redo() {
+        setupBlackdResponse(BlackdResponse.Blackened("print(\"123\")"))
+        val unformattedFile = openFileInEditor("unformatted.py")
+        val documentUtilMock = myFixture.project.getService(DocumentUtil::class.java) as DocumentUtilMock
+
+        documentUtilMock.enterUndo()
+        val event = eventForFile(unformattedFile)
+        runActionForEvent(event)
+
+        myFixture.checkResultByFile("unformatted.py")
     }
 
     @Test
@@ -38,9 +52,10 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
     }
 
     @Test
-    fun test_error_message_is_displayed_on_syntax_error() {
+    fun test_error_message_is_displayed_on_syntax_error_if_option_is_set() {
         setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
         val brokenSyntaxFile = openFileInEditor("broken.py")
+        pluginConfiguration.showSyntaxErrorMsgs = true
 
         val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
@@ -49,7 +64,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
     }
 
     @Test
-    fun test_error_message_is_not_displayed_on_syntax_error_if_option_set() {
+    fun test_error_message_is_not_displayed_on_syntax_error_if_option_is_not_set() {
         setupBlackdResponse(BlackdResponse.SyntaxError("Error"))
         val brokenSyntaxFile = openFileInEditor("broken.py")
 
@@ -68,7 +83,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         val event = eventForFile(brokenSyntaxFile)
         runActionForEvent(event)
 
-        mockNotificationManager.assertNotificationShown("Internal error, please see blackd output.")
+        mockNotificationManager.assertNotificationShown("Internal server error, please see blackd output.")
     }
 
     @Test
@@ -79,7 +94,7 @@ class WholeFileReformatTestCase : BlackConnectTestCase() {
         val event = eventForFile(unformattedFile)
         runActionForEvent(event)
 
-        mockNotificationManager.assertNotificationShown("Something unexpected happened:\nI'm A Teapot!")
+        mockNotificationManager.assertNotificationShown("Something unexpected happened:<br>I'm A Teapot!")
     }
 
     private fun runActionForEvent(event: TestActionEvent) {

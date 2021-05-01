@@ -40,7 +40,9 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                     is BlackdResponse.Blackened -> {
                         documentUtil.updateCodeInDocument(document) {
                             logger.debug("Code is going to be updated in $document")
-                            document.setText(response.sourceCode)
+                            if (!documentUtil.isInUndoRedo()) {
+                                document.setText(response.sourceCode)
+                            }
                         }
                     }
                     BlackdResponse.NoChangesMade -> {
@@ -51,10 +53,19 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                         }
                     }
                     is BlackdResponse.InternalError -> {
-                        notificationService.showError("Internal error, please see blackd output.")
+                        notificationService.showError(
+                            "Internal server error, please see blackd output.",
+                            viewPromptText = "View response",
+                            additionalInfo = response.reason
+                        )
                     }
                     is BlackdResponse.UnknownStatus -> notificationService.showError(
-                        "Something unexpected happened:\n${response.responseText}"
+                        "Something unexpected happened:<br>${response.responseText}"
+                    )
+                    is BlackdResponse.InvalidRequest -> notificationService.showError(
+                        "Server did not understand our request.<br>Maybe you need to connect over SSL?",
+                        viewPromptText = "View response",
+                        additionalInfo = response.reason
                     )
                 }
             }

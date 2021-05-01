@@ -1,30 +1,24 @@
 package me.lensvol.blackconnect.ui
 
 import com.intellij.notification.Notification
-import com.intellij.notification.NotificationDisplayType
-import com.intellij.notification.NotificationGroup
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationType
+import com.intellij.notification.impl.NotificationFullContent
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import java.util.concurrent.ConcurrentHashMap
 
 const val MAIN_DISPLAY_ID = "BlackConnect"
 
+class FullSizeErrorNotification(text: String) : NotificationFullContent,
+    Notification(MAIN_DISPLAY_ID, "BlackConnect", text, NotificationType.ERROR)
+
 @Service
 open class NotificationManager(project: Project) {
     private val currentProject = project
     private val shownErrorNotifications = ConcurrentHashMap<Notification, String>()
 
-    private fun mainGroup(): NotificationGroup {
-        val existingGroup = NotificationGroup.findRegisteredGroup(MAIN_DISPLAY_ID)
-        if (existingGroup != null) {
-            return existingGroup
-        }
-
-        return NotificationGroup(MAIN_DISPLAY_ID, NotificationDisplayType.BALLOON, false)
-    }
-
-    open fun showError(text: String) {
+    open fun showError(text: String, additionalInfo: String? = null, viewPromptText: String = "View") {
         for ((shown_notification, error_text) in shownErrorNotifications.iterator()) {
             if (error_text == text) {
                 shown_notification.expire()
@@ -32,13 +26,22 @@ open class NotificationManager(project: Project) {
             }
         }
 
-        val newNotification = mainGroup().createNotification(text, NotificationType.ERROR)
+        val newNotification = FullSizeErrorNotification(text)
         shownErrorNotifications[newNotification] = text
 
         newNotification
             .setTitle("BlackConnect")
             .whenExpired { shownErrorNotifications.remove(newNotification) }
-            .notify(currentProject)
+
+        additionalInfo?.let {
+            newNotification.addAction(
+                NotificationAction.createSimple(viewPromptText) {
+                    AdditionalInformationDialog(currentProject, additionalInfo).show()
+                }
+            )
+        }
+
+        newNotification.notify(currentProject)
     }
 
     open fun expireAllErrors() {

@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.intellij' version '0.7.1'
     id 'org.jetbrains.kotlin.jvm' version '1.4.21-2'
     id 'jacoco'
 
@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.4.4-SNAPSHOT'
+version '0.4.4'
 
 compileKotlin {
     kotlinOptions.freeCompilerArgs = ['-Xjvm-default=enable']
@@ -50,9 +50,23 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
+      <p>(UNRELEASED)</p>
+      <ul>
+        <li>Fix for rare crash when updating document during Undo/Redo operation.</li>
+      </ul>
+
       <p>0.4.4</p>
+      <br>
+      <br>
+      <p>This release is dedicated to the memory of our cat <b>Luna</b>, who passed away due to cancer last year.</p><br> 
+      <p>She was kind, smart and loyal. Best cat in the world.</p><br>
+      <p><b>We miss you, girl.</b></p>
+      <br>
       <ul>
         <li>Add button to copy line length settings from the IDE ("right margin").</li>
+        <li>Support for connecting to blackd over SSL (kudos to studioj)</li>
+        <li>Make server error notifications more descriptive.</li>
+        <li>Miscellaneous fixes and improvements.</li>
       </ul>
 
       <p>0.4.3</p>

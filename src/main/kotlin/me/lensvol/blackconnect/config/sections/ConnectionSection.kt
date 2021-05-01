@@ -1,10 +1,7 @@
 package me.lensvol.blackconnect.config.sections
 
-import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.Messages
-import com.intellij.openapi.ui.TextBrowseFolderListener
-import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import me.lensvol.blackconnect.BlackdClient
@@ -14,20 +11,16 @@ import me.lensvol.blackconnect.Success
 import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import me.lensvol.blackconnect.ui.disableContents
-import me.lensvol.blackconnect.ui.enableContents
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
-import java.awt.Insets
 import javax.swing.Box
 import javax.swing.BoxLayout
-import javax.swing.ButtonGroup
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JRadioButton
 import javax.swing.JSpinner
 import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
@@ -35,9 +28,9 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 class ConnectionSection(project: Project) : ConfigSection(project) {
+    private val hostnameText = JTextField(Constants.DEFAULT_HOST_BINDING)
+    private val httpsCheckBox = JCheckBox("Use SSL (e.g. blackd behind nginx)")
     private val localPortModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
-
-    private val hostnameText = JTextField("127.0.0.1")
     private val remotePortSpinner = JSpinner(localPortModel)
 
     private val checkConnectionButton = JButton("Check connection")
@@ -70,6 +63,9 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
             add(remoteConnectionPanel, constraints)
 
             constraints.gridy = 1
+            add(httpsCheckBox, constraints)
+
+            constraints.gridy = 2
             add(checkConnectionButton, constraints)
         }
     }
@@ -107,7 +103,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
         })
 
         checkConnectionButton.addActionListener {
-            val blackdClient = BlackdClient(hostnameText.text, remotePortSpinner.value as Int)
+            val blackdClient = BlackdClient(hostnameText.text, remotePortSpinner.value as Int, httpsCheckBox.isSelected)
 
             when (val result = blackdClient.checkConnection()) {
                 is Success -> Messages.showInfoMessage(
@@ -121,17 +117,18 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
                 )
             }
         }
-
     }
 
     override fun loadFrom(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
         hostnameText.text = projectConfig.hostname
         remotePortSpinner.value = projectConfig.port
+        httpsCheckBox.isSelected = projectConfig.useSSL
     }
 
     override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
         projectConfig.hostname = hostnameText.text.ifBlank { "localhost" }
         projectConfig.port = remotePortSpinner.value as Int
+        projectConfig.useSSL = httpsCheckBox.isSelected
     }
 
     override fun isModified(
@@ -139,6 +136,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
         projectConfig: BlackConnectProjectSettings
     ): Boolean {
         return hostnameText.text != projectConfig.hostname ||
-            remotePortSpinner.value != projectConfig.port
+            remotePortSpinner.value != projectConfig.port ||
+            httpsCheckBox.isSelected != projectConfig.useSSL
     }
 }

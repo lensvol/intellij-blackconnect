@@ -4,31 +4,38 @@ import com.intellij.openapi.diagnostic.Logger
 import java.io.IOException
 import java.net.ConnectException
 import java.net.HttpURLConnection
+import java.net.SocketTimeoutException
 import java.net.URL
+import javax.net.ssl.SSLException
 
 sealed class BlackdResponse {
     object NoChangesMade : BlackdResponse()
     data class SyntaxError(val reason: String) : BlackdResponse()
     data class InternalError(val reason: String) : BlackdResponse()
+    data class InvalidRequest(val reason: String) : BlackdResponse()
     data class Blackened(val sourceCode: String) : BlackdResponse()
     data class UnknownStatus(val code: Int, val responseText: String) : BlackdResponse()
 }
 
-class BlackdClient(val hostname: String, val port: Int) {
-
+class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
     private val logger = Logger.getInstance(BlackdClient::class.java.name)
+    private val protocol = if (useSsl) "https" else "http"
+    val blackdUrl = URL("$protocol://$hostname:$port")
 
     fun checkConnection(): Result<String, String> {
-        val url = URL("http://$hostname:$port")
-
-        with(url.openConnection() as HttpURLConnection) {
+        with(blackdUrl.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
+
+            // Sometimes SSL negotiation can hang and we need to handle this by bailing quickly
+            connectTimeout = Constants.DEFAULT_CONNECTION_TIMEOUT
+            readTimeout = Constants.DEFAULT_READ_TIMEOUT
+
             setRequestProperty("X-Protocol-Version", "1")
 
             try {
                 connect()
-            } catch (e: ConnectException) {
-                return Failure(e.message ?: "Connection failed.")
+            } catch (e: IOException) {
+                return Failure(retrieveIoExceptionMessage(e))
             }
 
             return try {
@@ -36,11 +43,21 @@ class BlackdClient(val hostname: String, val port: Int) {
                 if (version != null) {
                     return Success(version)
                 }
-                return Failure("Someone is listenning on that address, but it is not blackd.")
+                return Failure("Someone is listening on that address, but it is not blackd.")
             } catch (e: IOException) {
                 Failure(errorStream.readBytes().toString())
             }
         }
+    }
+
+    private fun retrieveIoExceptionMessage(e: IOException): String {
+        val defaultMessage = when (e) {
+            is ConnectException -> "Connection failed."
+            is SSLException -> "Failed to connect using SSL."
+            is SocketTimeoutException -> "Read timed out."
+            else -> "Something went wrong."
+        }
+        return (e.message ?: defaultMessage).capitalize()
     }
 
     fun reformat(
@@ -50,10 +67,9 @@ class BlackdClient(val hostname: String, val port: Int) {
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
         targetPythonVersions: String = ""
-    ): Result<BlackdResponse, Exception> {
-        val url = URL("http://$hostname:$port")
+    ): Result<BlackdResponse, String> {
 
-        with(url.openConnection() as HttpURLConnection) {
+        with(blackdUrl.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
             doOutput = true
 
@@ -64,7 +80,7 @@ class BlackdClient(val hostname: String, val port: Int) {
             if (pyi) {
                 setRequestProperty("X-Python-Variant", "pyi")
             } else {
-                if (!targetPythonVersions.isEmpty()) {
+                if (targetPythonVersions.isNotEmpty()) {
                     setRequestProperty("X-Python-Variant", targetPythonVersions)
                 }
             }
@@ -73,21 +89,17 @@ class BlackdClient(val hostname: String, val port: Int) {
                 setRequestProperty("X-Skip-String-Normalization", "yes")
             }
 
-            try {
+            return try {
                 connect()
-            } catch (e: ConnectException) {
-                return Failure(e)
-            }
 
-            try {
                 outputStream.use { os ->
                     val input: ByteArray = sourceCode.toByteArray()
                     os.write(input, 0, input.size)
                 }
 
-                return Success(parseBlackdResponse(this))
+                Success(parseBlackdResponse(this))
             } catch (e: IOException) {
-                return Failure(e)
+                Failure(retrieveIoExceptionMessage(e))
             }
         }
     }
@@ -108,8 +120,20 @@ class BlackdClient(val hostname: String, val port: Int) {
                 BlackdResponse.NoChangesMade
             }
             Constants.HTTP_INVALID_REQUEST -> {
-                logger.debug("400: Code contained syntax errors.")
-                BlackdResponse.SyntaxError(connection.errorStream.bufferedReader().readText())
+                val errorText = connection.errorStream.bufferedReader().readText()
+
+                /*
+                 Heuristics are bad, but "blackd behind ngingx/whatever" setup can also reply with 400
+                 if you are sending request to an SSL port over non-SSL connections, so we to somehow
+                 distinguish between them.
+                 */
+                if (errorText.startsWith("Cannot parse")) {
+                    logger.debug("400: Code contained syntax errors.")
+                    BlackdResponse.SyntaxError(errorText)
+                } else {
+                    logger.debug("400: Invalid request was sent:\n$errorText")
+                    BlackdResponse.InvalidRequest(errorText)
+                }
             }
             Constants.HTTP_INTERNAL_ERROR -> {
                 val errorText = connection.errorStream.bufferedReader().readText()

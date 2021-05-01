@@ -5,6 +5,7 @@ import org.junit.Test
 import org.mockserver.integration.ClientAndServer
 import org.mockserver.model.HttpRequest
 import org.mockserver.model.HttpResponse
+import java.net.URL
 
 class BlackdClientTestCase : BlackConnectTestCase() {
     lateinit var mockServer: ClientAndServer
@@ -67,5 +68,21 @@ class BlackdClientTestCase : BlackConnectTestCase() {
 
         val blackenedCode = response.value as BlackdResponse.Blackened
         Assert.assertEquals(blackenedCode.sourceCode, "with function(x) as f:\n    pass")
+    }
+
+    @Test
+    fun test_blackd_client_can_be_used_with_ssl_enabled() {
+
+        val blackdClient = BlackdClient("remote.host", 1337, useSsl = true)
+
+        Assert.assertEquals(blackdClient.blackdUrl, URL("https://remote.host:1337"))
+    }
+
+    @Test
+    fun test_blackd_client_can_be_used_with_ssl_disabled() {
+
+        val blackdClient = BlackdClient("localhost", 45484, useSsl = false)
+
+        Assert.assertEquals(blackdClient.blackdUrl, URL("http://localhost:45484"))
     }
 }
