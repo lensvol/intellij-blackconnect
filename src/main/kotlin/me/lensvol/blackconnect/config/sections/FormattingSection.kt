@@ -35,7 +35,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
 
     private val fastModeCheckbox = JCheckBox("Skip sanity checks")
     private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
-    private val skipMagicTrailingCommaCheckbox = JCheckBox("Don't use trailing commas as a reason to split lines.")
+    private val skipMagicTrailingCommaCheckbox = JCheckBox("Don't use trailing commas as a reason to split lines")
     private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
 
     private val targetVersions = linkedMapOf(
