@@ -148,6 +148,7 @@ open class CodeReformatter(project: Project) {
             lineLength = configuration.lineLength,
             fastMode = configuration.fastMode,
             skipStringNormalization = configuration.skipStringNormalization,
+            skipMagicTrailingComma = configuration.skipMagicTrailingComma,
             targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else ""
         )
 

@@ -35,19 +35,21 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
 
     private val fastModeCheckbox = JCheckBox("Skip sanity checks")
     private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
+    private val skipMagicTrailingCommaCheckbox = JCheckBox("Don't use trailing commas as a reason to split lines")
     private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
 
-    private val targetVersions = mapOf(
+    private val targetVersions = linkedMapOf(
         "py27" to "2.7",
         "py33" to "3.3",
         "py34" to "3.4",
         "py35" to "3.5",
         "py36" to "3.6",
         "py37" to "3.7",
-        "py38" to "3.8"
+        "py38" to "3.8",
+        "py39" to "3.9"
     )
 
-    private val versionCheckboxes = sortedMapOf<String, JCheckBox>().apply {
+    private val versionCheckboxes = linkedMapOf<String, JCheckBox>().apply {
         targetVersions.values.map { version ->
             this.put("py$version", JCheckBox(version))
         }
@@ -98,6 +100,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
 
         lineLengthSpinner.value = blackSettings.getLong("line-length", DEFAULT_LINE_LENGTH.toLong()).toInt()
         skipStringNormalCheckbox.isSelected = blackSettings.getBoolean("skip-string-normalization", false)
+        skipMagicTrailingCommaCheckbox.isSelected = blackSettings.getBoolean("skip-magic-trailing-comma", false)
         fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", false)
     }
 
@@ -128,6 +131,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
                     .addLabeledComponent("Line length:", lineLengthPanel)
                     .addComponent(fastModeCheckbox)
                     .addComponent(skipStringNormalCheckbox)
+                    .addComponent(skipMagicTrailingCommaCheckbox)
                     .addComponent(targetSpecificVersionsCheckbox)
                     .addComponent(targetVersionsPanel)
                     .addComponent(loadPyprojectTomlButton)
@@ -184,6 +188,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         lineLengthSpinner.value = configuration.lineLength
         fastModeCheckbox.isSelected = configuration.fastMode
         skipStringNormalCheckbox.isSelected = configuration.skipStringNormalization
+        skipMagicTrailingCommaCheckbox.isSelected = configuration.skipMagicTrailingComma
 
         configuration.pythonTargets.split(",").forEach { version ->
             versionCheckboxes[version]?.isSelected = true
@@ -208,6 +213,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         configuration.lineLength = lineLengthSpinner.value as Int
         configuration.fastMode = fastModeCheckbox.isSelected
         configuration.skipStringNormalization = skipStringNormalCheckbox.isSelected
+        configuration.skipMagicTrailingComma = skipMagicTrailingCommaCheckbox.isSelected
         configuration.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
         configuration.pythonTargets = generateVersionSpec()
     }
@@ -216,6 +222,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         return lineLengthSpinner.value != configuration.lineLength ||
             fastModeCheckbox.isSelected != configuration.fastMode ||
             skipStringNormalCheckbox.isSelected != configuration.skipStringNormalization ||
+            skipMagicTrailingCommaCheckbox.isSelected != configuration.skipMagicTrailingComma ||
             targetSpecificVersionsCheckbox.isSelected != configuration.targetSpecificVersions ||
             generateVersionSpec() != configuration.pythonTargets
     }

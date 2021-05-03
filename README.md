@@ -24,6 +24,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
+    * Processing of "magic trailing comma" in collections.
     * Target specific Python versions.
 
 ## Installation
