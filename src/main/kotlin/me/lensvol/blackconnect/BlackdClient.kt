@@ -135,8 +135,7 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
                 if (errorText.startsWith("Cannot parse")) {
                     logger.debug("400: Code contained syntax errors.")
                     BlackdResponse.SyntaxError(errorText)
-                }
-                else {
+                } else {
                     logger.debug("400: Invalid request was sent:\n$errorText")
                     BlackdResponse.InvalidRequest(errorText)
                 }

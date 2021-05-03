@@ -68,13 +68,14 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                         crude error detection heuristics here. This one specifically looks for unsupported
                         target versions, as different versions of blackd may have different sets of them.
                          */
-                        if(response.reason.startsWith("Invalid value for X-Python-Variant")) {
+                        if (response.reason.startsWith("Invalid value for X-Python-Variant")) {
                             val startPos = response.reason.indexOf(": ")
                             val endPos = response.reason.indexOf(" is not supported")
-                            val unsupportedVersion = response.reason.slice(startPos+2..endPos)
+                            val unsupportedVersion = response.reason.slice(startPos + 2..endPos)
 
                             notificationService.showError(
-                                "Your version of <b>blackd</b> does not support targeting Python <b>${unsupportedVersion}</b>.",
+                                "Your version of <b>blackd</b> does not support targeting " +
+                                    "Python <b>$unsupportedVersion</b>.",
                             )
                         } else {
                             notificationService.showError(
