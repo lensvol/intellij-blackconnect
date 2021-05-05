@@ -49,6 +49,7 @@ patchPluginXml {
     changeNotes """
       <p>(UNRELEASED)</p>
       <ul>
+        <li>Added "Trigger on Code Reformat" option</li>
         <li>Fix for rare crash when updating document during Undo/Redo operation.</li>
       </ul>
 
