@@ -62,6 +62,8 @@ Just go to the [plugin page](https://plugins.jetbrains.com/plugin/14321-blackcon
 Development requirements:
 
 * Java SDK 11 or newer
+* Python 3.8 or newer
+* Poetry
 
 Run tests:
 

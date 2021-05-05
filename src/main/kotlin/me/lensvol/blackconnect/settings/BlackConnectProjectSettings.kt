@@ -43,6 +43,9 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var triggerOnEachSave: Boolean = false
 
     @Attribute
+    var triggerOnReformat: Boolean = false
+
+    @Attribute
     var targetSpecificVersions: Boolean = false
 
     @Attribute

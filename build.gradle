@@ -33,6 +33,7 @@ intellij {
     version ideaVersion
     updateSinceUntilBuild false
     pluginName 'intellij-blackconnect'
+    plugins = ['python-ce']
 }
 
 compileKotlin {
