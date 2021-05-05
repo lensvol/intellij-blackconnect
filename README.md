@@ -57,6 +57,26 @@ Just go to the [plugin page](https://plugins.jetbrains.com/plugin/14321-blackcon
 * Detection of possible conflicts with other plugins / File Watchers.
 * Better integration with Jupyter Notebooks.
 
+## Contributing
+
+Development requirements:
+
+* Java SDK 11 or newer
+* Python 3.8 or newer
+* Poetry
+
+Run tests:
+
+```shell
+./gradlew test
+```
+
+Launch a testing version of PyCharm with the plugin enabled:
+
+```shell
+./gradlew runIde
+```
+
 ## Special thanks
 
 * [Andrey Vlasovskikh](https://github.com/vlasovskikh) - goading me into publishing this plugin.

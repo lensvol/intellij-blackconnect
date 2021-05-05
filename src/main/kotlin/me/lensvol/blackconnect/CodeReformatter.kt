@@ -68,24 +68,37 @@ open class CodeReformatter(project: Project) {
         val projectService = currentProject.service<BlackConnectProgressTracker>()
         projectService.registerOperationOnTag(tag, progressIndicator)
 
-        val (formatting, deindentedFragment) = extractIndent(fragment)
-
         ProgressManager.getInstance().runProcessWithProgressAsynchronously(
             object : Task.Backgroundable(currentProject, "Calling blackd") {
                 override fun run(indicator: ProgressIndicator) {
                     logger.debug("Reformatting code with tag '$tag'")
-                    reformatWithBlackd(currentConfig, deindentedFragment, isPyi)?.let { response ->
-                        when (response) {
-                            is Blackened -> {
-                                receiver(Blackened(restoreFormatting(response.sourceCode.trimEnd('\n'), formatting)))
-                            }
-                            else -> receiver(response)
-                        }
+                    reformatFragment(fragment, isPyi)?.let {
+                        receiver(it)
                     }
                 }
             },
             progressIndicator
         )
+    }
+
+    fun reformatFragment(
+        fragment: String,
+        isPyi: Boolean,
+        connectTimeout: Int = 0,
+        readTimeout: Int = 0,
+    ): BlackdResponse? {
+        val (formatting, deIndentedFragment) = extractIndent(fragment)
+        val response = reformatWithBlackd(
+            currentConfig,
+            deIndentedFragment,
+            isPyi,
+            connectTimeout = connectTimeout,
+            readTimeout = readTimeout,
+        ) ?: return null
+        return when (response) {
+            is Blackened -> Blackened(restoreFormatting(response.sourceCode.trimEnd('\n'), formatting))
+            else -> response
+        }
     }
 
     private fun extractIndent(codeFragment: String): Pair<FragmentFormatting, String> {
@@ -135,7 +148,9 @@ open class CodeReformatter(project: Project) {
     private fun reformatWithBlackd(
         configuration: BlackConnectProjectSettings,
         sourceCode: String,
-        isPyi: Boolean
+        isPyi: Boolean,
+        connectTimeout: Int = 0,
+        readTimeout: Int = 0,
     ): BlackdResponse? {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
         logger.debug("Reformatting cancelled before we could begin")
@@ -149,7 +164,9 @@ open class CodeReformatter(project: Project) {
             fastMode = configuration.fastMode,
             skipStringNormalization = configuration.skipStringNormalization,
             skipMagicTrailingComma = configuration.skipMagicTrailingComma,
-            targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else ""
+            targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else "",
+            connectTimeout = connectTimeout,
+            readTimeout = readTimeout,
         )
 
         logger.debug("Reformatting cancelled after call to blackd")

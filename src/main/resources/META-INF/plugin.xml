@@ -84,6 +84,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <postStartupActivity
                 implementation="me.lensvol.blackconnect.PluginStartupActivity"/>
+        <postFormatProcessor
+                implementation="me.lensvol.blackconnect.BlackPostFormatProcessor"/>
     </extensions>
 
     <projectListeners>
