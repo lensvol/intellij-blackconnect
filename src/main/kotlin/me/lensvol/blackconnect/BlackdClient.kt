@@ -67,12 +67,16 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
         skipMagicTrailingComma: Boolean = false,
-        targetPythonVersions: String = ""
+        targetPythonVersions: String = "",
+        connectTimeout: Int = 0,
+        readTimeout: Int = 0,
     ): Result<BlackdResponse, String> {
 
         with(blackdUrl.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
             doOutput = true
+            this.connectTimeout = connectTimeout
+            this.readTimeout = readTimeout
 
             setRequestProperty("X-Protocol-Version", "1")
             setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe")
