@@ -10,3 +10,7 @@ formatting:
 complexity:
   LongParameterList:
     ignoreDefaultParameters: true
+
+style:
+  ReturnCount:
+    active: false
