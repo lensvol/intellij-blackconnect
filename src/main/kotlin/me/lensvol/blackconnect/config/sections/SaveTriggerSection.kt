@@ -35,7 +35,7 @@ class SaveTriggerSection(project: Project) : ConfigSection(project) {
     }
 
     override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
-        return configuration.triggerOnEachSave != triggerOnEachSave.isSelected
-            || configuration.triggerOnReformat != triggerOnReformat.isSelected
+        return configuration.triggerOnEachSave != triggerOnEachSave.isSelected ||
+            configuration.triggerOnReformat != triggerOnReformat.isSelected
     }
 }
