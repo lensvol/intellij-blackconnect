@@ -74,8 +74,7 @@ class BlackPostFormatProcessor : PostFormatProcessor {
         documentManager.doPostponedOperationsAndUnblockDocument(document)
         try {
             document.replaceString(range.startOffset, range.endOffset, s)
-        }
-        finally {
+        } finally {
             documentManager.commitDocument(document)
         }
     }
