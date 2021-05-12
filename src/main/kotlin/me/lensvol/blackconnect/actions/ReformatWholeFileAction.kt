@@ -62,11 +62,29 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                     is BlackdResponse.UnknownStatus -> notificationService.showError(
                         "Something unexpected happened:<br>${response.responseText}"
                     )
-                    is BlackdResponse.InvalidRequest -> notificationService.showError(
-                        "Server did not understand our request.<br>Maybe you need to connect over SSL?",
-                        viewPromptText = "View response",
-                        additionalInfo = response.reason
-                    )
+                    is BlackdResponse.InvalidRequest -> {
+                        /*
+                        Sadly, blackd does not reply with easily parseable error codes, so we have to implement
+                        crude error detection heuristics here. This one specifically looks for unsupported
+                        target versions, as different versions of blackd may have different sets of them.
+                         */
+                        if (response.reason.startsWith("Invalid value for X-Python-Variant")) {
+                            val startPos = response.reason.indexOf(": ")
+                            val endPos = response.reason.indexOf(" is not supported")
+                            val unsupportedVersion = response.reason.slice(startPos + 2..endPos)
+
+                            notificationService.showError(
+                                "Your version of <b>blackd</b> does not support targeting " +
+                                    "Python <b>$unsupportedVersion</b>.",
+                            )
+                        } else {
+                            notificationService.showError(
+                                "Server did not understand our request.<br>Maybe you need to connect over SSL?",
+                                viewPromptText = "View response",
+                                additionalInfo = response.reason
+                            )
+                        }
+                    }
                 }
             }
         }

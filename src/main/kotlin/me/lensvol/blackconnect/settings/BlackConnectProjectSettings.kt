@@ -37,7 +37,13 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var skipStringNormalization: Boolean = false
 
     @Attribute
+    var skipMagicTrailingComma: Boolean = false
+
+    @Attribute
     var triggerOnEachSave: Boolean = false
+
+    @Attribute
+    var triggerOnReformat: Boolean = false
 
     @Attribute
     var targetSpecificVersions: Boolean = false

@@ -24,6 +24,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
     * Preferred line length (default: 88).
     * Skipping sanity checks ("fast mode").
     * Skipping string normalization.
+    * Processing of "magic trailing comma" in collections.
     * Target specific Python versions.
 
 ## Installation
@@ -55,6 +56,26 @@ Just go to the [plugin page](https://plugins.jetbrains.com/plugin/14321-blackcon
 * Hook into standard "Reformat Code" command.
 * Detection of possible conflicts with other plugins / File Watchers.
 * Better integration with Jupyter Notebooks.
+
+## Contributing
+
+Development requirements:
+
+* Java SDK 11 or newer
+* Python 3.8 or newer
+* Poetry
+
+Run tests:
+
+```shell
+./gradlew test
+```
+
+Launch a testing version of PyCharm with the plugin enabled:
+
+```shell
+./gradlew runIde
+```
 
 ## Special thanks
 

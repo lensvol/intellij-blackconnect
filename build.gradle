@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.7.1'
+    id 'org.jetbrains.intellij' version '0.7.2'
     id 'org.jetbrains.kotlin.jvm' version '1.4.21-2'
     id 'jacoco'
 
@@ -37,6 +37,7 @@ intellij {
     version ideaVersion
     updateSinceUntilBuild false
     pluginName 'intellij-blackconnect'
+    plugins = ['python-ce']
 }
 
 compileKotlin {
@@ -52,6 +53,7 @@ patchPluginXml {
     changeNotes """
       <p>(UNRELEASED)</p>
       <ul>
+        <li>Added "Trigger on Code Reformat" option</li>
         <li>Fix for rare crash when updating document during Undo/Redo operation.</li>
       </ul>
 

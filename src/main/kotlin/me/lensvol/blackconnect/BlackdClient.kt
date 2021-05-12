@@ -66,12 +66,17 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
         lineLength: Int = 88,
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
-        targetPythonVersions: String = ""
+        skipMagicTrailingComma: Boolean = false,
+        targetPythonVersions: String = "",
+        connectTimeout: Int = 0,
+        readTimeout: Int = 0,
     ): Result<BlackdResponse, String> {
 
         with(blackdUrl.openConnection() as HttpURLConnection) {
             requestMethod = "POST"
             doOutput = true
+            this.connectTimeout = connectTimeout
+            this.readTimeout = readTimeout
 
             setRequestProperty("X-Protocol-Version", "1")
             setRequestProperty("X-Fast-Or-Safe", if (fastMode) "fast" else "safe")
@@ -87,6 +92,10 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
 
             if (skipStringNormalization) {
                 setRequestProperty("X-Skip-String-Normalization", "yes")
+            }
+
+            if (skipMagicTrailingComma) {
+                setRequestProperty("X-Skip-Magic-Trailing-Comma", "yes")
             }
 
             return try {
