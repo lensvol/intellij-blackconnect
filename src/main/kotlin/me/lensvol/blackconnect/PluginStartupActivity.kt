@@ -39,7 +39,7 @@ class PluginStartupActivity : StartupActivity, DumbAware {
                     globalSettings.bindOnHostname,
                     globalSettings.bindOnPort
                 )
-                runInEdt {
+                invokeLater {
                     when (result) {
                         is ExecutionResult.Started -> {}
                         is ExecutionResult.AlreadyStarted -> {
@@ -58,8 +58,8 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         }
 
         // If uncommented, it will show settings for the plugin immediately upon startup.
-        invokeLater {
-            ShowSettingsUtil.getInstance().editConfigurable(project, BlackConnectConfigurable(project))
-        }
+        // invokeLater {
+        //     ShowSettingsUtil.getInstance().editConfigurable(project, BlackConnectConfigurable(project))
+        // }
     }
 }
