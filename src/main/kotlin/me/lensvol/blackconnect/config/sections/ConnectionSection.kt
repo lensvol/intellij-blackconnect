@@ -49,7 +49,7 @@ class ConnectionSection(project: Project) : ConfigSection(project) {
     private fun createPanel(): JPanel {
         return JPanel().apply {
             layout = GridBagLayout()
-            border = IdeBorderFactory.createTitledBorder("Connection settings")
+            border = IdeBorderFactory.createTitledBorder("Connection Settings")
             alignmentX = Component.LEFT_ALIGNMENT
 
             val constraints = GridBagConstraints().apply {

@@ -1,14 +1,22 @@
 package me.lensvol.blackconnect.config.sections
 
+import com.intellij.icons.AllIcons
+import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.invokeLater
+import com.intellij.openapi.application.runInEdt
+import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
+import me.lensvol.blackconnect.BlackdExecutor
+import me.lensvol.blackconnect.ExecutionResult
 import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
+import me.lensvol.blackconnect.ui.AdditionalInformationDialog
 import me.lensvol.blackconnect.ui.disableContents
 import me.lensvol.blackconnect.ui.enableContents
 import java.awt.Component
@@ -26,9 +34,10 @@ import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import kotlin.concurrent.thread
 
-class LocalDaemonSection(project: Project) : ConfigSection(project) {
-    private val startLocalServerCheckbox = JCheckBox("Start local blackd instance")
+class LocalDaemonSection(val project: Project) : ConfigSection(project) {
+    private val startLocalServerCheckbox = JCheckBox("Start local blackd instance when plugin loads")
     private val remotePortModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val bindOnHostnameText = JTextField("127.0.0.1")
     private val localPortSpinner = JSpinner(remotePortModel)
@@ -43,7 +52,10 @@ class LocalDaemonSection(project: Project) : ConfigSection(project) {
         )
         addBrowseFolderListener(TextBrowseFolderListener(fileChooserDescriptor))
     }
-    private val tryStartupButton = JButton("Try starting up")
+    private val startDaemonButton = JButton("Start", AllIcons.Actions.Execute)
+    private val stopDaemonButton = JButton("Stop", AllIcons.Actions.Suspend)
+
+    private val blackdExecutor = service<BlackdExecutor>()
 
     private val localServerPanel = createLocalServerPanel()
 
@@ -60,7 +72,7 @@ class LocalDaemonSection(project: Project) : ConfigSection(project) {
     private fun createPanel(): JPanel {
         return JPanel().apply {
             layout = GridBagLayout()
-            border = IdeBorderFactory.createTitledBorder("Local blackd instance")
+            border = IdeBorderFactory.createTitledBorder("Local Instance")
             alignmentX = Component.LEFT_ALIGNMENT
 
             val constraints = GridBagConstraints().apply {
@@ -109,7 +121,13 @@ class LocalDaemonSection(project: Project) : ConfigSection(project) {
             )
 
             constraints.gridy = 2
-            add(tryStartupButton, constraints)
+            constraints.gridx = 0
+            constraints.gridwidth = GridBagConstraints.RELATIVE
+            add(startDaemonButton, constraints)
+
+            constraints.gridx = 1
+            constraints.gridwidth = GridBagConstraints.REMAINDER
+            add(stopDaemonButton, constraints)
         }
 
         bindingSettingsPanel.layout = BoxLayout(bindingSettingsPanel, BoxLayout.X_AXIS)
@@ -132,9 +150,7 @@ class LocalDaemonSection(project: Project) : ConfigSection(project) {
             }
 
             fun disableButtonIfNeeded(e: DocumentEvent?) {
-                e?.document?.apply {
-                    tryStartupButton.isEnabled = getText(0, length).isNotEmpty()
-                }
+                updateButtonState()
             }
         })
 
@@ -144,6 +160,40 @@ class LocalDaemonSection(project: Project) : ConfigSection(project) {
             } else {
                 localServerPanel.disableContents()
             }
+            updateButtonState()
+        }
+
+        startDaemonButton.addActionListener {
+            // FIXME: Maybe there is a primitive already for a delayed one-off jobs?
+            thread {
+                val executionResult = blackdExecutor.startDaemon(
+                    blackdExecutableChooser.text,
+                    bindOnHostnameText.text,
+                    localPortSpinner.value as Int
+                )
+
+                if (executionResult is ExecutionResult.Failed) {
+                    invokeLater(modalityState = ModalityState.any()) {
+                        AdditionalInformationDialog(project, executionResult.reason).show()
+                    }
+                }
+
+                updateButtonState()
+            }
+        }
+
+        stopDaemonButton.addActionListener {
+            thread {
+                blackdExecutor.stopDaemon()
+                updateButtonState()
+            }
+        }
+    }
+
+    private fun updateButtonState() {
+        if (startLocalServerCheckbox.isSelected) {
+            startDaemonButton.isEnabled = !blackdExecutor.isRunning() && bindOnHostnameText.text.isNotEmpty()
+            stopDaemonButton.isEnabled = !startDaemonButton.isEnabled
         }
     }
 
@@ -155,6 +205,7 @@ class LocalDaemonSection(project: Project) : ConfigSection(project) {
         if (globalConfig.spawnBlackdOnStartup) {
             startLocalServerCheckbox.doClick()
             startLocalServerCheckbox.isSelected = true
+            updateButtonState()
         }
     }
 
