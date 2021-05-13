@@ -11,6 +11,7 @@ import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
+import com.intellij.util.ui.JBUI
 import me.lensvol.blackconnect.BlackdExecutor
 import me.lensvol.blackconnect.ExecutionResult
 import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
@@ -28,6 +29,7 @@ import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSpinner
 import javax.swing.JTextField
@@ -113,10 +115,26 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
             constraints.gridy = 1
             add(
-                FormBuilder.createFormBuilder()
-                    // FIXME: Do it properly with insets
-                    .addLabeledComponent("Path:      ", blackdExecutableChooser)
-                    .panel,
+                JPanel().apply {
+                    layout = GridBagLayout()
+                    alignmentX = Component.LEFT_ALIGNMENT
+
+                    val c = GridBagConstraints().apply {
+                        anchor = GridBagConstraints.WEST
+                        fill = GridBagConstraints.NONE
+                    }
+
+                    c.gridy = 0
+                    c.gridx = 0
+                    c.insets = JBUI.insets(0, 0, 0, 36)
+                    add(JLabel("Path:"), c)
+
+                    c.gridx = 1
+                    c.weightx = 1.0
+                    c.fill = GridBagConstraints.HORIZONTAL
+                    c.insets = JBUI.emptyInsets()
+                    add(blackdExecutableChooser, c)
+                },
                 constraints
             )
 
