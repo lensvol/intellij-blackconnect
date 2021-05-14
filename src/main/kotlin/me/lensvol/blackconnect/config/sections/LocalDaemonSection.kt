@@ -74,7 +74,8 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private fun createPanel(): JPanel {
         return JPanel().apply {
             layout = GridBagLayout()
-            border = IdeBorderFactory.createTitledBorder("Local Instance")
+            @Suppress("DialogTitleCapitalization")
+            border = IdeBorderFactory.createTitledBorder("Local Instance (shared between projects)")
             alignmentX = Component.LEFT_ALIGNMENT
 
             val constraints = GridBagConstraints().apply {
