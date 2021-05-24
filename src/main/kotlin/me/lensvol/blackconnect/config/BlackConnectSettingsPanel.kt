@@ -18,6 +18,7 @@ import javax.swing.JPanel
 const val PYPROJECT_TOML: String = "pyproject.toml"
 const val DEFAULT_LINE_LENGTH: Int = 88
 const val DEFAULT_BLACKD_PORT: Int = 45484
+const val DEFAULT_BLACKD_HOST: String = "localhost"
 
 class BlackConnectSettingsPanel(project: Project) : JPanel() {
     private val configSections = listOf(

@@ -28,7 +28,7 @@ class BlackConnectGlobalSettings : PersistentStateComponent<BlackConnectGlobalSe
     var bindOnPort: Int = 45484
 
     @Attribute
-    var blackdBinaryPath: String = "/Users/lensvol/.local/bin/blackd"
+    var blackdBinaryPath: String = ""
 
     override fun getState() = this
 

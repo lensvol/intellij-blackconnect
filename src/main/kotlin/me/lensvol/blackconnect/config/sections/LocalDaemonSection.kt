@@ -14,6 +14,7 @@ import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import me.lensvol.blackconnect.BlackdExecutor
 import me.lensvol.blackconnect.ExecutionResult
+import me.lensvol.blackconnect.config.DEFAULT_BLACKD_HOST
 import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
@@ -41,7 +42,7 @@ import kotlin.concurrent.thread
 class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private val startLocalServerCheckbox = JCheckBox("Start local blackd instance when plugin loads")
     private val remotePortModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
-    private val bindOnHostnameText = JTextField("127.0.0.1")
+    private val bindOnHostnameText = JTextField(DEFAULT_BLACKD_HOST)
     private val localPortSpinner = JSpinner(remotePortModel)
     private val blackdExecutableChooser = TextFieldWithBrowseButton().apply {
         val fileChooserDescriptor = FileChooserDescriptor(
