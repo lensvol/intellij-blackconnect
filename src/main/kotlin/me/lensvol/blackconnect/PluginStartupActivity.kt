@@ -1,5 +1,6 @@
 package me.lensvol.blackconnect
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
@@ -31,7 +32,7 @@ class PluginStartupActivity : StartupActivity, DumbAware {
             logger.info("Unknown version of BlackConnect plugin is ready to start.")
         }
 
-        if (globalSettings.spawnBlackdOnStartup) {
+        if (globalSettings.spawnBlackdOnStartup && !ApplicationManager.getApplication().isUnitTestMode) {
             thread {
                 val blackdExecutor = service<BlackdExecutor>()
                 val result = blackdExecutor.startDaemon(
