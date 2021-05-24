@@ -7,6 +7,7 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
 import java.io.BufferedReader
 import java.io.IOException
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 sealed class ExecutionResult {
@@ -47,9 +48,12 @@ class BlackdExecutor : Disposable {
             }
 
         } catch (e: IOException) {
-            return ExecutionResult.Failed(e.message ?: "Unknown error")
+            return ExecutionResult.Failed(e.message ?: "Unknown IO error")
+        } catch (e: ExecutionException) {
+            return ExecutionResult.Failed(e.message ?: "Unknown execution error")
         }
     }
+}
 
     private fun currentPid(): Int {
         blackdProcess?.let {
