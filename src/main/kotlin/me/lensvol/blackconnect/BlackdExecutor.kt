@@ -53,7 +53,6 @@ class BlackdExecutor : Disposable {
             return ExecutionResult.Failed(e.message ?: "Unknown execution error")
         }
     }
-}
 
     private fun currentPid(): Int {
         blackdProcess?.let {
