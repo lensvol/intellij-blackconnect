@@ -11,9 +11,9 @@ import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
 sealed class ExecutionResult {
-    class Failed(val reason: String): ExecutionResult()
-    class AlreadyStarted(val pid: Int): ExecutionResult()
-    class Started(val pid: Int): ExecutionResult()
+    class Failed(val reason: String) : ExecutionResult()
+    class AlreadyStarted(val pid: Int) : ExecutionResult()
+    class Started(val pid: Int) : ExecutionResult()
 }
 
 @Service
@@ -46,7 +46,6 @@ class BlackdExecutor : Disposable {
                 val reason = spawnedProcess.errorStream.bufferedReader().use(BufferedReader::readText)
                 return ExecutionResult.Failed(reason)
             }
-
         } catch (e: IOException) {
             return ExecutionResult.Failed(e.message ?: "Unknown IO error")
         } catch (e: ExecutionException) {

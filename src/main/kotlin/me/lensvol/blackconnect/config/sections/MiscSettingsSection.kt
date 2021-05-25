@@ -34,13 +34,16 @@ class MiscSettingsSection(project: Project) : ConfigSection(project) {
         jupyterSupportCheckbox.isSelected = projectConfig.enableJupyterSupport
         showSyntaxErrorMsgsCheckbox.isSelected = projectConfig.showSyntaxErrorMsgs
     }
-        
+
     override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
         projectConfig.enableJupyterSupport = jupyterSupportCheckbox.isSelected
         projectConfig.showSyntaxErrorMsgs = showSyntaxErrorMsgsCheckbox.isSelected
     }
 
-    override fun isModified(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings): Boolean {
+    override fun isModified(
+        globalConfig: BlackConnectGlobalSettings,
+        projectConfig: BlackConnectProjectSettings
+    ): Boolean {
         return jupyterSupportCheckbox.isSelected != projectConfig.enableJupyterSupport ||
             showSyntaxErrorMsgsCheckbox.isSelected != projectConfig.showSyntaxErrorMsgs
     }

@@ -9,6 +9,8 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
+const val DEFAULT_COLUMN_WIDTH = 120
+
 class AdditionalInformationDialog(project: Project?, additionalInformation: String) : DialogWrapper(project) {
     private val textToDisplay = additionalInformation
 
@@ -27,7 +29,7 @@ class AdditionalInformationDialog(project: Project?, additionalInformation: Stri
 
             val textPane = JTextArea()
             textPane.text = textToDisplay
-            textPane.columns = 120
+            textPane.columns = DEFAULT_COLUMN_WIDTH
             textPane.lineWrap = true
             textPane.isEditable = false
 

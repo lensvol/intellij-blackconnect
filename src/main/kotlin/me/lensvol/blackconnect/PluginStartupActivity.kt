@@ -2,14 +2,11 @@ package me.lensvol.blackconnect
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.startup.StartupActivity
-import me.lensvol.blackconnect.config.BlackConnectConfigurable
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.ui.NotificationManager
 import java.util.Properties

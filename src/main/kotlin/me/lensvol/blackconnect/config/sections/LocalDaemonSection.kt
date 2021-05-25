@@ -3,7 +3,6 @@ package me.lensvol.blackconnect.config.sections
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.invokeLater
-import com.intellij.openapi.application.runInEdt
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
@@ -39,8 +38,12 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import kotlin.concurrent.thread
 
+const val PATH_FIELD_RIGHT_INSET = 36
+const val SERVER_SETTINGS_DELIMETER_WIDTH = 6
+
 class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private val startLocalServerCheckbox = JCheckBox("Start local blackd instance when plugin loads")
+    @Suppress("MagicNumber")
     private val remotePortModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val bindOnHostnameText = JTextField(DEFAULT_BLACKD_HOST)
     private val localPortSpinner = JSpinner(remotePortModel)
@@ -97,7 +100,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private fun createLocalServerPanel(): JPanel {
         val bindingSettingsPanel = FormBuilder.createFormBuilder()
             .addLabeledComponent("Bind on:    ", bindOnHostnameText)
-            .addComponent(Box.createRigidArea(Dimension(6, 0)) as JComponent)
+            .addComponent(Box.createRigidArea(Dimension(SERVER_SETTINGS_DELIMETER_WIDTH, 0)) as JComponent)
             .addLabeledComponent("Port:", localPortSpinner)
             .panel
 
@@ -128,7 +131,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
                     c.gridy = 0
                     c.gridx = 0
-                    c.insets = JBUI.insets(0, 0, 0, 36)
+                    c.insets = JBUI.insets(0, 0, 0, PATH_FIELD_RIGHT_INSET)
                     add(JLabel("Path:"), c)
 
                     c.gridx = 1
@@ -175,7 +178,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         })
 
         startLocalServerCheckbox.addItemListener {
-            if(startLocalServerCheckbox.isSelected) {
+            if (startLocalServerCheckbox.isSelected) {
                 localServerPanel.enableContents()
             } else {
                 localServerPanel.disableContents()
@@ -184,7 +187,6 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         }
 
         startDaemonButton.addActionListener {
-            // FIXME: Maybe there is a primitive already for a delayed one-off jobs?
             thread {
                 val executionResult = blackdExecutor.startDaemon(
                     blackdExecutableChooser.text,

@@ -7,6 +7,7 @@ import com.intellij.openapi.components.StoragePathMacros
 import com.intellij.openapi.components.service
 import com.intellij.util.xmlb.XmlSerializerUtil
 import com.intellij.util.xmlb.annotations.Attribute
+import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
 
 @State(name = "BlackConnectGlobalSettings", storages = [Storage(StoragePathMacros.NON_ROAMABLE_FILE)])
 class BlackConnectGlobalSettings : PersistentStateComponent<BlackConnectGlobalSettings> {
@@ -25,7 +26,7 @@ class BlackConnectGlobalSettings : PersistentStateComponent<BlackConnectGlobalSe
     var bindOnHostname: String = "localhost"
 
     @Attribute
-    var bindOnPort: Int = 45484
+    var bindOnPort: Int = DEFAULT_BLACKD_PORT
 
     @Attribute
     var blackdBinaryPath: String = ""
