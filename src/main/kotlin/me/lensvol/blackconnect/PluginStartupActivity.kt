@@ -29,7 +29,10 @@ class PluginStartupActivity : StartupActivity, DumbAware {
             logger.info("Unknown version of BlackConnect plugin is ready to start.")
         }
 
-        if (globalSettings.spawnBlackdOnStartup && !ApplicationManager.getApplication().isUnitTestMode) {
+        if (ApplicationManager.getApplication().isUnitTestMode) return;
+
+        //
+        if (globalSettings.spawnBlackdOnStartup && globalSettings.blackdBinaryPath.isNotEmpty()) {
             thread {
                 val blackdExecutor = service<BlackdExecutor>()
                 val result = blackdExecutor.startDaemon(

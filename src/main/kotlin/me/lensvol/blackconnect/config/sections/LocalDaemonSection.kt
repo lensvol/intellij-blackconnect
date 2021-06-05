@@ -1,11 +1,13 @@
 package me.lensvol.blackconnect.config.sections
 
+import com.intellij.execution.configurations.PathEnvironmentVariableUtil
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.ui.IdeBorderFactory
@@ -60,6 +62,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     }
     private val startDaemonButton = JButton("Start", AllIcons.Actions.Execute)
     private val stopDaemonButton = JButton("Stop", AllIcons.Actions.Suspend)
+    private val detectBinaryButton = JButton("Detect")
 
     private val blackdExecutor = service<BlackdExecutor>()
 
@@ -139,6 +142,12 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                     c.fill = GridBagConstraints.HORIZONTAL
                     c.insets = JBUI.emptyInsets()
                     add(blackdExecutableChooser, c)
+
+                    c.gridx = 2
+                    c.weightx = 0.1
+                    c.fill = GridBagConstraints.HORIZONTAL
+                    c.insets = JBUI.emptyInsets()
+                    add(detectBinaryButton, c)
                 },
                 constraints
             )
@@ -210,6 +219,16 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                 updateButtonState()
             }
         }
+
+        detectBinaryButton.addActionListener {
+            // TODO: Handle case when multiple blackd executables are in PATH
+            val blackdInPath = PathEnvironmentVariableUtil.findInPath("blackd");
+            if (blackdInPath != null) {
+                blackdExecutableChooser.text = blackdInPath.absolutePath
+            } else {
+                Messages.showErrorDialog("No <b>blackd</b> executables were found in PATH.", "Nothing Found")
+            }
+        }
     }
 
     private fun updateButtonState() {
@@ -235,7 +254,10 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         globalConfig.spawnBlackdOnStartup = startLocalServerCheckbox.isSelected
         globalConfig.bindOnHostname = bindOnHostnameText.text.ifBlank { "localhost" }
         globalConfig.bindOnPort = localPortSpinner.value as Int
-        globalConfig.blackdBinaryPath = blackdExecutableChooser.text
+
+        if (globalConfig.blackdBinaryPath.isNotEmpty()) {
+            globalConfig.blackdBinaryPath = blackdExecutableChooser.text
+        }
     }
 
     override fun isModified(
