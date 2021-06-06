@@ -3,6 +3,7 @@ package me.lensvol.blackconnect.config.sections
 import com.intellij.openapi.project.Project
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import javax.swing.JCheckBox
@@ -29,18 +30,21 @@ class MiscSettingsSection(project: Project) : ConfigSection(project) {
         }
     }
 
-    override fun loadFrom(configuration: BlackConnectProjectSettings) {
-        jupyterSupportCheckbox.isSelected = configuration.enableJupyterSupport
-        showSyntaxErrorMsgsCheckbox.isSelected = configuration.showSyntaxErrorMsgs
+    override fun loadFrom(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        jupyterSupportCheckbox.isSelected = projectConfig.enableJupyterSupport
+        showSyntaxErrorMsgsCheckbox.isSelected = projectConfig.showSyntaxErrorMsgs
     }
 
-    override fun saveTo(configuration: BlackConnectProjectSettings) {
-        configuration.enableJupyterSupport = jupyterSupportCheckbox.isSelected
-        configuration.showSyntaxErrorMsgs = showSyntaxErrorMsgsCheckbox.isSelected
+    override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        projectConfig.enableJupyterSupport = jupyterSupportCheckbox.isSelected
+        projectConfig.showSyntaxErrorMsgs = showSyntaxErrorMsgsCheckbox.isSelected
     }
 
-    override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
-        return jupyterSupportCheckbox.isSelected != configuration.enableJupyterSupport ||
-            showSyntaxErrorMsgsCheckbox.isSelected != configuration.showSyntaxErrorMsgs
+    override fun isModified(
+        globalConfig: BlackConnectGlobalSettings,
+        projectConfig: BlackConnectProjectSettings
+    ): Boolean {
+        return jupyterSupportCheckbox.isSelected != projectConfig.enableJupyterSupport ||
+            showSyntaxErrorMsgsCheckbox.isSelected != projectConfig.showSyntaxErrorMsgs
     }
 }

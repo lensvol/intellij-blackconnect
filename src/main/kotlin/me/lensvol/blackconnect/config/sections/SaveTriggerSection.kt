@@ -3,6 +3,7 @@ package me.lensvol.blackconnect.config.sections
 import com.intellij.openapi.project.Project
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import java.awt.BorderLayout
 import javax.swing.JCheckBox
@@ -24,18 +25,21 @@ class SaveTriggerSection(project: Project) : ConfigSection(project) {
         }
     }
 
-    override fun loadFrom(configuration: BlackConnectProjectSettings) {
-        triggerOnEachSave.isSelected = configuration.triggerOnEachSave
-        triggerOnReformat.isSelected = configuration.triggerOnReformat
+    override fun loadFrom(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        triggerOnEachSave.isSelected = projectConfig.triggerOnEachSave
+        triggerOnReformat.isSelected = projectConfig.triggerOnReformat
     }
 
-    override fun saveTo(configuration: BlackConnectProjectSettings) {
-        configuration.triggerOnEachSave = triggerOnEachSave.isSelected
-        configuration.triggerOnReformat = triggerOnReformat.isSelected
+    override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        projectConfig.triggerOnEachSave = triggerOnEachSave.isSelected
+        projectConfig.triggerOnReformat = triggerOnReformat.isSelected
     }
 
-    override fun isModified(configuration: BlackConnectProjectSettings): Boolean {
-        return configuration.triggerOnEachSave != triggerOnEachSave.isSelected ||
-            configuration.triggerOnReformat != triggerOnReformat.isSelected
+    override fun isModified(
+        globalConfig: BlackConnectGlobalSettings,
+        projectConfig: BlackConnectProjectSettings
+    ): Boolean {
+        return projectConfig.triggerOnEachSave != triggerOnEachSave.isSelected ||
+            projectConfig.triggerOnReformat != triggerOnReformat.isSelected
     }
 }

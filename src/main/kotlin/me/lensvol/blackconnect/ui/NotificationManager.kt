@@ -18,6 +18,13 @@ open class NotificationManager(project: Project) {
     private val currentProject = project
     private val shownErrorNotifications = ConcurrentHashMap<Notification, String>()
 
+    open fun showInfo(text: String) {
+        Notification(MAIN_DISPLAY_ID, null, NotificationType.INFORMATION)
+            .setTitle("BlackConnect")
+            .setContent(text)
+            .notify(currentProject)
+    }
+
     open fun showError(text: String, additionalInfo: String? = null, viewPromptText: String = "View") {
         for ((shown_notification, error_text) in shownErrorNotifications.iterator()) {
             if (error_text == text) {

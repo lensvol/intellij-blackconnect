@@ -2,6 +2,7 @@ package me.lensvol.blackconnect.config
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.project.Project
+import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import javax.swing.JComponent
 
@@ -10,11 +11,12 @@ class BlackConnectConfigurable(project: Project) : Configurable {
         BlackConnectSettingsPanel(project)
     }
 
-    private val configuration: BlackConnectProjectSettings =
-        BlackConnectProjectSettings.getInstance(project)
+    private val projectConfig: BlackConnectProjectSettings = BlackConnectProjectSettings.getInstance(project)
+
+    private val globalConfig: BlackConnectGlobalSettings = BlackConnectGlobalSettings.getInstance()
 
     override fun isModified(): Boolean {
-        return panel.isModified(configuration)
+        return panel.isModified(globalConfig, projectConfig)
     }
 
     override fun getDisplayName(): String {
@@ -22,15 +24,15 @@ class BlackConnectConfigurable(project: Project) : Configurable {
     }
 
     override fun apply() {
-        panel.apply(configuration)
+        panel.apply(globalConfig, projectConfig)
     }
 
     override fun reset() {
-        panel.load(configuration)
+        panel.load(globalConfig, projectConfig)
     }
 
     override fun createComponent(): JComponent? {
-        panel.load(configuration)
+        panel.load(globalConfig, projectConfig)
         return panel
     }
 }
