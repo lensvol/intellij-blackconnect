@@ -43,9 +43,9 @@ import kotlin.concurrent.thread
 const val PATH_FIELD_RIGHT_INSET = 36
 const val SERVER_SETTINGS_DELIMETER_WIDTH = 6
 
+@Suppress("MagicNumber")
 class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private val startLocalServerCheckbox = JCheckBox("Start local blackd instance when plugin loads")
-    @Suppress("MagicNumber")
     private val remotePortModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
     private val bindOnHostnameText = JTextField(DEFAULT_BLACKD_HOST)
     private val localPortSpinner = JSpinner(remotePortModel)
@@ -222,7 +222,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
         detectBinaryButton.addActionListener {
             // TODO: Handle case when multiple blackd executables are in PATH
-            val blackdInPath = PathEnvironmentVariableUtil.findInPath("blackd");
+            val blackdInPath = PathEnvironmentVariableUtil.findInPath("blackd")
             if (blackdInPath != null) {
                 blackdExecutableChooser.text = blackdInPath.absolutePath
             } else {
