@@ -6,10 +6,13 @@ import com.intellij.openapi.application.ModalityState
 import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
+import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
@@ -20,12 +23,15 @@ import me.lensvol.blackconnect.config.DEFAULT_BLACKD_PORT
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.AdditionalInformationDialog
+import me.lensvol.blackconnect.ui.BlackdExecutableVariant
+import me.lensvol.blackconnect.ui.ExecutableVariantsDialog
 import me.lensvol.blackconnect.ui.disableContents
 import me.lensvol.blackconnect.ui.enableContents
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.GridBagConstraints
 import java.awt.GridBagLayout
+import java.io.File
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JButton
@@ -221,12 +227,57 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         }
 
         detectBinaryButton.addActionListener {
-            // TODO: Handle case when multiple blackd executables are in PATH
-            val blackdInPath = PathEnvironmentVariableUtil.findInPath("blackd")
-            if (blackdInPath != null) {
-                blackdExecutableChooser.text = blackdInPath.absolutePath
-            } else {
-                Messages.showErrorDialog("No <b>blackd</b> executables were found in PATH.", "Nothing Found")
+            val variants = mutableListOf<BlackdExecutableVariant>()
+            val blackdInPath = PathEnvironmentVariableUtil.findExecutableInPathOnAnyOS("blackd")
+            blackdInPath?.let {
+                variants.add(BlackdExecutableVariant("PATH", it.absolutePath))
+            }
+
+            for (module in ModuleManager.getInstance(project).modules) {
+                val sdk = ModuleRootManager.getInstance(module).sdk ?: continue
+                // TODO: Do it in a less fragile way
+                if(sdk.sdkType.name != "Python SDK" || sdk.homePath == null) {
+                    continue
+                }
+
+                val homePath = sdk.homePath ?: continue
+
+                val parts = FileUtil.splitPath(File(homePath).path)
+                if (parts.last() != "python" && parts.last() != "python3") {
+                    continue
+                }
+                parts.removeLast()
+                parts.add("blackd")
+                val pathToBlackd = FileUtil.join(*parts.map { it }.toTypedArray())
+
+                if(!FileUtil.exists(pathToBlackd)) {
+                    continue
+                }
+
+                variants.add(BlackdExecutableVariant(module.name, pathToBlackd))
+            }
+
+            when (variants.size) {
+                0 -> {
+                    Messages.showErrorDialog(
+                        "No <b>blackd</b> executables were found in PATH or virtualenvs.",
+                        "Nothing Found",
+                    )
+                }
+                1 -> {
+                    variants[0].path
+                }
+                else -> {
+                    invokeLater(modalityState = ModalityState.defaultModalityState()) {
+                        val executableChooserDialog = ExecutableVariantsDialog(
+                            project,
+                            variants
+                        ) {
+                            blackdExecutableChooser.text = it.path
+                        }
+                        executableChooserDialog.show()
+                    }
+                }
             }
         }
     }

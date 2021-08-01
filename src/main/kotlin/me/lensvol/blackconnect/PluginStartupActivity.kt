@@ -61,10 +61,10 @@ class PluginStartupActivity : StartupActivity, DumbAware {
         }
 
         // If uncommented, it will show settings for the plugin immediately upon startup.
-        // if (!ApplicationManager.getApplication().isUnitTestMode) {
-        //     invokeLater {
-        //         ShowSettingsUtil.getInstance().editConfigurable(project, BlackConnectConfigurable(project))
-        //     }
-        // }
+        if (!ApplicationManager.getApplication().isUnitTestMode) {
+            invokeLater {
+                ShowSettingsUtil.getInstance().editConfigurable(project, BlackConnectConfigurable(project))
+            }
+        }
     }
 }

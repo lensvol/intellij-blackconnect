@@ -43,6 +43,7 @@
     <idea-version since-build="201.8743.11"/>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="tools"
@@ -57,8 +58,6 @@
         <projectService serviceImplementation="me.lensvol.blackconnect.DocumentUtil"/>
         <actionPromoter implementation="me.lensvol.blackconnect.actions.BeforeCloseTabActionPromoter"/>
     </extensions>
-
-    <depends>com.intellij.modules.lang</depends>
 
     <actions>
         <group id="me.lensvol.blackconnect.groups.MainGroup" text="BlackConnect" popup="true" icon="/icons/blackconnect.svg">
