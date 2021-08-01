@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.7.2'
+    id 'org.jetbrains.intellij' version '1.0'
     id 'org.jetbrains.kotlin.jvm' version '1.4.21-2'
     id 'jacoco'
 
@@ -34,10 +34,10 @@ dependencies {
 }
 
 intellij {
-    version ideaVersion
-    updateSinceUntilBuild false
-    pluginName 'intellij-blackconnect'
-    plugins = ['python-ce']
+    version.set(ideaVersion)
+    updateSinceUntilBuild.set(false)
+    pluginName.set('intellij-blackconnect')
+    plugins.set(['PythonCore:211.6693.119'])
 }
 
 compileKotlin {
@@ -49,8 +49,8 @@ compileTestKotlin {
 }
 
 patchPluginXml {
-    version project.version
-    changeNotes """
+    version.set(project.version)
+    changeNotes.set("""
       <p>(UNRELEASED)</p>
       <ul>
         <li>Added "Trigger on Code Reformat" option</li>
@@ -96,7 +96,7 @@ patchPluginXml {
         <li>Fix rare crash when closing tab with window handle set to <i>null</i>.</li>
         <li>Notification balloons no longer show up in "Event log".</li>
       </ul>
-      """
+      """)
 }
 
 processResources {
@@ -108,7 +108,7 @@ processResources {
 }
 
 publishPlugin {
-    token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
+    token.set(System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken"))
 }
 
 jacocoTestReport {
@@ -132,4 +132,4 @@ detekt {
 }
 
 tasks.detekt.jvmTarget = "1.8"
-tasks.runPluginVerifier.ideVersions = "2020.1.4, 2020.2.3, 2020.3"
+tasks.runPluginVerifier.ideVersions.set(["2020.1.4", "2020.2.3", "2020.3"])
