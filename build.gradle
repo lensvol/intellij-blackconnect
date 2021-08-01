@@ -37,7 +37,7 @@ intellij {
     version.set(ideaVersion)
     updateSinceUntilBuild.set(false)
     pluginName.set('intellij-blackconnect')
-    plugins.set(['PythonCore:211.6693.119'])
+    plugins.set(['PythonCore'])
 }
 
 compileKotlin {
