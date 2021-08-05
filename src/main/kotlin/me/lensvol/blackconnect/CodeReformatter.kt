@@ -37,8 +37,7 @@ open class CodeReformatter(project: Project) {
         }
 
         return currentConfig.enableJupyterSupport &&
-            file.fileType !is UnknownFileType &&
-            (file.fileType as LanguageFileType).language.id == "Jupyter"
+            (file.fileType as? LanguageFileType)?.language?.id == "Jupyter"
     }
 
     open fun process(tag: String, sourceCode: String, isPyi: Boolean, receiver: (BlackdResponse) -> Unit) {
