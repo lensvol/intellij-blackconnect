@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'me.lensvol'
-version '0.4.4'
+version '0.4.5'
 
 repositories {
     jcenter()
@@ -47,14 +47,17 @@ compileTestKotlin {
 patchPluginXml {
     version project.version
     changeNotes """
-      <p>(UNRELEASED)</p>
+      <p>0.4.5</p>
       <ul>
-        <li>Added "Trigger on Code Reformat" option</li>
+        <li>Support new '--skip-magic-trailing-comma' option.</li>
+        <li>Support Python 3.9 as target version.</li>
+        <li>Added "Trigger on Code Reformat" option (kudos to <a href="https://github.com/vlasovskikh">Andrey Vlasovskikh</a>).</li>
+        <li>Fix rare crash when saving non-Python files with Jupyter support enabled (kudos to <a href=" 
+https://github.com/elliotwaite">Elliot Waite</a>).</li>
         <li>Fix for rare crash when updating document during Undo/Redo operation.</li>
       </ul>
 
       <p>0.4.4</p>
-      <br>
       <br>
       <p>This release is dedicated to the memory of our cat <b>Luna</b>, who passed away due to cancer last year.</p><br> 
       <p>She was kind, smart and loyal. Best cat in the world.</p><br>
@@ -62,7 +65,7 @@ patchPluginXml {
       <br>
       <ul>
         <li>Add button to copy line length settings from the IDE ("right margin").</li>
-        <li>Support for connecting to blackd over SSL (kudos to studioj)</li>
+        <li>Support for connecting to blackd over SSL (kudos to <a href="https://github.com/studioj">studioj</a>)</li>
         <li>Make server error notifications more descriptive.</li>
         <li>Miscellaneous fixes and improvements.</li>
       </ul>
