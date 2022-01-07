@@ -6,7 +6,8 @@
 
     <description>
         <![CDATA[
-    <p>Connect to <b><a href="https://black.readthedocs.io/en/stable/blackd.html">blackd</a></b> and format your Python
+    <p>Connect to <b><a href="https://black.readthedocs.io/en/stable/usage_and_configuration/black_as_a_server.html">
+    blackd</a></b> and format your Python
     code without creating a new <b>black</b> process!</p>
     <br>
     <p>Avoid overhead of starting a new <b>black</b> process on each file save by making a quick
