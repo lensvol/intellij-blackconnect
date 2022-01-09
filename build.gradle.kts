@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.lensvol"
-version = "0.4.5"
+version = "0.4.6"
 
 repositories {
   jcenter()
@@ -49,6 +49,14 @@ tasks.compileTestKotlin {
 tasks.patchPluginXml {
   version(project.version)
   changeNotes("""
+      <p>0.4.6</p>
+      <p>A small release to tide you over till bigger features ship.</p>
+      <ul>
+        <li>Support 3.10 as a target version. (kudos to <a href="https://github.com/lxop">Alex Opie
+</a>)</li>
+        <li>Fix broken link to <b>blackd</b> documentation in plugin description.</li>
+      </ul>
+
       <p>0.4.5</p>
       <ul>
         <li>Support new '--skip-magic-trailing-comma' option.</li>
