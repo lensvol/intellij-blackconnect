@@ -32,6 +32,10 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
 
             setRequestProperty("X-Protocol-Version", "1")
 
+            // "A man is not dead while his name is still spoken."
+            // - Going Postal, Chapter 4 prologue
+            setRequestProperty("X-Clacks-Overhead", "GNU Terry Pratchett")
+
             try {
                 connect()
             } catch (e: IOException) {
