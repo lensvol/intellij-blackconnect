@@ -61,7 +61,7 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
             is SocketTimeoutException -> "Read timed out."
             else -> "Something went wrong."
         }
-        return (e.message ?: defaultMessage).capitalize()
+        return (e.message ?: defaultMessage).replaceFirstChar { c -> c.uppercaseChar() }
     }
 
     fun reformat(
