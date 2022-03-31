@@ -1,54 +1,46 @@
 plugins {
-  id("org.jetbrains.intellij") version "0.7.2"
-  id("org.jetbrains.kotlin.jvm") version "1.4.21-2"
-  id("jacoco")
+    id("org.jetbrains.intellij") version "1.5.1"
+    id("org.jetbrains.kotlin.jvm") version "1.6.0"
+    id("jacoco")
 
-  id("io.gitlab.arturbosch.detekt") version "1.15.0"
+    id("io.gitlab.arturbosch.detekt") version "1.15.0"
 }
 
 group = "me.lensvol"
 version = "0.4.6"
 
 repositories {
-  jcenter()
-  mavenCentral()
+    jcenter()
+    mavenCentral()
 }
 
 apply(plugin = "io.gitlab.arturbosch.detekt")
 dependencies {
-  implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-  implementation("com.moandjiezana.toml:toml4j:0.7.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    implementation("com.moandjiezana.toml:toml4j:0.7.2")
 
-  testImplementation("org.mock-server:mockserver-netty:5.3.0") {
-    exclude(group = "ch.qos.logback")
-  }
+    testImplementation("org.mock-server:mockserver-netty:5.3.0") {
+        exclude(group = "ch.qos.logback")
+    }
 
-  implementation("io.sentry:sentry:1.7.30") {
-    exclude(group = "org.slf4j")
-  }
+    implementation("io.sentry:sentry:1.7.30") {
+        exclude(group = "org.slf4j")
+    }
 
-  detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
 
 intellij {
-  val ideaVersion: String by project
-  version = ideaVersion
-  updateSinceUntilBuild = false
-  pluginName = "intellij-blackconnect"
-  setPlugins("python-ce")
-}
-
-tasks.compileKotlin {
-  kotlinOptions.jvmTarget = "1.8"
-}
-
-tasks.compileTestKotlin {
-  kotlinOptions.jvmTarget = "1.8"
+    val ideaVersion: String by project
+    version.set(ideaVersion)
+    updateSinceUntilBuild.set(false)
+    pluginName.set("intellij-blackconnect")
+    plugins.set(listOf("python-ce"))
 }
 
 tasks.patchPluginXml {
-  version(project.version)
-  changeNotes("""
+    changeNotes.set(
+        """
       <p>0.4.6</p>
       <p>A small release to tide you over till bigger features ship.</p>
       <ul>
@@ -105,49 +97,65 @@ https://github.com/elliotwaite">Elliot Waite</a>).</li>
         <li>Fix rare crash when closing tab with window handle set to <i>null</i>.</li>
         <li>Notification balloons no longer show up in "Event log".</li>
       </ul>
-      """)
+      """
+    )
 }
 
 tasks.processResources {
-  val properties = mapOf("version" to project.version)
-  inputs.properties(properties)
-  filesMatching("*/version.properties") {
-    expand(properties)
-  }
+    // We need bogus second entry due to https://github.com/gradle/gradle/issues/14733 *facepalm*
+    val properties = mapOf("version" to project.version, "hello" to "world")
+    inputs.properties(properties)
+    filesMatching("**/version.properties") {
+        expand(properties)
+    }
 }
 
 tasks.publishPlugin {
-  token(System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken"))
+    token.set(System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken"))
 }
 
 tasks.jacocoTestReport {
-  reports {
-    xml.isEnabled = true // coveralls plugin depends on xml format report
-    html.isEnabled = true
-  }
+    reports {
+        xml.isEnabled = true // coveralls plugin depends on xml format report
+        html.isEnabled = true
+    }
 }
 
 detekt {
-  config = files("./detekt-config.yml")
-  buildUponDefaultConfig = true // preconfigure defaults
-  baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
+    config = files("./detekt-config.yml")
+    buildUponDefaultConfig = true // preconfigure defaults
+    baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
 
-  reports {
-    html.enabled = false // observe findings in your browser with structure and code snippets
-    xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
-    txt.enabled = false // similar to the console output, contains issue signature to manually edit baseline files
-    sarif.enabled = false // SARIF integration (https://sarifweb.azurewebsites.net/) for integrations with Github
-  }
+    reports {
+        html.enabled = false // observe findings in your browser with structure and code snippets
+        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
+        txt.enabled = false // similar to the console output, contains issue signature to manually edit baseline files
+        sarif.enabled = false // SARIF integration (https://sarifweb.azurewebsites.net/) for integrations with Github
+    }
 }
 
 tasks.detekt {
-  jvmTarget = "1.8"
+    jvmTarget = "11"
+}
+
+tasks.compileKotlin {
+    kotlinOptions.jvmTarget = "11"
+}
+
+tasks.compileTestKotlin {
+    kotlinOptions.jvmTarget = "11"
 }
 
 tasks.runPluginVerifier {
-  ideVersions("2020.1.4, 2020.2.3, 2020.3")
+    ideVersions.set(listOf("2020.1.4", "2020.2.3", "2020.3"))
 }
 
 tasks.test {
-  systemProperty("idea.force.use.core.classloader", "true")
+    systemProperty("idea.force.use.core.classloader", "true")
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
