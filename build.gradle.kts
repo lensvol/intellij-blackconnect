@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.lensvol"
-version = "0.4.6"
+version = "0.4.7"
 
 repositories {
     jcenter()
