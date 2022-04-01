@@ -226,6 +226,11 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
             }
         }
 
+        installDetectBinaryHandler()
+    }
+
+    @Suppress("ComplexMethod")
+    private fun installDetectBinaryHandler() {
         detectBinaryButton.addActionListener {
             val variants = mutableListOf<BlackdExecutableVariant>()
             val blackdInPath = PathEnvironmentVariableUtil.findExecutableInPathOnAnyOS("blackd")
@@ -233,10 +238,12 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                 variants.add(BlackdExecutableVariant("PATH", it.absolutePath))
             }
 
+            @Suppress("LoopWithTooManyJumpStatements")
             for (module in ModuleManager.getInstance(project).modules) {
                 val sdk = ModuleRootManager.getInstance(module).sdk ?: continue
-                // TODO: Do it in a less fragile way
-                if(sdk.sdkType.name != "Python SDK" || sdk.homePath == null) {
+
+                // We need to do it in a less fragile way...
+                if (sdk.sdkType.name != "Python SDK" || sdk.homePath == null) {
                     continue
                 }
 
@@ -246,11 +253,13 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                 if (parts.last() != "python" && parts.last() != "python3") {
                     continue
                 }
+
                 parts.removeLast()
                 parts.add("blackd")
+                @Suppress("SpreadOperator")
                 val pathToBlackd = FileUtil.join(*parts.map { it }.toTypedArray())
 
-                if(!FileUtil.exists(pathToBlackd)) {
+                if (!FileUtil.exists(pathToBlackd)) {
                     continue
                 }
 
