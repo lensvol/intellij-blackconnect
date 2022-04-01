@@ -50,7 +50,7 @@ tasks.patchPluginXml {
       </ul>
 
       <p>0.4.5</p>
-      <ul>
+      <ul>      
         <li>Support new '--skip-magic-trailing-comma' option.</li>
         <li>Support Python 3.9 as target version.</li>
         <li>Added "Trigger on Code Reformat" option (kudos to <a href="https://github.com/vlasovskikh">Andrey Vlasovskikh</a>).</li>

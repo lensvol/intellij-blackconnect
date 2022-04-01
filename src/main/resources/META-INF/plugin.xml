@@ -44,12 +44,14 @@
     <idea-version since-build="201.8743.11"/>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="tools"
                              id="me.lensvol.blackconnect.settings"
                              provider="me.lensvol.blackconnect.config.BlackConnectConfigurableProvider"/>
         <applicationService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectGlobalSettings"/>
+        <applicationService serviceImplementation="me.lensvol.blackconnect.BlackdExecutor"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectProjectSettings"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.BlackConnectProgressTracker"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.ui.NotificationManager"/>
@@ -57,8 +59,6 @@
         <projectService serviceImplementation="me.lensvol.blackconnect.DocumentUtil"/>
         <actionPromoter implementation="me.lensvol.blackconnect.actions.BeforeCloseTabActionPromoter"/>
     </extensions>
-
-    <depends>com.intellij.modules.lang</depends>
 
     <actions>
         <group id="me.lensvol.blackconnect.groups.MainGroup" text="BlackConnect" popup="true" icon="/icons/blackconnect.svg">

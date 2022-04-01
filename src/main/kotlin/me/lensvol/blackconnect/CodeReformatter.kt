@@ -26,7 +26,7 @@ data class FragmentFormatting(
 open class CodeReformatter(project: Project) {
     private val currentProject: Project = project
     private val currentConfig = BlackConnectProjectSettings.getInstance(project)
-    private val notificationService: NotificationManager = project.service<NotificationManager>()
+    private val notificationService: NotificationManager = project.service()
 
     private val logger = Logger.getInstance(CodeReformatter::class.java.name)
 
