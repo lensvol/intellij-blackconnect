@@ -274,7 +274,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                     )
                 }
                 1 -> {
-                    variants[0].path
+                    blackdExecutableChooser.text = variants[0].path
                 }
                 else -> {
                     invokeLater(modalityState = ModalityState.defaultModalityState()) {
