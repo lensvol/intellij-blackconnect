@@ -19,9 +19,8 @@ open class NotificationManager(project: Project) {
     private val shownErrorNotifications = ConcurrentHashMap<Notification, String>()
 
     open fun showInfo(text: String) {
-        Notification(MAIN_DISPLAY_ID, null, NotificationType.INFORMATION)
+        Notification(MAIN_DISPLAY_ID, text, NotificationType.INFORMATION)
             .setTitle("BlackConnect")
-            .setContent(text)
             .notify(currentProject)
     }
 

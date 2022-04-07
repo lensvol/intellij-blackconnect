@@ -187,6 +187,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                 disableButtonIfNeeded(e)
             }
 
+            @Suppress("UNUSED_PARAMETER")
             fun disableButtonIfNeeded(e: DocumentEvent?) {
                 updateButtonState()
             }

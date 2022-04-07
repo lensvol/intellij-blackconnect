@@ -28,7 +28,7 @@ class BeforeTabClosedAction : AnAction(), DumbAware {
         vFile?.let { file ->
             projectService.cancelOperationOnTag(file.path)
             fileMgr.currentWindow?.let { window ->
-                if (window.findFileComposite(vFile) != null) {
+                if (window.getComposite(vFile) != null) {
                     fileMgr.closeFile(vFile, window)
                 }
             }
