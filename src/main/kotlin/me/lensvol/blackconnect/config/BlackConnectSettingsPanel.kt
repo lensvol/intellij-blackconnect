@@ -61,6 +61,10 @@ class BlackConnectSettingsPanel(project: Project) : JPanel() {
     }
 
     fun apply(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
+        // We are doing this in two passes to prevent partial save of the incorrect configuration
+        configSections.map {
+            it.validate()
+        }
         configSections.map {
             it.saveTo(globalConfig, projectConfig)
         }

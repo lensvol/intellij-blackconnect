@@ -17,4 +17,6 @@ abstract class ConfigSection(project: Project) {
         globalConfig: BlackConnectGlobalSettings,
         projectConfig: BlackConnectProjectSettings
     ): Boolean
+
+    open fun validate() {}
 }
