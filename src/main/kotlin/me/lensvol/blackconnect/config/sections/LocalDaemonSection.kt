@@ -7,6 +7,7 @@ import com.intellij.openapi.application.invokeLater
 import com.intellij.openapi.components.service
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.module.ModuleManager
+import com.intellij.openapi.options.ConfigurationException
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.roots.ModuleRootManager
 import com.intellij.openapi.ui.Messages
@@ -329,5 +330,11 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
             bindOnHostnameText.text != globalConfig.bindOnHostname ||
             blackdExecutableChooser.text != globalConfig.blackdBinaryPath ||
             startLocalServerCheckbox.isSelected != globalConfig.spawnBlackdOnStartup
+    }
+
+    override fun validate() {
+        if (startLocalServerCheckbox.isSelected && blackdExecutableChooser.text.isEmpty()) {
+            throw ConfigurationException("No path provided for a local blackd binary.")
+        }
     }
 }
