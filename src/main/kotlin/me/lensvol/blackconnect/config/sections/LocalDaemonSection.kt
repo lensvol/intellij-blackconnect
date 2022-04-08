@@ -295,8 +295,14 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
     private fun updateButtonState() {
         if (startLocalServerCheckbox.isSelected) {
-            startDaemonButton.isEnabled = !blackdExecutor.isRunning() && bindOnHostnameText.text.isNotEmpty()
-            stopDaemonButton.isEnabled = !startDaemonButton.isEnabled
+            if (blackdExecutableChooser.text.isNotEmpty()) {
+                startDaemonButton.isEnabled = !blackdExecutor.isRunning()
+                    && bindOnHostnameText.text.isNotEmpty()
+                stopDaemonButton.isEnabled = !startDaemonButton.isEnabled
+            } else {
+                startDaemonButton.isEnabled = false
+                stopDaemonButton.isEnabled = false
+            }
         }
     }
 
