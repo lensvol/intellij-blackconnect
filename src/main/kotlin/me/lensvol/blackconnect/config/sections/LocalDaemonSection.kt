@@ -317,7 +317,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         globalConfig.bindOnHostname = bindOnHostnameText.text.ifBlank { "localhost" }
         globalConfig.bindOnPort = localPortSpinner.value as Int
 
-        if (globalConfig.blackdBinaryPath.isNotEmpty()) {
+        if (blackdExecutableChooser.text.isNotEmpty()) {
             globalConfig.blackdBinaryPath = blackdExecutableChooser.text
         }
     }
