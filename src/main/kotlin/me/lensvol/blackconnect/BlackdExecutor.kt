@@ -10,10 +10,12 @@ import java.io.IOException
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.TimeUnit
 
+data class CurrentlyRunning(val path: String, val binding: String, val pid: Int)
+
 sealed class ExecutionResult {
     class Failed(val reason: String) : ExecutionResult()
-    class AlreadyStarted(val pid: Int) : ExecutionResult()
-    class Started(val pid: Int) : ExecutionResult()
+    class AlreadyStarted(val instance: CurrentlyRunning) : ExecutionResult()
+    class Started(val instance: CurrentlyRunning) : ExecutionResult()
 }
 
 @Service
@@ -21,10 +23,14 @@ class BlackdExecutor : Disposable {
     private val logger = Logger.getInstance(BlackdExecutor::class.java.name)
     private val processBuilder: ProcessBuilder = ProcessBuilder()
     private var blackdProcess: Process? = null
+    private var runningInstance: CurrentlyRunning? = null
+
+    fun currentInstance(): CurrentlyRunning? = runningInstance
 
     fun startDaemon(binaryPath: String, bindOnHostname: String, bindOnPort: Int): ExecutionResult {
+
         if (isRunning()) {
-            return ExecutionResult.AlreadyStarted(currentPid())
+            return ExecutionResult.AlreadyStarted(runningInstance!!)
         }
 
         val cmdLine = GeneralCommandLine(
@@ -41,7 +47,9 @@ class BlackdExecutor : Disposable {
             if (spawnedProcess.isAlive) {
                 blackdProcess = spawnedProcess
                 logger.debug("Started $binaryPath on $bindOnHostname:$bindOnPort (PID: ${currentPid()}")
-                return ExecutionResult.Started(currentPid())
+
+                runningInstance = CurrentlyRunning(binaryPath, "$bindOnHostname:$bindOnPort", currentPid())
+                return ExecutionResult.Started(runningInstance!!)
             } else {
                 val reason = spawnedProcess.errorStream.bufferedReader().use(BufferedReader::readText)
                 return ExecutionResult.Failed(reason)

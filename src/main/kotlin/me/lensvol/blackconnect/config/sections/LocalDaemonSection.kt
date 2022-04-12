@@ -70,6 +70,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private val startDaemonButton = JButton("Start", AllIcons.Actions.Execute)
     private val stopDaemonButton = JButton("Stop", AllIcons.Actions.Suspend)
     private val detectBinaryButton = JButton("Detect")
+    private val currentlyRunningText = JLabel("<html><b>Currently running:</b> <i>none</i>")
 
     private val blackdExecutor = service<BlackdExecutor>()
 
@@ -161,12 +162,19 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
             constraints.gridy = 2
             constraints.gridx = 0
+            constraints.gridwidth = 2
+            add(currentlyRunningText, constraints)
+
+            constraints.gridy = 3
+            constraints.gridx = 0
             constraints.gridwidth = GridBagConstraints.RELATIVE
             add(startDaemonButton, constraints)
 
             constraints.gridx = 1
-            constraints.gridwidth = GridBagConstraints.REMAINDER
+            constraints.gridwidth = GridBagConstraints.RELATIVE
             add(stopDaemonButton, constraints)
+
+            updateRunStateUI()
         }
 
         bindingSettingsPanel.layout = BoxLayout(bindingSettingsPanel, BoxLayout.X_AXIS)
@@ -190,7 +198,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
             @Suppress("UNUSED_PARAMETER")
             fun disableButtonIfNeeded(e: DocumentEvent?) {
-                updateButtonState()
+                updateRunStateUI()
             }
         })
 
@@ -200,7 +208,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
             } else {
                 localServerPanel.disableContents()
             }
-            updateButtonState()
+            updateRunStateUI()
         }
 
         startDaemonButton.addActionListener {
@@ -217,14 +225,14 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
                     }
                 }
 
-                updateButtonState()
+                updateRunStateUI()
             }
         }
 
         stopDaemonButton.addActionListener {
             thread {
                 blackdExecutor.stopDaemon()
-                updateButtonState()
+                updateRunStateUI()
             }
         }
 
@@ -293,16 +301,19 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         }
     }
 
-    private fun updateButtonState() {
-        if (startLocalServerCheckbox.isSelected) {
-            if (blackdExecutableChooser.text.isNotEmpty()) {
-                startDaemonButton.isEnabled = !blackdExecutor.isRunning()
-                    && bindOnHostnameText.text.isNotEmpty()
-                stopDaemonButton.isEnabled = !startDaemonButton.isEnabled
-            } else {
-                startDaemonButton.isEnabled = false
-                stopDaemonButton.isEnabled = false
-            }
+    private fun updateRunStateUI() {
+        if (!startLocalServerCheckbox.isSelected) return
+
+        if (blackdExecutor.isRunning()) {
+            val instance = blackdExecutor.currentInstance()
+            currentlyRunningText.text = "<html><b>Currently running:</b> ${instance?.path}"
+
+            startDaemonButton.isEnabled = false
+            stopDaemonButton.isEnabled = true
+        } else {
+            currentlyRunningText.text = "<html><b>No instances are running at this moment.</b>"
+            stopDaemonButton.isEnabled = false
+            startDaemonButton.isEnabled = blackdExecutableChooser.text.isNotEmpty() && bindOnHostnameText.text.isNotEmpty()
         }
     }
 
@@ -314,7 +325,7 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         if (globalConfig.spawnBlackdOnStartup) {
             startLocalServerCheckbox.doClick()
             startLocalServerCheckbox.isSelected = true
-            updateButtonState()
+            updateRunStateUI()
         }
     }
 
