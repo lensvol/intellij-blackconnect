@@ -43,7 +43,7 @@ class PluginStartupActivity : StartupActivity, DumbAware {
                     when (result) {
                         is ExecutionResult.Started -> {}
                         is ExecutionResult.AlreadyStarted -> {
-                            notificationManager.showInfo("Already started <b>blackd</b> process (PID: ${result.instance.pid})")
+                            notificationManager.showInfo("<b>blackd</b> already started (PID: ${result.instance.pid})")
                         }
                         is ExecutionResult.Failed -> {
                             notificationManager.showError("Failed to start <b>blackd</b> on " +

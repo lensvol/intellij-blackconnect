@@ -313,7 +313,8 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         } else {
             currentlyRunningText.text = "<html><b>No instances are running at this moment.</b>"
             stopDaemonButton.isEnabled = false
-            startDaemonButton.isEnabled = blackdExecutableChooser.text.isNotEmpty() && bindOnHostnameText.text.isNotEmpty()
+            startDaemonButton.isEnabled = blackdExecutableChooser.text.isNotEmpty() &&
+                bindOnHostnameText.text.isNotEmpty()
         }
     }
 
