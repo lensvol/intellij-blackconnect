@@ -15,6 +15,7 @@ import com.intellij.openapi.ui.TextBrowseFolderListener
 import com.intellij.openapi.ui.TextFieldWithBrowseButton
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.ui.IdeBorderFactory
+import com.intellij.util.io.isDirectory
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import me.lensvol.blackconnect.BlackdExecutor
@@ -46,6 +47,8 @@ import javax.swing.SpinnerNumberModel
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import kotlin.concurrent.thread
+import kotlin.io.path.Path
+import kotlin.io.path.isExecutable
 
 const val PATH_FIELD_RIGHT_INSET = 36
 const val SERVER_SETTINGS_DELIMETER_WIDTH = 6
@@ -351,8 +354,22 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     }
 
     override fun validate() {
-        if (startLocalServerCheckbox.isSelected && blackdExecutableChooser.text.isEmpty()) {
-            throw ConfigurationException("No path provided for a local blackd binary.")
+        if (startLocalServerCheckbox.isSelected) {
+            val userProvidedPath = blackdExecutableChooser.text
+
+            if (userProvidedPath.isEmpty()) {
+                throw ConfigurationException("No path provided for a local 'blackd' binary.")
+            }
+
+            val pathToBlackdBinary = Path(userProvidedPath)
+
+            if (pathToBlackdBinary.isDirectory()) {
+                throw ConfigurationException("'blackd' binary path points to a directory, not a file.")
+            }
+
+            if (!pathToBlackdBinary.isExecutable()) {
+                throw ConfigurationException("'blackd' binary path does not point to an executable.")
+            }
         }
     }
 }
