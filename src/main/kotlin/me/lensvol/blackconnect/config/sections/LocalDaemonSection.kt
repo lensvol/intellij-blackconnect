@@ -166,8 +166,10 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
             constraints.gridy = 2
             constraints.gridx = 0
             constraints.gridwidth = 2
+            constraints.insets = JBUI.insets(5, 0, 5, 0)
             add(currentlyRunningText, constraints)
 
+            constraints.insets = JBUI.emptyInsets()
             constraints.gridy = 3
             constraints.gridx = 0
             constraints.gridwidth = GridBagConstraints.RELATIVE
