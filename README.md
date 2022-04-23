@@ -14,6 +14,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 ## Features
 
 * Ability to trigger on each file save.
+* Start <b>blackd</b> when IDE opens.
 * Automatic handling of Python type stubs (`.pyi`).
 * Rough support for Jupyter Notebook files.
 * Ability to reformat selected fragment only instead of whole file.
@@ -49,11 +50,9 @@ Just go to the [plugin page](https://plugins.jetbrains.com/plugin/14321-blackcon
 
 ## TODOs
 
-* Spawn **blackd** process if not started already.
 * Make plugin properly [dynamic](https://www.jetbrains.org/intellij/sdk/docs/basics/plugin_structure/dynamic_plugins.html).
 * "Live reformatting".
 * Automatic detection of applicable Python frameworks.
-* Hook into standard "Reformat Code" command.
 * Detection of possible conflicts with other plugins / File Watchers.
 * Better integration with Jupyter Notebooks.
 

@@ -17,6 +17,7 @@
     <p><b>Features supported:</b></p>
     <br>
     <p>
+      –&nbsp;Automatically starting <b>blackd</b> when IDE opens.<br>
       –&nbsp;Automatic Python type stub (.pyi) detection.<br>
       –&nbsp;Configurable options: hostname, port, preferred line length, etc.<br>
       –&nbsp;Trigger automatically when saving changed files.<br>
