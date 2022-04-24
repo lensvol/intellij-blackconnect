@@ -93,7 +93,7 @@ tasks.processResources {
     // We need bogus second entry due to https://github.com/gradle/gradle/issues/14733 *facepalm*
     val properties = mapOf("version" to project.version, "hello" to "world")
     inputs.properties(properties)
-    filesMatching("**/version.properties") {
+    filesMatching("**/plugin.properties") {
         expand(properties)
     }
 }
