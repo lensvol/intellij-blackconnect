@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.lensvol"
-version = "0.5.0-SNAPSHOT"
+version = "0.5.0"
 
 repositories {
     jcenter()
@@ -41,6 +41,20 @@ intellij {
 tasks.patchPluginXml {
     changeNotes.set(
         """
+      <p>0.5.0</p>
+      <p>Well, that one was a long overdue. Groundwork for starting <b>blackd</b> from inside the plugin was
+      done more than a year ago, but alas - mental health is a fickle thing and burnout is no laughing matter.
+      Funnily enough, it took being depressed from the ongoing world crisis to finally push me into
+      releasing this as a futile effort to allay my anxiety.</p>
+      
+      <p>Anyways, here it is. Go play with it, have fun, come back with helpful suggestions.</p>
+      
+      <p>And stay safe. Stay sane.</p>
+      
+      <ul>
+        <li>Support starting <b>blackd</b> when the plugin starts.</li>
+      </ul>
+            
       <p>0.4.6</p>
       <p>A small release to tide you over till bigger features ship.</p>
       <ul>
@@ -70,32 +84,6 @@ https://github.com/elliotwaite">Elliot Waite</a>).</li>
         <li>Support for connecting to blackd over SSL (kudos to <a href="https://github.com/studioj">studioj</a>)</li>
         <li>Make server error notifications more descriptive.</li>
         <li>Miscellaneous fixes and improvements.</li>
-      </ul>
-
-      <p>0.4.3</p>
-      <ul>
-        <li>Fix rare crash when processing source code with CR/LF sequence inside.</li>
-        <li>Fix rare crash when saving files without type and Jupyter support is enabled.</li>
-      </ul>
-
-      <p>0.4.2</p>
-      <ul>
-        <li>Automatically close any outstanding error messages on successful call to blackd.</li>
-        <li>Bump lower compatibility boundary to IDEA 2020.1.4 and up.</li>
-      </ul>
-
-      <p>0.4.1</p>
-      <ul>
-        <li>Fix regression with file save trigger reformatting non-Python files (reported by Matthew R. Scott).</li>
-      </ul>
-
-      <p>0.4.0</p>
-      <ul>
-        <li>Added "Check connection" button to "Settings" screen.</li>
-        <li>Added "Reformat Selected Fragment" action to support partial reformatting.</li>
-        <li>Reformatting actions moved to <b>BlackConnect</b> submenu under "Tools".</li>
-        <li>Fix rare crash when closing tab with window handle set to <i>null</i>.</li>
-        <li>Notification balloons no longer show up in "Event log".</li>
       </ul>
       """
     )
