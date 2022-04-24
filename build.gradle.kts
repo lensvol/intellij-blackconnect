@@ -42,14 +42,14 @@ tasks.patchPluginXml {
     changeNotes.set(
         """
       <p>0.5.0</p>
-      <p>Well, that one was a long overdue. Groundwork for starting <b>blackd</b> from inside the plugin was
+      <p>Well, that one was long overdue. The groundwork for starting <b>blackd</b> from inside the plugin was
       done more than a year ago, but alas - mental health is a fickle thing and burnout is no laughing matter.
       Funnily enough, it took being depressed from the ongoing world crisis to finally push me into
       releasing this as a futile effort to allay my anxiety.</p>
       
-      <p>Anyways, here it is. Go play with it, have fun, come back with helpful suggestions.</p>
+      <p>Anyways, here it is. Go play with it, have fun, and come back with helpful suggestions.</p>
       
-      <p>And stay safe. Stay sane.</p>
+      <p>Stay safe. Stay sane.</p>
       
       <ul>
         <li>Support starting <b>blackd</b> when the plugin starts.</li>
