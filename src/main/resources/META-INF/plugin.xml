@@ -42,7 +42,7 @@
     </change-notes>
     -->
 
-    <idea-version since-build="201.8743.11"/>
+    <idea-version since-build="211.7628.24"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
