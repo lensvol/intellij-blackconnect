@@ -24,10 +24,10 @@ jobs:
         uses: ChrisCarini/intellij-platform-plugin-verifier-action@latest
         with:
           ide-versions: |
-            ideaIC:2021.3.3
-            ideaIU:2021.3.3
-            pycharmPC:2021.3.3
-            pycharmPY:2021.3.3
+            ideaIC:2021.1.3
+            ideaIU:2021.1.3
+            pycharmPC:2021.1.3
+            pycharmPY:2021.1.3
             ideaIC:LATEST-EAP-SNAPSHOT
 
       - name: Get log file path and print contents
