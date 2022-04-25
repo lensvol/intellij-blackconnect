@@ -173,6 +173,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
                 val pyprojectTomlDescriptor = createPyprojectSpecificDescriptor()
                 val candidates =
                     FilenameIndex.getVirtualFilesByName(
+                        project,
                         "pyproject.toml",
                         GlobalSearchScope.projectScope(project)
                     )
