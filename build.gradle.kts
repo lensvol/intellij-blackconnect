@@ -53,6 +53,7 @@ tasks.patchPluginXml {
       
       <ul>
         <li>Support starting <b>blackd</b> when the plugin starts.</li>
+        <li>Lower IDE compatibility bound is now 2021.1.3.</li> 
       </ul>
             
       <p>0.4.6</p>
