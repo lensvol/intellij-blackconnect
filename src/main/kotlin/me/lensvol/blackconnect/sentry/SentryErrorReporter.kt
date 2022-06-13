@@ -33,7 +33,7 @@ class SentryErrorReporter : ErrorReportSubmitter() {
     }
 
     override fun submit(
-        events: Array<out IdeaLoggingEvent>?,
+        events: Array<out IdeaLoggingEvent>,
         additionalInfo: String?,
         parentComponent: Component,
         consumer: Consumer<in SubmittedReportInfo>

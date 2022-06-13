@@ -76,6 +76,7 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
                 is BlackdResponse.UnknownStatus -> notificationService.showError(
                     "Something unexpected happened:<br>${response.responseText}"
                 )
+                is BlackdResponse.InvalidRequest -> TODO()
             }
         }
     }

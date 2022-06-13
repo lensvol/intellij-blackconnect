@@ -55,4 +55,8 @@ open class NotificationManager(project: Project) {
         shownErrorNotifications.keys.map { it.expire() }
         shownErrorNotifications.clear()
     }
+
+    companion object {
+        const val NOTIFICATION_GROUP_ID: String = MAIN_DISPLAY_ID
+    }
 }
