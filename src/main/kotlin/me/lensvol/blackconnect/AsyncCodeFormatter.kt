@@ -4,7 +4,6 @@ import com.intellij.formatting.service.AsyncDocumentFormattingService
 import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService
 import com.intellij.openapi.components.service
-import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationManager
@@ -12,7 +11,7 @@ import java.util.EnumSet
 
 class AsyncCodeFormatter: AsyncDocumentFormattingService() {
     override fun getFeatures(): MutableSet<FormattingService.Feature> {
-        return EnumSet.noneOf(FormattingService.Feature::class.java)
+        return EnumSet.of(FormattingService.Feature.FORMAT_FRAGMENTS)
     }
 
     override fun canFormat(source: PsiFile): Boolean {
@@ -26,16 +25,24 @@ class AsyncCodeFormatter: AsyncDocumentFormattingService() {
         return object: FormattingTask {
             override fun run() {
                 val formatter = formattingRequest.context.project.service<CodeReformatter>()
-                val source = formattingRequest.documentText
-                val response = formatter.reformatFragment(
-                    source,
-                    formattingRequest.ioFile?.name?.endsWith("pyi") ?: false
-                )
-                val blackened = response as? BlackdResponse.Blackened ?: return
-                formattingRequest.onTextReady(blackened.sourceCode)
+                var source = formattingRequest.documentText
+                val ranges = formattingRequest.formattingRanges.toMutableList()
+                ranges.sortByDescending { range -> range.endOffset }
+                ranges.map { range ->
+                    val sliceRange = IntRange(range.startOffset, range.endOffset)
+                    val response = formatter.reformatFragment(
+                        source.slice(sliceRange),
+                        formattingRequest.ioFile?.name?.endsWith("pyi") ?: false
+                    )
+                    val blackened = response as? BlackdResponse.Blackened ?: return
+                    source = source.replaceRange(sliceRange, blackened.sourceCode)
+                }
+                formattingRequest.onTextReady(source)
             }
 
             override fun cancel(): Boolean = false
+
+            override fun isRunUnderProgress(): Boolean = false
         }
     }
 
