@@ -151,8 +151,11 @@ open class CodeReformatter(project: Project) {
         readTimeout: Int = 0,
     ): BlackdResponse? {
         val progressIndicator = ProgressManager.getGlobalProgressIndicator()
-        logger.debug("Reformatting cancelled before we could begin")
-        if (progressIndicator?.isCanceled == true) return null
+
+        if (progressIndicator?.isCanceled == true) {
+            logger.debug("Reformatting cancelled before we could begin")
+            return null
+        }
         val blackdClient = BlackdClient(configuration.hostname, configuration.port, configuration.useSSL)
 
         val result = blackdClient.reformat(
