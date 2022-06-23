@@ -14,6 +14,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 ## Features
 
 * Ability to trigger on each file save.
+* Integration with the "Reformat Code" function.
 * Start <b>blackd</b> when IDE opens.
 * Automatic handling of Python type stubs (`.pyi`).
 * Rough support for Jupyter Notebook files.
