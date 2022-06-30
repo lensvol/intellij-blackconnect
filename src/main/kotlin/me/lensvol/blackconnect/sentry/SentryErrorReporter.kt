@@ -33,7 +33,7 @@ class SentryErrorReporter : ErrorReportSubmitter() {
     }
 
     override fun submit(
-        events: Array<out IdeaLoggingEvent>?,
+        events: Array<out IdeaLoggingEvent>,
         additionalInfo: String?,
         parentComponent: Component,
         consumer: Consumer<in SubmittedReportInfo>
@@ -48,10 +48,6 @@ class SentryErrorReporter : ErrorReportSubmitter() {
                 indicator.isIndeterminate = true
 
                 val errors = LinkedList<SentryException>()
-
-                if (events == null) {
-                    return
-                }
 
                 for (ideaEvent in events) {
                     if (ideaEvent is IdeaReportingEvent) {
