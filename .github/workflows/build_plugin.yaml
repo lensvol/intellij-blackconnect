@@ -47,4 +47,4 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         arguments: check
-        gradle-version: 6.6
+        gradle-version: "7.0"
