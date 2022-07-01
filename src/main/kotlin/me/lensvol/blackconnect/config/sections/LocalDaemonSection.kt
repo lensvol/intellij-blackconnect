@@ -171,12 +171,10 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
 
             constraints.insets = JBUI.emptyInsets()
             constraints.gridy = 3
-            constraints.gridx = 0
             constraints.gridwidth = GridBagConstraints.RELATIVE
             add(startDaemonButton, constraints)
 
             constraints.gridx = 1
-            constraints.gridwidth = GridBagConstraints.RELATIVE
             add(stopDaemonButton, constraints)
 
             updateRunStateUI()
