@@ -31,7 +31,7 @@ class BlackConnectConfigurable(project: Project) : Configurable {
         panel.load(globalConfig, projectConfig)
     }
 
-    override fun createComponent(): JComponent? {
+    override fun createComponent(): JComponent {
         panel.load(globalConfig, projectConfig)
         return panel
     }

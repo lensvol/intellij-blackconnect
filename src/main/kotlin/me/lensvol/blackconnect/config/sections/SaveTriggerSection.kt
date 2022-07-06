@@ -1,45 +1,50 @@
 package me.lensvol.blackconnect.config.sections
 
 import com.intellij.openapi.project.Project
-import com.intellij.ui.IdeBorderFactory
-import com.intellij.util.ui.FormBuilder
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.dsl.builder.bindSelected
+import com.intellij.ui.dsl.builder.panel
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
-import java.awt.BorderLayout
-import javax.swing.JCheckBox
-import javax.swing.JPanel
 
+internal data class Model(
+    var triggerOnEachSave: Boolean = false,
+    var triggerOnReformat: Boolean = false
+)
+
+@Suppress("UnstableApiUsage")
 class SaveTriggerSection(project: Project) : ConfigSection(project) {
-    private val triggerOnEachSave = JCheckBox("Trigger when saving changed files")
-    private val triggerOnReformat = JCheckBox("Trigger on code reformat")
+    private val state = Model()
 
-    override val panel: JPanel by lazy {
-        JPanel().apply {
-            layout = BorderLayout()
-            border = IdeBorderFactory.createTitledBorder("Trigger Settings")
-            val formPanel = FormBuilder.createFormBuilder()
-                .addComponent(triggerOnEachSave)
-                .addComponent(triggerOnReformat)
-                .panel
-            add(formPanel)
+    override val panel: DialogPanel by lazy {
+        panel {
+            group("Trigger Settings") {
+                row {
+                    checkBox("Trigger when saving changed files").bindSelected(state::triggerOnEachSave)
+                }
+                row {
+                    checkBox("Trigger on code reformat").bindSelected(state::triggerOnReformat)
+                }
+            }
         }
     }
 
     override fun loadFrom(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
-        triggerOnEachSave.isSelected = projectConfig.triggerOnEachSave
-        triggerOnReformat.isSelected = projectConfig.triggerOnReformat
+        state.triggerOnEachSave = projectConfig.triggerOnEachSave
+        state.triggerOnReformat = projectConfig.triggerOnReformat
+        this.panel.reset()
     }
 
     override fun saveTo(globalConfig: BlackConnectGlobalSettings, projectConfig: BlackConnectProjectSettings) {
-        projectConfig.triggerOnEachSave = triggerOnEachSave.isSelected
-        projectConfig.triggerOnReformat = triggerOnReformat.isSelected
+        this.panel.apply()
+        projectConfig.triggerOnEachSave = state.triggerOnEachSave
+        projectConfig.triggerOnReformat = state.triggerOnReformat
     }
 
     override fun isModified(
         globalConfig: BlackConnectGlobalSettings,
         projectConfig: BlackConnectProjectSettings
     ): Boolean {
-        return projectConfig.triggerOnEachSave != triggerOnEachSave.isSelected ||
-            projectConfig.triggerOnReformat != triggerOnReformat.isSelected
+        return this.panel.isModified()
     }
 }
