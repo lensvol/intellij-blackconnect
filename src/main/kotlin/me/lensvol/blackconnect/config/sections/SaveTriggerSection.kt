@@ -7,14 +7,14 @@ import com.intellij.ui.dsl.builder.panel
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
-internal data class Model(
+internal data class SaveTriggerSectionModel(
     var triggerOnEachSave: Boolean = false,
     var triggerOnReformat: Boolean = false
 )
 
 @Suppress("UnstableApiUsage")
 class SaveTriggerSection(project: Project) : ConfigSection(project) {
-    private val state = Model()
+    private val state = SaveTriggerSectionModel()
 
     override val panel: DialogPanel by lazy {
         panel {
