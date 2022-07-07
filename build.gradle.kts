@@ -16,6 +16,7 @@ repositories {
 
 apply(plugin = "io.gitlab.arturbosch.detekt")
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
 
@@ -140,7 +141,7 @@ tasks.compileTestKotlin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.set(listOf("2021.3", "2021.2", "2021.1.3"))
+    ideVersions.set(listOf("2022.1", "2021.3"))
 }
 
 tasks.test {
