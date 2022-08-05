@@ -94,4 +94,31 @@ class PostFormatTestCase {
             """.trimIndent()
         )
     }
+
+    @Test
+    fun `test reformat fragment with Black end of file, respects indents`() = runInEdtAndWait {
+        fixture.blackSettings.triggerOnReformat = true
+        fixture.configureByText(
+            "a.py",
+            """
+            class Foo:
+                def bar(self):
+                    <selection>g(1,2,3,)</selection>
+ 
+            """.trimIndent()
+        )
+        fixture.performEditorAction(IdeActions.ACTION_EDITOR_REFORMAT)
+        fixture.checkResult(
+            """
+            class Foo:
+                def bar(self):
+                    g(
+                        1,
+                        2,
+                        3,
+                    )
+ 
+            """.trimIndent()
+        )
+    }
 }
