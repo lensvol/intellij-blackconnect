@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement
 import com.intellij.psi.PsiFile
 import com.intellij.psi.codeStyle.CodeStyleSettings
 import com.intellij.psi.impl.source.codeStyle.PostFormatProcessor
+import com.intellij.psi.impl.source.codeStyle.CodeStyleManagerImpl
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
 /**
@@ -38,7 +39,11 @@ class BlackPostFormatProcessor : PostFormatProcessor {
         )
         val blackened = response as? BlackdResponse.Blackened ?: return rangeToReformat
         source.replaceAndCommit(fixedRange, blackened.sourceCode)
-        return TextRange.from(fixedRange.startOffset, blackened.sourceCode.length)
+        val blackenedRange = TextRange.from(fixedRange.startOffset, blackened.sourceCode.length)
+        // Fix line indentation so that the fragment result from black respects the current indentation
+        CodeStyleManagerImpl(source.project).adjustLineIndent(source, blackenedRange)
+
+        return blackenedRange
     }
 
     private fun isApplicable(source: PsiFile): Boolean {
