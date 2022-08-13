@@ -96,7 +96,7 @@ class PostFormatTestCase {
     }
 
     @Test
-    fun `test reformat fragment with Black end of file, respects indents`() = runInEdtAndWait {
+    fun `test reformat fragment with Black respects indents`() = runInEdtAndWait {
         fixture.blackSettings.triggerOnReformat = true
         fixture.configureByText(
             "a.py",
@@ -116,6 +116,36 @@ class PostFormatTestCase {
                         1,
                         2,
                         3,
+                    )
+ 
+            """.trimIndent()
+        )
+    }
+
+
+    @Test
+    fun `test reformat long line with Black respects line length`() = runInEdtAndWait {
+        fixture.blackSettings.triggerOnReformat = true
+        fixture.blackSettings.lineLength = 80
+        // The selected print line in the editor is just over 80 char if you also count the
+        // indents. We expect black to pick up the indentation so it can correctly see the
+        // line length.
+        fixture.configureByText(
+            "a.py",
+            """
+            class Foo:
+                def bar(self):
+                    <selection>print("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod")</selection>
+ 
+            """.trimIndent()
+        )
+        fixture.performEditorAction(IdeActions.ACTION_EDITOR_REFORMAT)
+        fixture.checkResult(
+            """
+            class Foo:
+                def bar(self):
+                    print(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod"
                     )
  
             """.trimIndent()
