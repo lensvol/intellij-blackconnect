@@ -70,7 +70,7 @@ class BlackdProcessRule(private val port: Int, private val timeout: Int = 5_000)
             val commandLine = GeneralCommandLine("poetry", "install")
             val p = commandLine.createProcess()
             if (p.waitFor() != 0) {
-                error("Error running '${commandLine}': ${p.inputStream.bufferedReader().readText()}")
+                error("Error running '$commandLine': ${p.inputStream.bufferedReader().readText()}")
             }
         }
 

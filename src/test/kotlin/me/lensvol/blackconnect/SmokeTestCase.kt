@@ -13,7 +13,7 @@ import org.mockserver.model.HttpResponse.response
 class SmokeTestCase : BlackConnectTestCase() {
     lateinit var mockServer: ClientAndServer
 
-    override fun setupMocks() {}
+    override fun setupMocks()
 
     override fun setUp() {
         super.setUp()

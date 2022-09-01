@@ -1,22 +1,25 @@
 plugins {
-    id("org.jetbrains.intellij") version "1.5.2"
+    kotlin("jvm") version "1.7.10"
+    id("org.jetbrains.intellij") version "1.8.1"
+    id("io.gitlab.arturbosch.detekt") version "1.21.0"
     jacoco
-
-    id("io.gitlab.arturbosch.detekt") version "1.15.0"
-    kotlin("jvm") version "1.7.0"
 }
 
 group = "me.lensvol"
 version = "0.5.0"
 
 repositories {
-    jcenter()
     mavenCentral()
 }
 
-apply(plugin = "io.gitlab.arturbosch.detekt")
+// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
 
     testImplementation("org.mock-server:mockserver-netty:5.3.0") {
@@ -27,7 +30,7 @@ dependencies {
         exclude(group = "org.slf4j")
     }
 
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.21.0")
 }
 
 intellij {
@@ -91,8 +94,7 @@ https://github.com/elliotwaite">Elliot Waite</a>).</li>
 }
 
 tasks.processResources {
-    // We need bogus second entry due to https://github.com/gradle/gradle/issues/14733 *facepalm*
-    val properties = mapOf("version" to project.version, "hello" to "world")
+    val properties = mapOf("version" to project.version)
     inputs.properties(properties)
     filesMatching("**/plugin.properties") {
         expand(properties)
@@ -115,40 +117,15 @@ tasks.jacocoTestReport {
 }
 
 detekt {
-    config = files("./detekt-config.yml")
+    config = files("detekt-config.yml")
     buildUponDefaultConfig = true // preconfigure defaults
-    baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
-
-    reports {
-        html.enabled = false // observe findings in your browser with structure and code snippets
-        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
-        txt.enabled = false // similar to the console output, contains issue signature to manually edit baseline files
-        sarif.enabled = false // SARIF integration (https://sarifweb.azurewebsites.net/) for integrations with Github
-    }
-}
-
-tasks.detekt {
-    jvmTarget = "11"
-}
-
-tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "11"
-}
-
-tasks.compileTestKotlin {
-    kotlinOptions.jvmTarget = "11"
+    baseline = file("config/baseline.xml") // a way of suppressing issues before introducing detekt
 }
 
 tasks.runPluginVerifier {
-    ideVersions.set(listOf("2021.3", "2021.2", "2021.1.3"))
+    ideVersions.set(listOf("2021.1.3", "2021.3", "2021.2", "2022.1", "2022.2"))
 }
 
 tasks.test {
     systemProperty("idea.force.use.core.classloader", "true")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
 }

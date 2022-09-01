@@ -10,7 +10,7 @@ import java.net.URL
 class BlackdClientTestCase : BlackConnectTestCase() {
     lateinit var mockServer: ClientAndServer
 
-    override fun setupMocks() {}
+    override fun setupMocks()
 
     override fun setUp() {
         super.setUp()

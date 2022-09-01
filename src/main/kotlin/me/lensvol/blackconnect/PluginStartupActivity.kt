@@ -48,7 +48,8 @@ class PluginStartupActivity : StartupActivity, DumbAware {
                             notificationManager.showInfo("<b>blackd</b> already started (PID: ${result.instance.pid})")
                         }
                         is ExecutionResult.Failed -> {
-                            notificationManager.showError("Failed to start <b>blackd</b> on " +
+                            notificationManager.showError(
+                                "Failed to start <b>blackd</b> on " +
                                 "${globalSettings.bindOnHostname}:${globalSettings.bindOnPort}",
                                 additionalInfo = result.reason,
                                 viewPromptText = "View error"
