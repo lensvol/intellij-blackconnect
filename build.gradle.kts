@@ -1,22 +1,33 @@
+import org.jetbrains.changelog.Changelog
+import org.jetbrains.changelog.markdownToHTML
+
+fun properties(key: String) = project.findProperty(key).toString()
+
 plugins {
-    id("org.jetbrains.intellij") version "1.9.0"
-    jacoco
-
+    // Kotlin support
+    kotlin("jvm") version "1.7.21"
+    // Gradle IntelliJ Plugin
+    id("org.jetbrains.intellij") version "1.10.0"
+    // Gradle Changelog Plugin
+    id("org.jetbrains.changelog") version "2.0.0"
+    // Gradle Qodana Plugin
+    id("org.jetbrains.qodana") version "0.1.13"
+    // Gradle Kover Plugin
+    id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    // Gradle Detekt Plugin
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
-    kotlin("jvm") version "1.7.0"
 }
 
-group = "me.lensvol"
-version = "0.5.0"
+group = properties("pluginGroup")
+version = properties("pluginVersion")
 
+// Configure project's dependencies
 repositories {
-    jcenter()
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/public/p/kotlinx-html/maven")
 }
 
-apply(plugin = "io.gitlab.arturbosch.detekt")
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
 
     testImplementation("org.mock-server:mockserver-netty:5.14.0") {
@@ -30,125 +41,112 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.15.0")
 }
 
+// Set the JVM language level used to compile sources and generate files - Java 11 is required since 2020.3
+kotlin {
+    jvmToolchain(11)
+}
+
 intellij {
-    val ideaVersion: String by project
-    version.set(ideaVersion)
-    updateSinceUntilBuild.set(false)
-    pluginName.set("intellij-blackconnect")
-    plugins.set(listOf("python-ce"))
+    pluginName.set(properties("pluginName"))
+    version.set(properties("platformVersion"))
+    type.set(properties("platformType"))
+
+    // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
+    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
 }
 
-tasks.patchPluginXml {
-    changeNotes.set(
-        """
-      <p>0.5.0</p>
-      <p>Well, that one was long overdue. The groundwork for starting <b>blackd</b> from inside the plugin was
-      done more than a year ago, but alas - mental health is a fickle thing and burnout is no laughing matter.
-      Funnily enough, it took being depressed from the ongoing world crisis to finally push me into
-      releasing this as a futile effort to allay my anxiety.</p>
-      
-      <p>Anyways, here it is. Go play with it, have fun, and come back with helpful suggestions.</p>
-      
-      <p>Stay safe. Stay sane.</p>
-      
-      <ul>
-        <li>Support starting <b>blackd</b> when the plugin starts.</li>
-        <li>Lower IDE compatibility bound is now 2021.1.3.</li> 
-      </ul>
-            
-      <p>0.4.6</p>
-      <p>A small release to tide you over till bigger features ship.</p>
-      <ul>
-        <li>Support 3.10 as a target version. (kudos to <a href="https://github.com/lxop">Alex Opie
-</a>)</li>
-        <li>Fix broken link to <b>blackd</b> documentation in plugin description.</li>
-      </ul>
-
-      <p>0.4.5</p>
-      <ul>      
-        <li>Support new '--skip-magic-trailing-comma' option.</li>
-        <li>Support Python 3.9 as target version.</li>
-        <li>Added "Trigger on Code Reformat" option (kudos to <a href="https://github.com/vlasovskikh">Andrey Vlasovskikh</a>).</li>
-        <li>Fix rare crash when saving non-Python files with Jupyter support enabled (kudos to <a href="
-https://github.com/elliotwaite">Elliot Waite</a>).</li>
-        <li>Fix for rare crash when updating document during Undo/Redo operation.</li>
-      </ul>
-
-      <p>0.4.4</p>
-      <br>
-      <p>This release is dedicated to the memory of our cat <b>Luna</b>, who passed away due to cancer last year.</p><br>
-      <p>She was kind, smart and loyal. Best cat in the world.</p><br>
-      <p><b>We miss you, girl.</b></p>
-      <br>
-      <ul>
-        <li>Add button to copy line length settings from the IDE ("right margin").</li>
-        <li>Support for connecting to blackd over SSL (kudos to <a href="https://github.com/studioj">studioj</a>)</li>
-        <li>Make server error notifications more descriptive.</li>
-        <li>Miscellaneous fixes and improvements.</li>
-      </ul>
-      """
-    )
+// Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
+changelog {
+    groups.set(emptyList())
+    repositoryUrl.set(properties("pluginRepositoryUrl"))
 }
 
-tasks.processResources {
-    // We need bogus second entry due to https://github.com/gradle/gradle/issues/14733 *facepalm*
-    val properties = mapOf("version" to project.version, "hello" to "world")
-    inputs.properties(properties)
-    filesMatching("**/plugin.properties") {
-        expand(properties)
+// Configure Gradle Qodana Plugin - read more: https://github.com/JetBrains/gradle-qodana-plugin
+qodana {
+    cachePath.set(file(".qodana").canonicalPath)
+    reportPath.set(buildDir.resolve("reports/inspections").canonicalPath)
+    saveReport.set(true)
+    showReport.set(System.getenv("QODANA_SHOW_REPORT")?.toBoolean() ?: false)
+}
+
+// Configure Gradle Kover Plugin - read more: https://github.com/Kotlin/kotlinx-kover#configuration
+kover.xmlReport {
+    onCheck.set(true)
+}
+
+tasks {
+    wrapper {
+        gradleVersion = properties("gradleVersion")
     }
-}
 
-tasks.publishPlugin {
-    token.set(System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken"))
-}
+    patchPluginXml {
+        version.set(properties("pluginVersion"))
+        sinceBuild.set(properties("pluginSinceBuild"))
+        untilBuild.set(properties("pluginUntilBuild"))
 
-jacoco {
-    toolVersion = "0.8.7"
-}
+        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
+        pluginDescription.set(
+            projectDir.resolve("README.md").readText().lines().run {
+                val start = "<!-- Plugin description -->"
+                val end = "<!-- Plugin description end -->"
 
-tasks.jacocoTestReport {
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
+                if (!containsAll(listOf(start, end))) {
+                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+                }
+                subList(indexOf(start) + 1, indexOf(end))
+            }.joinToString("\n").let { markdownToHTML(it) }
+        )
+
+        // Get the latest available change notes from the changelog file
+        changeNotes.set(provider {
+            with(changelog) {
+                renderItem(
+                    getOrNull(properties("pluginVersion")) ?: getLatest(),
+                    Changelog.OutputType.HTML,
+                )
+            }
+        })
+    }
+
+    // Configure UI tests plugin
+    // Read more: https://github.com/JetBrains/intellij-ui-test-robot
+    runIdeForUiTests {
+        systemProperty("robot-server.port", "8082")
+        systemProperty("ide.mac.message.dialogs.as.sheets", "false")
+        systemProperty("jb.privacy.policy.text", "<!--999.999-->")
+        systemProperty("jb.consents.confirmation.enabled", "false")
+    }
+
+    signPlugin {
+        certificateChain.set(System.getenv("CERTIFICATE_CHAIN"))
+        privateKey.set(System.getenv("PRIVATE_KEY"))
+        password.set(System.getenv("PRIVATE_KEY_PASSWORD"))
+    }
+
+    publishPlugin {
+        dependsOn("patchChangelog")
+        token.set(System.getenv("PUBLISH_TOKEN"))
+        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
+        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
+        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
+        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+    }
+
+    processResources {
+        val properties = mapOf("version" to project.version)
+        inputs.properties(properties)
+        filesMatching("**/plugin.properties") {
+            expand(properties)
+        }
+    }
+
+    test {
+        systemProperty("idea.force.use.core.classloader", "true")
     }
 }
 
 detekt {
-    config = files("./detekt-config.yml")
+    config = files("detekt-config.yml")
     buildUponDefaultConfig = true // preconfigure defaults
-    baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
-
-    reports {
-        html.enabled = false // observe findings in your browser with structure and code snippets
-        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
-        txt.enabled = false // similar to the console output, contains issue signature to manually edit baseline files
-        sarif.enabled = false // SARIF integration (https://sarifweb.azurewebsites.net/) for integrations with Github
-    }
-}
-
-tasks.detekt {
-    jvmTarget = "11"
-}
-
-tasks.compileKotlin {
-    kotlinOptions.jvmTarget = "11"
-}
-
-tasks.compileTestKotlin {
-    kotlinOptions.jvmTarget = "11"
-}
-
-tasks.runPluginVerifier {
-    ideVersions.set(listOf("2021.3", "2021.2", "2021.1.3"))
-}
-
-tasks.test {
-    systemProperty("idea.force.use.core.classloader", "true")
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-    kotlinOptions {
-        jvmTarget = "11"
-    }
+    baseline = file("config/baseline.xml") // a way of suppressing issues before introducing detekt
 }

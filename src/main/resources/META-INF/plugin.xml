@@ -1,48 +1,8 @@
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin url="https://github.com/lensvol/intellij-blackconnect">
     <id>me.lensvol.blackconnect</id>
     <name>BlackConnect</name>
-    <!-- <version>0.0.0</version> -->
     <vendor email="lensvol@gmail.com" url="https://github.com/lensvol/">Kirill Borisov</vendor>
-
-    <description>
-        <![CDATA[
-    <p>Connect to <b><a href="https://black.readthedocs.io/en/stable/usage_and_configuration/black_as_a_server.html">
-    blackd</a></b> and format your Python
-    code without creating a new <b>black</b> process!</p>
-    <br>
-    <p>Avoid overhead of starting a new <b>black</b> process on each file save by making a quick
-    HTTP call to <b>blackd</b> instead.</p>
-    <br>
-
-    <p><b>Features supported:</b></p>
-    <br>
-    <p>
-      –&nbsp;Automatically starting <b>blackd</b> when IDE opens.<br>
-      –&nbsp;Automatic Python type stub (.pyi) detection.<br>
-      –&nbsp;Configurable options: hostname, port, preferred line length, etc.<br>
-      –&nbsp;Trigger automatically when saving changed files.<br>
-      -&nbsp;Ability to reformat only selected code fragment.<br>
-      –&nbsp;Support for <b>[tool.black]</b> section in <i>pyproject.toml</i>.<br>
-      –&nbsp;Rough support for "Jupyter" file type.<br>
-    </p>
-    <br>
-
-    <p><b>Steps to use:</b></p>
-    <ol>
-      <li><b>pip install black[d]</b></li>
-      <li>Start <b>blackd</b> daemon.</li>
-      <li>Press "Alt + Shift + B" to reformat your code...<br>...or enable "on file save" option.</li>
-      <li>Enjoy!</li>
-    </ol>
-    ]]>
-    </description>
-
-    <!--
-    <change-notes>
-    </change-notes>
-    -->
-
-    <idea-version since-build="211.7628.24"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
@@ -62,7 +22,8 @@
     </extensions>
 
     <actions>
-        <group id="me.lensvol.blackconnect.groups.MainGroup" text="BlackConnect" popup="true" icon="/icons/blackconnect.svg">
+        <group id="me.lensvol.blackconnect.groups.MainGroup" text="BlackConnect" popup="true"
+               icon="/icons/blackconnect.svg">
             <action id="me.lensvol.blackconnect.actions.ReformatWholeFileAction"
                     class="me.lensvol.blackconnect.actions.ReformatWholeFileAction"
                     text="Reformat Whole File"
@@ -79,7 +40,8 @@
             </action>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
-        <action id="me.lensvol.blackconnect.actions.BeforeTabClosedAction" class="me.lensvol.blackconnect.actions.BeforeTabClosedAction"
+        <action id="me.lensvol.blackconnect.actions.BeforeTabClosedAction"
+                class="me.lensvol.blackconnect.actions.BeforeTabClosedAction"
                 use-shortcut-of="CloseContent"/>
     </actions>
 
