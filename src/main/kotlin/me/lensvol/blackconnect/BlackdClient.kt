@@ -71,6 +71,7 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
         fastMode: Boolean = false,
         skipStringNormalization: Boolean = false,
         skipMagicTrailingComma: Boolean = false,
+        previewMode: Boolean = false,
         targetPythonVersions: String = "",
         connectTimeout: Int = 0,
         readTimeout: Int = 0,
@@ -102,12 +103,23 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
                 setRequestProperty("X-Skip-Magic-Trailing-Comma", "yes")
             }
 
+            if (previewMode) {
+                setRequestProperty("X-Preview", "yes")
+            }
+
             return try {
                 connect()
 
                 outputStream.use { os ->
                     val input: ByteArray = sourceCode.toByteArray()
                     os.write(input, 0, input.size)
+                }
+
+                val versionParts = getHeaderField("X-Black-Version").split('.')
+                if (previewMode && (
+                        versionParts[0].toInt() < 22 || versionParts[0].toInt() == 22 && versionParts[1].toInt() < 8)
+                ) {
+                    Failure("The version of <b>blackd</b> you are using does not support the 'preview' option.")
                 }
 
                 Success(parseBlackdResponse(this))

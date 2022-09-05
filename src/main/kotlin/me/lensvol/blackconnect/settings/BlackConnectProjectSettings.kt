@@ -40,6 +40,9 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var skipMagicTrailingComma: Boolean = false
 
     @Attribute
+    var previewMode: Boolean = false
+
+    @Attribute
     var triggerOnEachSave: Boolean = false
 
     @Attribute
