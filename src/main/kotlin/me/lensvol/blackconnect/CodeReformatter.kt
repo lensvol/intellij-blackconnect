@@ -165,6 +165,7 @@ open class CodeReformatter(project: Project) {
             fastMode = configuration.fastMode,
             skipStringNormalization = configuration.skipStringNormalization,
             skipMagicTrailingComma = configuration.skipMagicTrailingComma,
+            previewMode = configuration.previewMode,
             targetPythonVersions = if (configuration.targetSpecificVersions) configuration.pythonTargets else "",
             connectTimeout = connectTimeout,
             readTimeout = readTimeout,
