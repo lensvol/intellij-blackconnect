@@ -53,7 +53,6 @@ import kotlin.io.path.isExecutable
 const val PATH_FIELD_RIGHT_INSET = 36
 const val SERVER_SETTINGS_DELIMETER_WIDTH = 6
 
-@Suppress("MagicNumber")
 class LocalDaemonSection(val project: Project) : ConfigSection(project) {
     private val startLocalServerCheckbox = JCheckBox("Start local blackd instance when plugin loads")
     private val remotePortModel = SpinnerNumberModel(DEFAULT_BLACKD_PORT, 1, 65535, 1)
