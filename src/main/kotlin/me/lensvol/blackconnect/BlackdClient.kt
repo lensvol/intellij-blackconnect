@@ -17,6 +17,35 @@ sealed class BlackdResponse {
     data class UnknownStatus(val code: Int, val responseText: String) : BlackdResponse()
 }
 
+data class BlackVersion(val major: Int, val minor: Int, val patch: Int) : Comparable<BlackVersion> {
+    companion object {
+        fun parse(versionString: String): BlackVersion {
+            val parts = versionString
+                .trim()
+                .split(".", "b")
+                .map(String::toInt)
+
+            if (parts.size < 3) {
+                return BlackVersion(0, 0, 0)
+            }
+
+            return BlackVersion(parts[0], parts[1], parts[2])
+        }
+    }
+    override fun compareTo(other: BlackVersion): Int {
+        if (this.major < other.major) return -1
+        if (this.major > other.major) return 1
+
+        if (this.minor < other.major) return -1
+        if (this.minor > other.major) return 1
+
+        if (this.patch < other.patch) return -1
+        if (this.patch > other.patch) return 1
+
+        return 0
+    }
+}
+
 class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
     private val logger = Logger.getInstance(BlackdClient::class.java.name)
     private val protocol = if (useSsl) "https" else "http"
@@ -115,14 +144,12 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
                     os.write(input, 0, input.size)
                 }
 
-                val versionParts = getHeaderField("X-Black-Version").split('.')
-                if (previewMode && (
-                        versionParts[0].toInt() < 22 || versionParts[0].toInt() == 22 && versionParts[1].toInt() < 8)
-                ) {
-                    Failure("The version of <b>blackd</b> you are using does not support the 'preview' option.")
+                val blackdVersion = BlackVersion.parse(getHeaderField("X-Black-Version").orEmpty())
+                if (previewMode && blackdVersion < BlackVersion(22, 8, 0)) {
+                    Failure("The version of <b>blackd</b> you are using does not support the '--preview' option.")
+                } else {
+                    Success(parseBlackdResponse(this))
                 }
-
-                Success(parseBlackdResponse(this))
             } catch (e: IOException) {
                 Failure(retrieveIoExceptionMessage(e))
             }
