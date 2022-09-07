@@ -38,7 +38,7 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
     private val skipStringNormalCheckbox = JCheckBox("Skip string normalization")
     private val skipMagicTrailingCommaCheckbox = JCheckBox("Don't use trailing commas as a reason to split lines")
     private val previewModeCheckbox = JCheckBox(
-        "Enable potentially disruptive style changes ('--preview' option, requires black>=22.8.0)"
+        "Enable preview of potentially disruptive style changes"
     )
     private val targetSpecificVersionsCheckbox = JCheckBox("Target specific Python versions")
 
