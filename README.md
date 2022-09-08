@@ -7,8 +7,6 @@
 [![Code Coverage](https://codecov.io/gh/lensvol/intellij-blackconnect/branch/master/graph/badge.svg)](https://codecov.io/gh/lensvol/intellij-blackconnect)
 [![License](https://img.shields.io/github/license/lensvol/intellij-blackconnect)](https://github.com/lensvol/intellij-blackconnect/blob/master/LICENSE)
 
-**NB**: *If you want to see this plugin as an official way to use **black** with PyCharm - feel free to voice your support in [this Pull Request](https://github.com/psf/black/pull/3150)!*
-
 Simple plugin for IDEA intended to help you to avoid overhead from starting [black](https://github.com/psf/black) process each time you save a Python file.
 
 Instead, on each press of `Alt + Shift + B` plugin will send contents of the current Python file to the [blackd](https://black.readthedocs.io/en/stable/blackd.html) and replace them with the formatted version (if any changes were made at all).
@@ -17,7 +15,7 @@ Instead, on each press of `Alt + Shift + B` plugin will send contents of the cur
 
 * Ability to trigger on each file save.
 * Integration with the "Reformat Code" function.
-* Start <b>blackd</b> when IDE opens.
+* Start **blackd** when IDE opens.
 * Automatic handling of Python type stubs (`.pyi`).
 * Rough support for Jupyter Notebook files.
 * Ability to reformat selected fragment only instead of whole file.
