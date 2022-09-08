@@ -23,7 +23,8 @@ data class BlackVersion(val major: Int, val minor: Int, val patch: Int) : Compar
             val parts = versionString
                 .trim()
                 .split(".", "b")
-                .map(String::toInt)
+                .mapNotNull(String::toIntOrNull)
+                .filter { it >= 0 }
 
             if (parts.size < 3) {
                 return BlackVersion(0, 0, 0)
