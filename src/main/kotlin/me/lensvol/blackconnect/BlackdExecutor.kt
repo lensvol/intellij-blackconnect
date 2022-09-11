@@ -2,6 +2,7 @@ package me.lensvol.blackconnect
 
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.process.OSProcessUtil
+import com.intellij.execution.process.ProcessNotCreatedException
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.diagnostic.Logger
@@ -54,6 +55,8 @@ class BlackdExecutor : Disposable {
                 val reason = spawnedProcess.errorStream.bufferedReader().use(BufferedReader::readText)
                 return ExecutionResult.Failed(reason)
             }
+        } catch (e: ProcessNotCreatedException) {
+            return ExecutionResult.Failed(e.message ?: "Process could not be started")
         } catch (e: IOException) {
             return ExecutionResult.Failed(e.message ?: "Unknown IO error")
         } catch (e: ExecutionException) {

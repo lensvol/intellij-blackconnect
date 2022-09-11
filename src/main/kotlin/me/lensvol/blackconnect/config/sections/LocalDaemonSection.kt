@@ -213,20 +213,29 @@ class LocalDaemonSection(val project: Project) : ConfigSection(project) {
         }
 
         startDaemonButton.addActionListener {
-            thread {
-                val executionResult = blackdExecutor.startDaemon(
-                    blackdExecutableChooser.text,
-                    bindOnHostnameText.text,
-                    localPortSpinner.value as Int
-                )
+            try {
+                validate()
 
-                if (executionResult is ExecutionResult.Failed) {
-                    invokeLater(modalityState = ModalityState.any()) {
-                        AdditionalInformationDialog(project, executionResult.reason).show()
+                thread {
+                    val executionResult = blackdExecutor.startDaemon(
+                        blackdExecutableChooser.text,
+                        bindOnHostnameText.text,
+                        localPortSpinner.value as Int
+                    )
+
+                    if (executionResult is ExecutionResult.Failed) {
+                        invokeLater(modalityState = ModalityState.any()) {
+                            AdditionalInformationDialog(project, executionResult.reason).show()
+                        }
                     }
-                }
 
-                updateRunStateUI()
+                    updateRunStateUI()
+                }
+            } catch (e: ConfigurationException) {
+                Messages.showErrorDialog(
+                    e.message ?: "Oops.",
+                    "Binary Path Validation Failed"
+                )
             }
         }
 
