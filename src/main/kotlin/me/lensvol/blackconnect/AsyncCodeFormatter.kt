@@ -4,6 +4,7 @@ import com.intellij.formatting.service.AsyncDocumentFormattingService
 import com.intellij.formatting.service.AsyncFormattingRequest
 import com.intellij.formatting.service.FormattingService
 import com.intellij.openapi.components.service
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationManager
@@ -29,7 +30,7 @@ class AsyncCodeFormatter: AsyncDocumentFormattingService() {
                 val ranges = formattingRequest.formattingRanges.toMutableList()
                 ranges.sortByDescending { range -> range.endOffset }
                 ranges.map { range ->
-                    val sliceRange = IntRange(range.startOffset, range.endOffset)
+                    val sliceRange = IntRange(range.startOffset, range.endOffset - 1)
                     val response = formatter.reformatFragment(
                         source.slice(sliceRange),
                         formattingRequest.ioFile?.name?.endsWith("pyi") ?: false
