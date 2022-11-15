@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.intellij") version "1.5.2"
+    id("org.jetbrains.intellij") version "1.9.0"
     jacoco
 
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
