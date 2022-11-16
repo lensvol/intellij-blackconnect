@@ -37,8 +37,8 @@ data class BlackVersion(val major: Int, val minor: Int, val patch: Int) : Compar
         if (this.major < other.major) return -1
         if (this.major > other.major) return 1
 
-        if (this.minor < other.major) return -1
-        if (this.minor > other.major) return 1
+        if (this.minor < other.minor) return -1
+        if (this.minor > other.minor) return 1
 
         if (this.patch < other.patch) return -1
         if (this.patch > other.patch) return 1
