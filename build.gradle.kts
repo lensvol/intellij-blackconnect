@@ -19,7 +19,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.moandjiezana.toml:toml4j:0.7.2")
 
-    testImplementation("org.mock-server:mockserver-netty:5.3.0") {
+    testImplementation("org.mock-server:mockserver-netty:5.14.0") {
         exclude(group = "ch.qos.logback")
     }
 
