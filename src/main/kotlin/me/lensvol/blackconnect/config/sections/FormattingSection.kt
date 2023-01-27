@@ -51,7 +51,8 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         "py37" to "3.7",
         "py38" to "3.8",
         "py39" to "3.9",
-        "py310" to "3.10"
+        "py310" to "3.10",
+        "py311" to "3.11"
     )
 
     private val versionCheckboxes = linkedMapOf<String, JCheckBox>().apply {
