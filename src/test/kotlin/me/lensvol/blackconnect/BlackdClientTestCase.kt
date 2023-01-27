@@ -21,7 +21,6 @@ class BlackdClientTestCase : BlackConnectTestCase() {
         mockServer.close()
         super.tearDown()
     }
-
     @Test
     fun test_windows_newlines_are_replaced_in_blackd_response() {
         mockServer.apply {
@@ -45,6 +44,71 @@ class BlackdClientTestCase : BlackConnectTestCase() {
 
         val blackenedCode = response.value as BlackdResponse.Blackened
         Assert.assertFalse(blackenedCode.sourceCode.contains("\r\n"))
+    }
+
+    @Test
+    fun test_python311_support_errors_out_on_less_22_6() {
+        mockServer.apply {
+            this.`when`(
+                HttpRequest.request()
+                    .withMethod("POST")
+                    .withPath("/")
+            ).respond(
+                HttpResponse.response()
+                    .withStatusCode(200)
+                    .withHeader("X-Black-Version", "22.3.0")
+                    .withBody("with function(x) as f:\r\n    pass")
+            )
+        }
+
+        val blackdClient = BlackdClient("localhost", 45484)
+        val response = blackdClient.reformat("with function(x) as f:\r\n    pass", targetPythonVersions = "py311")
+
+        Assert.assertTrue(response is Failure)
+        Assert.assertTrue((response as Failure).reason.contains("Python 3.11"))
+    }
+
+    @Test
+    fun test_python311_support_is_okay_on_more_22_6() {
+        mockServer.apply {
+            this.`when`(
+                HttpRequest.request()
+                    .withMethod("POST")
+                    .withPath("/")
+            ).respond(
+                HttpResponse.response()
+                    .withStatusCode(200)
+                    .withHeader("X-Black-Version", "22.6.0")
+                    .withBody("with function(x) as f:\r\n    pass")
+            )
+        }
+
+        val blackdClient = BlackdClient("localhost", 45484)
+        val response = blackdClient.reformat("with function(x) as f:\r\n    pass", targetPythonVersions = "py311")
+
+        Assert.assertTrue(response is Success)
+    }
+
+    @Test
+    fun test_python311_support_is_checked_upon_request() {
+        mockServer.apply {
+            this.`when`(
+                HttpRequest.request()
+                    .withMethod("POST")
+                    .withPath("/")
+            ).respond(
+                HttpResponse.response()
+                    .withStatusCode(200)
+                    .withHeader("X-Black-Version", "22.3.0")
+                    .withBody("with function(x) as f:\r\n    pass")
+            )
+        }
+
+        val blackdClient = BlackdClient("localhost", 45484)
+        val response = blackdClient.reformat("with function(x) as f:\r\n    pass", targetPythonVersions = "py311")
+
+        Assert.assertTrue(response is Failure)
+        Assert.assertTrue((response as Failure).reason.contains("Python 3.11"))
     }
 
     @Test
