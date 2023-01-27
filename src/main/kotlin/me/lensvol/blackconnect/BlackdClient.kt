@@ -147,7 +147,7 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
 
                 val blackdVersion = BlackVersion.parse(getHeaderField("X-Black-Version").orEmpty())
 
-                if (targetPythonVersions.contains("py3.11") && blackdVersion < BlackVersion(22, 6, 0)) {
+                if (targetPythonVersions.contains("py311") && blackdVersion < BlackVersion(22, 6, 0)) {
                     return Failure("This <b>blackd</b> version does not support Python 3.11")
                 }
 
