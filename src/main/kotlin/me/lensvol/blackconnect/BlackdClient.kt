@@ -156,7 +156,6 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
                 } else {
                     return Success(parseBlackdResponse(this))
                 }
-
             } catch (e: IOException) {
                 Failure(retrieveIoExceptionMessage(e))
             }
