@@ -176,7 +176,7 @@ open class CodeReformatter(project: Project) {
 
         return when (result) {
             is Failure -> {
-                notificationService.showError("Failed to reformat code:<br><br>${result.reason}")
+                notificationService.showError(result.reason)
                 null
             }
             is Success -> {

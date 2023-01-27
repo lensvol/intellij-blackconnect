@@ -38,6 +38,7 @@ open class NotificationManager(project: Project) {
 
         newNotification
             .setTitle("BlackConnect")
+            .setImportant(true)
             .whenExpired { shownErrorNotifications.remove(newNotification) }
 
         additionalInfo?.let {
