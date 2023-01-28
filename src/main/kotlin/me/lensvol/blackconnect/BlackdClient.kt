@@ -146,10 +146,15 @@ class BlackdClient(hostname: String, port: Int, useSsl: Boolean = false) {
                 }
 
                 val blackdVersion = BlackVersion.parse(getHeaderField("X-Black-Version").orEmpty())
+
+                if (targetPythonVersions.contains("py311") && blackdVersion < BlackVersion(22, 6, 0)) {
+                    return Failure("This <b>blackd</b> version does not support Python 3.11")
+                }
+
                 if (previewMode && blackdVersion < BlackVersion(22, 8, 0)) {
-                    Failure("The version of <b>blackd</b> you are using does not support the '--preview' option.")
+                    return Failure("This <b>blackd</b> version does not support the <i>--preview</i> option.")
                 } else {
-                    Success(parseBlackdResponse(this))
+                    return Success(parseBlackdResponse(this))
                 }
             } catch (e: IOException) {
                 Failure(retrieveIoExceptionMessage(e))
