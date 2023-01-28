@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "me.lensvol"
-version = "0.5.0"
+version = "0.6.0"
 
 repositories {
     jcenter()
@@ -41,6 +41,16 @@ intellij {
 tasks.patchPluginXml {
     changeNotes.set(
         """
+      <p>0.6.0</p>
+      <p>Releases that are long overdue are becoming my jam! Oh, well.</p>
+
+      <ul>
+        <li>Support for targeting Python 3.11</li>
+        <li>Support for <i>--preview</i> option.</li>
+        <li>Perform validation before running our own <b>blackd</b> instance (h/t to <b>@KotlinIsland</b>).</li>
+        <li>Fix rare cases when indentation gets broken during reformatting (h/t to <b>@shanx</b>)</li> 
+      </ul>
+
       <p>0.5.0</p>
       <p>Well, that one was long overdue. The groundwork for starting <b>blackd</b> from inside the plugin was
       done more than a year ago, but alas - mental health is a fickle thing and burnout is no laughing matter.
@@ -54,37 +64,6 @@ tasks.patchPluginXml {
       <ul>
         <li>Support starting <b>blackd</b> when the plugin starts.</li>
         <li>Lower IDE compatibility bound is now 2021.1.3.</li> 
-      </ul>
-            
-      <p>0.4.6</p>
-      <p>A small release to tide you over till bigger features ship.</p>
-      <ul>
-        <li>Support 3.10 as a target version. (kudos to <a href="https://github.com/lxop">Alex Opie
-</a>)</li>
-        <li>Fix broken link to <b>blackd</b> documentation in plugin description.</li>
-      </ul>
-
-      <p>0.4.5</p>
-      <ul>      
-        <li>Support new '--skip-magic-trailing-comma' option.</li>
-        <li>Support Python 3.9 as target version.</li>
-        <li>Added "Trigger on Code Reformat" option (kudos to <a href="https://github.com/vlasovskikh">Andrey Vlasovskikh</a>).</li>
-        <li>Fix rare crash when saving non-Python files with Jupyter support enabled (kudos to <a href="
-https://github.com/elliotwaite">Elliot Waite</a>).</li>
-        <li>Fix for rare crash when updating document during Undo/Redo operation.</li>
-      </ul>
-
-      <p>0.4.4</p>
-      <br>
-      <p>This release is dedicated to the memory of our cat <b>Luna</b>, who passed away due to cancer last year.</p><br>
-      <p>She was kind, smart and loyal. Best cat in the world.</p><br>
-      <p><b>We miss you, girl.</b></p>
-      <br>
-      <ul>
-        <li>Add button to copy line length settings from the IDE ("right margin").</li>
-        <li>Support for connecting to blackd over SSL (kudos to <a href="https://github.com/studioj">studioj</a>)</li>
-        <li>Make server error notifications more descriptive.</li>
-        <li>Miscellaneous fixes and improvements.</li>
       </ul>
       """
     )
