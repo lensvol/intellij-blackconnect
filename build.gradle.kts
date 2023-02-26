@@ -83,7 +83,7 @@ tasks.publishPlugin {
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+    toolVersion = "0.8.8"
 }
 
 tasks.jacocoTestReport {
@@ -92,6 +92,15 @@ tasks.jacocoTestReport {
         html.required.set(true)
     }
 }
+
+tasks {
+    withType<Test> {
+        configure<JacocoTaskExtension> {
+            isIncludeNoLocationClasses = true
+            excludes = listOf("jdk.internal.*")
+        }
+    }
+ }
 
 detekt {
     config = files("./detekt-config.yml")
