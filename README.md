@@ -5,6 +5,7 @@
 [![Plugin rating](https://img.shields.io/jetbrains/plugin/r/rating/14321-blackconnect)](https://plugins.jetbrains.com/plugin/14321-blackconnect/reviews)
 [![Build status](https://github.com/lensvol/intellij-blackconnect/workflows/build/badge.svg)](https://github.com/lensvol/intellij-blackconnect/actions?query=workflow%3Abuild) 
 [![Code Coverage](https://codecov.io/gh/lensvol/intellij-blackconnect/branch/master/graph/badge.svg)](https://codecov.io/gh/lensvol/intellij-blackconnect)
+[![Qodana](https://github.com/lensvol/intellij-blackconnect/actions/workflows/run_qodana.yaml/badge.svg)](https://github.com/lensvol/intellij-blackconnect/actions/workflows/run_qodana.yaml)
 [![License](https://img.shields.io/github/license/lensvol/intellij-blackconnect)](https://github.com/lensvol/intellij-blackconnect/blob/master/LICENSE)
 
 Simple plugin for IDEA intended to help you to avoid overhead from starting [black](https://github.com/psf/black) process each time you save a Python file.
