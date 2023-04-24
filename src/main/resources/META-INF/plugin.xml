@@ -30,7 +30,7 @@
     <p><b>Steps to use:</b></p>
     <ol>
       <li><b>pip install black[d]</b></li>
-      <li>Start <b>blackd</b> daemon.</li>
+      <li>Start <b>blackd</b> daemon or enable autostart option.</li>
       <li>Press "Alt + Shift + B" to reformat your code...<br>...or enable "on file save" option.</li>
       <li>Enjoy!</li>
     </ol>
