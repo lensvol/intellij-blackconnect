@@ -101,7 +101,13 @@ open class CodeReformatter(project: Project) {
 
     private fun extractIndent(codeFragment: String): Pair<FragmentFormatting, String> {
         val builder = StringBuilder()
-        val firstLine = codeFragment.lines().dropWhile { it.isBlank() }.first()
+        val firstLine = codeFragment.lines().dropWhile { it.isBlank() }.firstOrNull()
+        if (firstLine == null) {
+            return Pair(
+                FragmentFormatting("", "", "", codeFragment.endsWith("\n")),
+                codeFragment
+            )
+        }
         val indentLen = firstLine.indexOfFirst { !it.isWhitespace() }.let { if (it == -1) firstLine.length else it }
         val indentString = "".padStart(indentLen)
 

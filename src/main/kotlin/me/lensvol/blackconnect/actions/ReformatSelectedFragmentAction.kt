@@ -40,9 +40,15 @@ class ReformatSelectedFragmentAction : AnAction(), DumbAware {
             primaryCaret.selectionEnd
         }
 
+        val fragment = editor.document.getText(TextRange.create(selectionStart, selectionEnd))
+        val allLinesBlank = fragment.lines().all { it -> it.isBlank() }
+        if (allLinesBlank) {
+            logger.debug("Not reformatting fragment due to it being filled with blank lines.")
+            return
+        }
+
         logger.debug("Reformatting fragment $selectionStart-$selectionStart of '$fileName'")
 
-        val fragment = editor.document.getText(TextRange.create(selectionStart, selectionEnd))
         codeReformatter.processFragment(fileName, fragment, fileName.endsWith(".pyi")) { response ->
             when (response) {
                 is BlackdResponse.Blackened -> {
