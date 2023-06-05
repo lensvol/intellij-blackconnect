@@ -3,7 +3,7 @@
 [![Plugin version](https://img.shields.io/jetbrains/plugin/v/14321-blackconnect)](https://plugins.jetbrains.com/plugin/14321-blackconnect/versions) 
 [![Total downloads](https://img.shields.io/jetbrains/plugin/d/14321-blackconnect)](https://plugins.jetbrains.com/plugin/14321-blackconnect) 
 [![Plugin rating](https://img.shields.io/jetbrains/plugin/r/rating/14321-blackconnect)](https://plugins.jetbrains.com/plugin/14321-blackconnect/reviews)
-[![Build status](https://github.com/lensvol/intellij-blackconnect/workflows/build/badge.svg)](https://github.com/lensvol/intellij-blackconnect/actions?query=workflow%3Abuild) 
+[![Build plugin](https://github.com/lensvol/intellij-blackconnect/actions/workflows/build_plugin.yaml/badge.svg?branch=master)](https://github.com/lensvol/intellij-blackconnect/actions/workflows/build_plugin.yaml)
 [![Code Coverage](https://codecov.io/gh/lensvol/intellij-blackconnect/branch/master/graph/badge.svg)](https://codecov.io/gh/lensvol/intellij-blackconnect)
 [![Qodana](https://github.com/lensvol/intellij-blackconnect/actions/workflows/run_qodana.yaml/badge.svg)](https://github.com/lensvol/intellij-blackconnect/actions/workflows/run_qodana.yaml)
 [![License](https://img.shields.io/github/license/lensvol/intellij-blackconnect)](https://github.com/lensvol/intellij-blackconnect/blob/master/LICENSE)
