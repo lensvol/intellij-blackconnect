@@ -14,6 +14,7 @@ import com.intellij.ui.IdeBorderFactory
 import com.intellij.util.ui.FormBuilder
 import com.intellij.util.ui.JBUI
 import com.moandjiezana.toml.Toml
+import me.lensvol.blackconnect.Constants
 import me.lensvol.blackconnect.config.DEFAULT_LINE_LENGTH
 import me.lensvol.blackconnect.config.PYPROJECT_TOML
 import me.lensvol.blackconnect.settings.BlackConnectGlobalSettings
@@ -23,11 +24,7 @@ import java.awt.Component
 import java.awt.FlowLayout
 import java.io.BufferedReader
 import java.util.Collections
-import javax.swing.JButton
-import javax.swing.JCheckBox
-import javax.swing.JPanel
-import javax.swing.JSpinner
-import javax.swing.SpinnerNumberModel
+import javax.swing.*
 
 class FormattingSection(private val project: Project) : ConfigSection(project) {
 
@@ -60,6 +57,9 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             this.put("py$version", JCheckBox(version))
         }
     }
+
+    private val extendExcludeArea = JTextArea(Constants.DEFAULT_EXTEND_EXCLUDE)
+    private val forceExcludeArea = JTextArea(Constants.DEFAULT_FORCE_EXCLUDE)
 
     override val panel: JPanel by lazy { createPanel() }
 
@@ -109,6 +109,8 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         skipMagicTrailingCommaCheckbox.isSelected = blackSettings.getBoolean("skip-magic-trailing-comma", false)
         previewModeCheckbox.isSelected = blackSettings.getBoolean("preview", false)
         fastModeCheckbox.isSelected = blackSettings.getBoolean("fast", false)
+        extendExcludeArea.text = blackSettings.getString("extend-exclude", "")
+        forceExcludeArea.text = blackSettings.getString("force-exclude", "")
     }
 
     private fun createPanel(): JPanel {
@@ -142,6 +144,8 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
                     .addComponent(previewModeCheckbox)
                     .addComponent(targetSpecificVersionsCheckbox)
                     .addComponent(targetVersionsPanel)
+                    .addLabeledComponent("Extend exclude:", extendExcludeArea)
+                    .addLabeledComponent("Force exclude:", forceExcludeArea)
                     .addComponent(loadPyprojectTomlButton)
                     .panel,
                 BorderLayout.NORTH
@@ -198,6 +202,8 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         skipStringNormalCheckbox.isSelected = projectConfig.skipStringNormalization
         skipMagicTrailingCommaCheckbox.isSelected = projectConfig.skipMagicTrailingComma
         previewModeCheckbox.isSelected = projectConfig.previewMode
+        extendExcludeArea.text = projectConfig.extendExclude
+        forceExcludeArea.text = projectConfig.forceExclude
 
         projectConfig.pythonTargets.split(",").forEach { version ->
             versionCheckboxes[version]?.isSelected = true
@@ -226,6 +232,8 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
         projectConfig.previewMode = previewModeCheckbox.isSelected
         projectConfig.targetSpecificVersions = targetSpecificVersionsCheckbox.isSelected
         projectConfig.pythonTargets = generateVersionSpec()
+        projectConfig.extendExclude = extendExcludeArea.text
+        projectConfig.forceExclude = forceExcludeArea.text
     }
 
     override fun isModified(
@@ -238,6 +246,8 @@ class FormattingSection(private val project: Project) : ConfigSection(project) {
             skipMagicTrailingCommaCheckbox.isSelected != projectConfig.skipMagicTrailingComma ||
             previewModeCheckbox.isSelected != projectConfig.previewMode ||
             targetSpecificVersionsCheckbox.isSelected != projectConfig.targetSpecificVersions ||
-            generateVersionSpec() != projectConfig.pythonTargets
+            generateVersionSpec() != projectConfig.pythonTargets ||
+            extendExcludeArea.text != projectConfig.extendExclude ||
+            forceExcludeArea.text != projectConfig.forceExclude
     }
 }

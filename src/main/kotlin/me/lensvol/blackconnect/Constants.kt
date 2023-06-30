@@ -3,6 +3,8 @@ package me.lensvol.blackconnect
 object Constants {
     const val DEFAULT_BLACKD_PORT = 45484
     const val DEFAULT_LINE_LENGTH = 88
+    const val DEFAULT_EXTEND_EXCLUDE = ""
+    const val DEFAULT_FORCE_EXCLUDE = ""
     const val DEFAULT_HOST_BINDING = "localhost"
     const val DEFAULT_USE_SSL = false
 
