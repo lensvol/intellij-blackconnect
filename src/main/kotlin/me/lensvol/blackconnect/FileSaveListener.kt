@@ -9,6 +9,8 @@ import com.intellij.openapi.project.Project
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 
+import kotlin.io.path.Path
+
 class FileSaveListener(project: Project) : FileDocumentManagerListener {
     private val currentProject: Project = project
     private val codeReformatter = project.service<CodeReformatter>()
@@ -28,8 +30,9 @@ class FileSaveListener(project: Project) : FileDocumentManagerListener {
         one of the modules in project associated with this instance.
          */
         ModuleUtil.findModuleForFile(vFile, currentProject) ?: return
+        val relativeFilePath = Path(currentProject.basePath as String).relativize(Path(vFile.path)).toString()
         if (codeReformatter.isFileSupported(vFile)) {
-            ReformatWholeFileAction.reformatWholeDocument(vFile.name, currentProject, document)
+            ReformatWholeFileAction.reformatWholeDocument(vFile.name, currentProject, document, relativeFilePath)
         }
     }
 }

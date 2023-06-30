@@ -16,21 +16,35 @@ import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.DocumentUtil
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 import me.lensvol.blackconnect.ui.NotificationManager
+import kotlin.io.path.Path
 
 class ReformatWholeFileAction : AnAction(), DumbAware {
     companion object {
         private val logger = Logger.getInstance(ReformatWholeFileAction::class.java.name)
 
+        fun file_in_excludes(configuration: BlackConnectProjectSettings, fileName: String): Boolean {
+            // blackd doesn't support excludes in their headers, so copying the logic from black.
+            // Unfortunately as well, re.VERBOSE from python does not exist in kotlin as 1:1.
+            // So approximating with the two RegexOptions.
+            val extendRegex = Regex(configuration.extendExclude, setOf(RegexOption.COMMENTS, RegexOption.MULTILINE))
+            val forceRegex = Regex(configuration.forceExclude, setOf(RegexOption.COMMENTS, RegexOption.MULTILINE))
+            return extendRegex.matches(fileName) || forceRegex.matches(fileName)
+        }
+
         fun reformatWholeDocument(
             fileName: String,
             project: Project,
-            document: Document
+            document: Document,
+            projectRelativeFilePath: String,
         ) {
             val configuration = BlackConnectProjectSettings.getInstance(project)
             val codeReformatter = project.service<CodeReformatter>()
             val notificationService = project.service<NotificationManager>()
             val documentUtil = project.service<DocumentUtil>()
 
+            if (file_in_excludes(configuration,projectRelativeFilePath)) {
+                return
+            }
             codeReformatter.process(
                 fileName,
                 document.text,
@@ -96,7 +110,9 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
 
         val vFile: VirtualFile? = FileDocumentManager.getInstance().getFile(editor.document)
         val fileName = vFile?.name ?: "unknown"
-        reformatWholeDocument(fileName, project, editor.document)
+        // Would cause an issue if "unknown" is in the exclude list.
+        val relativeFilePath = Path(project.basePath as String).relativize(Path(vFile?.path ?: "unknown")).toString()
+        reformatWholeDocument(fileName, project, editor.document, relativeFilePath)
     }
 
     override fun update(event: AnActionEvent) {

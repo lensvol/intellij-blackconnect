@@ -3,14 +3,14 @@
   <ManuallySuppressedIssues></ManuallySuppressedIssues>
   <CurrentIssues>
     <ID>EmptyFunctionBlock:SmokeTestCase.kt$SmokeTestCase${}</ID>
-    <ID>LongParameterList:BlackdClient.kt$BlackdClient$( sourceCode: String, pyi: Boolean = false, lineLength: Int = 88, fastMode: Boolean = false, skipStringNormalization: Boolean = false, targetPythonVersions: String = "" )</ID>
+    <ID>LongParameterList:BlackdClient.kt$BlackdClient$( sourceCode: String, pyi: Boolean = false, lineLength: Int = 88, fastMode: Boolean = false, skipStringNormalization: Boolean = false, targetPythonVersions: String = "", extendExclude: String = "", forceExclude: String = "" )</ID>
     <ID>MagicNumber:ConnectionSection.kt$ConnectionSection$6</ID>
     <ID>MagicNumber:ConnectionSection.kt$ConnectionSection$65535</ID>
     <ID>MagicNumber:FormattingSection.kt$FormattingSection$16</ID>
     <ID>MagicNumber:FormattingSection.kt$FormattingSection$255</ID>
     <ID>MagicNumber:FormattingSection.kt$FormattingSection$45</ID>
     <ID>ReturnCount:BlackdClient.kt$BlackdClient$fun checkConnection(): Result&lt;String, String&gt;</ID>
-    <ID>ReturnCount:BlackdClient.kt$BlackdClient$fun reformat( sourceCode: String, pyi: Boolean = false, lineLength: Int = 88, fastMode: Boolean = false, skipStringNormalization: Boolean = false, targetPythonVersions: String = "" ): Result&lt;BlackdResponse, Exception&gt;</ID>
+    <ID>ReturnCount:BlackdClient.kt$BlackdClient$fun reformat( sourceCode: String, pyi: Boolean = false, lineLength: Int = 88, fastMode: Boolean = false, skipStringNormalization: Boolean = false, targetPythonVersions: String = "", extendExclude: String = "", forceExclude: String = "" ): Result&lt;BlackdResponse, Exception&gt;</ID>
     <ID>ReturnCount:CodeReformatter.kt$CodeReformatter$private fun reformatWithBlackd( configuration: BlackConnectProjectSettings, sourceCode: String, isPyi: Boolean ): BlackdResponse?</ID>
     <ID>ReturnCount:FileSaveListener.kt$FileSaveListener$override fun beforeDocumentSaving(document: Document)</ID>
     <ID>ReturnCount:FormattingSection.kt$FormattingSection.&lt;no name provided&gt;$override fun isFileVisible(file: VirtualFile?, showHiddenFiles: Boolean): Boolean</ID>

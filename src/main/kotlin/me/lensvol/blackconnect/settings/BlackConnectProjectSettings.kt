@@ -31,6 +31,12 @@ class BlackConnectProjectSettings : PersistentStateComponent<BlackConnectProject
     var lineLength: Int = Constants.DEFAULT_LINE_LENGTH
 
     @Attribute
+    var extendExclude: String = Constants.DEFAULT_EXTEND_EXCLUDE
+
+    @Attribute
+    var forceExclude: String = Constants.DEFAULT_FORCE_EXCLUDE
+
+    @Attribute
     var fastMode: Boolean = false
 
     @Attribute
