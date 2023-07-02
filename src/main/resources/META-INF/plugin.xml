@@ -42,7 +42,7 @@
     </change-notes>
     -->
 
-    <idea-version since-build="211.7628.24"/>
+    <idea-version since-build="212.4746.92"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.lang</depends>
@@ -58,7 +58,6 @@
         <projectService serviceImplementation="me.lensvol.blackconnect.ui.NotificationManager"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.CodeReformatter"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.DocumentUtil"/>
-        <actionPromoter implementation="me.lensvol.blackconnect.actions.BeforeCloseTabActionPromoter"/>
     </extensions>
 
     <actions>
@@ -79,8 +78,6 @@
             </action>
             <add-to-group group-id="ToolsMenu" anchor="last"/>
         </group>
-        <action id="me.lensvol.blackconnect.actions.BeforeTabClosedAction" class="me.lensvol.blackconnect.actions.BeforeTabClosedAction"
-                use-shortcut-of="CloseContent"/>
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -93,6 +90,8 @@
     <projectListeners>
         <listener class="me.lensvol.blackconnect.FileSaveListener"
                   topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"/>
+        <listener class="me.lensvol.blackconnect.BeforeTabCloseActionListener"
+                  topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
     </projectListeners>
 
     <extensions defaultExtensionNs="com.intellij">
