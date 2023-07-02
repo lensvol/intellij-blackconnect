@@ -1,4 +1,4 @@
-package me.lensvol.blackconnect
+package me.lensvol.blackconnect.listeners
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Document
@@ -6,6 +6,7 @@ import com.intellij.openapi.fileEditor.FileDocumentManager
 import com.intellij.openapi.fileEditor.FileDocumentManagerListener
 import com.intellij.openapi.module.ModuleUtil
 import com.intellij.openapi.project.Project
+import me.lensvol.blackconnect.CodeReformatter
 import me.lensvol.blackconnect.actions.ReformatWholeFileAction
 import me.lensvol.blackconnect.settings.BlackConnectProjectSettings
 

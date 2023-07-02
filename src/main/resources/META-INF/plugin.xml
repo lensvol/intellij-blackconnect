@@ -88,9 +88,9 @@
     </extensions>
 
     <projectListeners>
-        <listener class="me.lensvol.blackconnect.FileSaveListener"
+        <listener class="me.lensvol.blackconnect.listeners.FileSaveListener"
                   topic="com.intellij.openapi.fileEditor.FileDocumentManagerListener"/>
-        <listener class="me.lensvol.blackconnect.BeforeTabCloseActionListener"
+        <listener class="me.lensvol.blackconnect.listeners.BeforeTabCloseActionListener"
                   topic="com.intellij.openapi.actionSystem.ex.AnActionListener"/>
     </projectListeners>
 
