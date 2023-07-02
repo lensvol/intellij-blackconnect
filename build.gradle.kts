@@ -128,7 +128,7 @@ tasks.compileTestKotlin {
 }
 
 tasks.runPluginVerifier {
-    ideVersions.set(listOf("2021.3", "2021.2", "2021.1.3"))
+    ideVersions.set(listOf("2023.1.3", "2022.3.3", "2021.3"))
 }
 
 tasks.test {
