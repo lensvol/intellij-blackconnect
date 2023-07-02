@@ -42,18 +42,12 @@ class PluginStartupActivity : StartupActivity, DumbAware {
                     globalSettings.bindOnPort
                 )
                 invokeLater {
-                    when (result) {
-                        is ExecutionResult.Started -> {}
-                        is ExecutionResult.AlreadyStarted -> {
-                            notificationManager.showInfo("<b>blackd</b> already started (PID: ${result.instance.pid})")
-                        }
-                        is ExecutionResult.Failed -> {
-                            notificationManager.showError("Failed to start <b>blackd</b> on " +
-                                "${globalSettings.bindOnHostname}:${globalSettings.bindOnPort}",
-                                additionalInfo = result.reason,
-                                viewPromptText = "View error"
-                            )
-                        }
+                    if (result is ExecutionResult.Failed) {
+                        notificationManager.showError("Failed to start <b>blackd</b> on " +
+                            "${globalSettings.bindOnHostname}:${globalSettings.bindOnPort}",
+                            additionalInfo = result.reason,
+                            viewPromptText = "View error"
+                        )
                     }
                 }
             }
