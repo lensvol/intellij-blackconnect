@@ -50,7 +50,9 @@
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable groupId="tools"
                              id="me.lensvol.blackconnect.settings"
-                             provider="me.lensvol.blackconnect.config.BlackConnectConfigurableProvider"/>
+                             provider="me.lensvol.blackconnect.config.BlackConnectConfigurableProvider"
+                             displayName="BlackConnect"
+        />
         <applicationService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectGlobalSettings"/>
         <applicationService serviceImplementation="me.lensvol.blackconnect.BlackdExecutor"/>
         <projectService serviceImplementation="me.lensvol.blackconnect.settings.BlackConnectProjectSettings"/>
