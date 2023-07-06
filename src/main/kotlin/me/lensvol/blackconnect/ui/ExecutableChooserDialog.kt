@@ -51,7 +51,9 @@ class ExecutableVariantsDialog(
     override fun createActions(): Array<Action> {
         return arrayOf(object : DialogWrapperExitAction("OK", OK_EXIT_CODE) {
             override fun doAction(e: ActionEvent?) {
-                resultHandler(variants[table.selectedRow])
+                if (table.selectedRow >= 0 && table.selectedRow < variants.size) {
+                    resultHandler(variants[table.selectedRow])
+                }
                 super.doAction(e)
             }
         })
