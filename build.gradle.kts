@@ -41,6 +41,18 @@ intellij {
 tasks.patchPluginXml {
     changeNotes.set(
         """
+      <p>0.6.1</p>
+      <p>Ain't no rest for the wicked, huh.</p>
+
+      <ul>
+        <li>Fix crash when no <b>blackd</b>> executable is chosen in the dialog window.</li>
+        <li>Fix exception appearing when you try to open Settings page in PyCharm EAP.</li>
+        <li>Fix crash when trying to reformat fragment consisting only of blank lines.</li>
+        <li>Fix plugin interfering with the <i>Ctrl-W</i> shortcut in IDEA.</li>
+        <li>Fix tab closure code taking too long in the event thread.</li>
+        <li>Remove superfluous <i>"<b>blackd</b> already started"</i> notification.</li>
+      </ul>            
+            
       <p>0.6.0</p>
       <p>Releases that are long overdue are becoming my jam! Oh, well.</p>
 
@@ -49,21 +61,6 @@ tasks.patchPluginXml {
         <li>Support for <i>--preview</i> option.</li>
         <li>Perform validation before running our own <b>blackd</b> instance (h/t to <b>@KotlinIsland</b>).</li>
         <li>Fix rare cases when indentation gets broken during reformatting (h/t to <b>@shanx</b>)</li> 
-      </ul>
-
-      <p>0.5.0</p>
-      <p>Well, that one was long overdue. The groundwork for starting <b>blackd</b> from inside the plugin was
-      done more than a year ago, but alas - mental health is a fickle thing and burnout is no laughing matter.
-      Funnily enough, it took being depressed from the ongoing world crisis to finally push me into
-      releasing this as a futile effort to allay my anxiety.</p>
-      
-      <p>Anyways, here it is. Go play with it, have fun, and come back with helpful suggestions.</p>
-      
-      <p>Stay safe. Stay sane.</p>
-      
-      <ul>
-        <li>Support starting <b>blackd</b> when the plugin starts.</li>
-        <li>Lower IDE compatibility bound is now 2021.1.3.</li> 
       </ul>
       """
     )
