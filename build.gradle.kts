@@ -41,11 +41,16 @@ intellij {
 tasks.patchPluginXml {
     changeNotes.set(
         """
-      <p>0.6.1</p>
+      <p><b>0.6.2</b></p>
+      <ul>
+        <li>Fix compatibility with PyCharm 2024.1+</li>
+      </ul>
+
+      <p><b>0.6.1</b></p>
       <p>Ain't no rest for the wicked, huh.</p>
 
       <ul>
-        <li>Fix crash when no <b>blackd</b>> executable is chosen in the dialog window.</li>
+        <li>Fix crash when no <b>blackd</b> executable is chosen in the dialog window.</li>
         <li>Fix exception appearing when you try to open Settings page in PyCharm EAP.</li>
         <li>Fix crash when trying to reformat fragment consisting only of blank lines.</li>
         <li>Fix plugin interfering with the <i>Ctrl-W</i> shortcut in IDEA.</li>
@@ -53,7 +58,7 @@ tasks.patchPluginXml {
         <li>Remove superfluous <i>"<b>blackd</b> already started"</i> notification.</li>
       </ul>            
             
-      <p>0.6.0</p>
+      <p><b>0.6.0</b></p>
       <p>Releases that are long overdue are becoming my jam! Oh, well.</p>
 
       <ul>
