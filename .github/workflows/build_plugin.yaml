@@ -31,7 +31,7 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         arguments: buildPlugin
-        gradle-version: "7.3"
+        gradle-version: "7.6"
 
     - name: Install Python for Test Dependencies
       uses: actions/setup-python@v2
@@ -47,4 +47,4 @@ jobs:
       uses: eskatos/gradle-command-action@v1
       with:
         arguments: check
-        gradle-version: "7.3"
+        gradle-version: "7.6"
