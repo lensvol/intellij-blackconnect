@@ -1,6 +1,7 @@
 package me.lensvol.blackconnect.actions
 
 import com.intellij.codeInsight.hint.HintManager
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.ApplicationManager
@@ -19,6 +20,10 @@ import me.lensvol.blackconnect.ui.NotificationManager
 
 class ReformatSelectedFragmentAction : AnAction(), DumbAware {
     private val logger = Logger.getInstance(ReformatSelectedFragmentAction::class.java.name)
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.EDT
+    }
 
     override fun actionPerformed(event: AnActionEvent) {
         val project = event.project ?: return

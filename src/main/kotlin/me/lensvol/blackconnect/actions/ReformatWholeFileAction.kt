@@ -1,5 +1,6 @@
 package me.lensvol.blackconnect.actions
 
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.PlatformDataKeys
@@ -88,6 +89,10 @@ class ReformatWholeFileAction : AnAction(), DumbAware {
                 }
             }
         }
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+        return ActionUpdateThread.BGT
     }
 
     override fun actionPerformed(event: AnActionEvent) {
