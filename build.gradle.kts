@@ -1,9 +1,9 @@
 plugins {
-    id("org.jetbrains.intellij") version "1.13.3"
+    id("org.jetbrains.intellij") version "1.17.2"
     jacoco
 
     id("io.gitlab.arturbosch.detekt") version "1.15.0"
-    kotlin("jvm") version "1.7.0"
+    kotlin("jvm") version "1.9.0"
 }
 
 group = "me.lensvol"
